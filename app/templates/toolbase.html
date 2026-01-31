@@ -56,6 +56,40 @@
         </div>
         {% endif %}
 
+        <!-- BULK IMPORT SECTION (Admin Only) -->
+        {% if is_admin %}
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted cursor-pointer"
+                data-bs-toggle="collapse" data-bs-target="#bulkImportCancel" aria-expanded="false"
+                style="cursor: pointer;">
+                <i class="fas fa-file-csv me-2"></i>Bulk Import Tools
+            </div>
+            <div class="collapse" id="bulkImportCancel">
+                <div class="card-body">
+                    <div class="alert alert-info py-2 small">
+                        <i class="fas fa-info-circle me-1"></i> Upload a CSV or Excel file with columns:
+                        <strong>Name, Link, Description</strong>.
+                    </div>
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ import_form.hidden_tag() }}
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-9">
+                                {{ import_form.file(class="form-control") }}
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-upload me-2"></i>Import
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
         <!-- TOOLS LIST -->
         <div class="card shadow-sm border-0">
             <div class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted">

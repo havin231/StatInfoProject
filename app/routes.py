@@ -2341,25 +2341,83 @@ def toolbase():
     # Guests and Students are allowed read-only access (fall-through)
         
     form = ToolForm()
+    # Task: Bulk Import Form (Reusing existing one)
+    import_form = BulkImportForm()
     
     # Only process form submission if user is admin
-    if is_admin and form.validate_on_submit():
-        new_tool = Tool(
-            title=form.title.data,
-            link=form.link.data,
-            description=form.description.data
-        )
-        try:
-            db.session.add(new_tool)
-            db.session.commit()
-            flash('New tool added successfully.', 'success')
-            return redirect(url_for('main.toolbase'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error adding tool: {str(e)}', 'danger')
+    if is_admin:
+        # A. SINGLE TOOL ADD
+        if form.validate_on_submit() and 'submit' in request.form:
+             # Check if this valid submission is from the manual form
+             # (Flask-WTF might validate both if fields overlap, but file field is unique)
+            if not form.link.data:
+                 # If link is missing but validation passed (odd case), skip
+                 pass
+            else:
+                new_tool = Tool(
+                    title=form.title.data,
+                    link=form.link.data,
+                    description=form.description.data
+                )
+                try:
+                    db.session.add(new_tool)
+                    db.session.commit()
+                    flash('New tool added successfully.', 'success')
+                    return redirect(url_for('main.toolbase'))
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f'Error adding tool: {str(e)}', 'danger')
+
+        # B. BULK IMPORT
+        if import_form.validate_on_submit() and 'file' in request.files:
+            uploaded_file = import_form.file.data
+            filename = uploaded_file.filename.lower()
+            
+            try:
+                # Read file
+                if filename.endswith('.csv'):
+                    df = pd.read_csv(uploaded_file)
+                else:
+                    df = pd.read_excel(uploaded_file)
+                
+                # Normalize headers
+                df.columns = [c.lower().strip() for c in df.columns]
+                
+                # Validate Headers (Name, Link) - Description is optional
+                if 'name' not in df.columns or 'link' not in df.columns:
+                    flash('Import Error: CSV must have "Name" and "Link" columns.', 'danger')
+                    return redirect(url_for('main.toolbase'))
+                
+                # Iterate and Add
+                count = 0
+                for _, row in df.iterrows():
+                    # Basic Validation
+                    t_title = str(row['name']).strip()
+                    t_link = str(row['link']).strip()
+                    t_desc = str(row.get('description', '')).strip()
+                    
+                    if t_title and t_link:
+                         # Optional: Check for duplicates or just add?
+                         # For now, we just add.
+                         new_tool = Tool(
+                             title=t_title,
+                             link=t_link,
+                             description=t_desc
+                         )
+                         db.session.add(new_tool)
+                         count += 1
+                
+                db.session.commit()
+                flash(f'Success! Imported {count} tools from file.', 'success')
+                return redirect(url_for('main.toolbase'))
+
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Import Failed: {str(e)}', 'danger')
             
     tools = Tool.query.order_by(desc(Tool.created_at)).all()
-    return render_template('toolbase.html', form=form, tools=tools, is_admin=is_admin)
+    # Pass both forms to template
+    return render_template('toolbase.html', form=form, import_form=import_form, tools=tools, is_admin=is_admin)
 
 @main.route('/toolbase/delete/<int:tool_id>', methods=['POST'])
 @login_required

@@ -92,8 +92,18 @@
 
         <!-- TOOLS LIST -->
         <div class="card shadow-sm border-0">
-            <div class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted">
-                Existing Tools
+            <div
+                class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted d-flex justify-content-between align-items-center">
+                <span>Existing Tools</span>
+                {% if is_admin and tools %}
+                <form action="{{ url_for('main.delete_all_tools') }}" method="POST"
+                    onsubmit="return confirm('WARNING: Are you sure you want to delete ALL tools? This cannot be undone.');">
+                    <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none p-0"
+                        style="font-size: 0.75rem;">
+                        <i class="fas fa-trash-alt me-1"></i>Delete All
+                    </button>
+                </form>
+                {% endif %}
             </div>
             <div class="list-group list-group-flush pt-2">
                 {% for tool in tools %}
@@ -105,16 +115,17 @@
                                 <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
-                        <div>
-                            <h6 class="fw-bold mb-0 text-highlight">
+                        <div style="min-width: 0;">
+                            <h6 class="fw-bold mb-0 text-highlight text-break">
                                 <a href="{{ tool.link }}" target="_blank" class="text-decoration-none text-reset">
                                     {{ tool.title }}
                                 </a>
                             </h6>
                             {% if tool.description %}
-                            <div class="text-muted small mt-1">{{ tool.description }}</div>
+                            <div class="text-muted small mt-1 text-break">{{ tool.description }}</div>
                             {% endif %}
-                            <small class="text-muted d-block mt-1 font-monospace" style="font-size: 0.75rem;">
+                            <small class="text-muted d-block mt-1 font-monospace text-break"
+                                style="font-size: 0.75rem;">
                                 {{ tool.link }}
                             </small>
                         </div>

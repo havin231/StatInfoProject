@@ -2435,3 +2435,24 @@ def delete_tool(tool_id):
         flash('Error deleting tool.', 'danger')
         
     return redirect(url_for('main.toolbase'))
+
+
+@main.route('/toolbase/delete_all', methods=['POST'])
+@login_required
+def delete_all_tools():
+    """
+    DELETE ALL TOOLS
+    """
+    if not current_user.is_admin:
+        abort(403)
+    
+    try:
+        # Delete all records in the Tool table
+        num_deleted = db.session.query(Tool).delete()
+        db.session.commit()
+        flash(f'All tools deleted! ({num_deleted} removed)', 'warning')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting all tools: {str(e)}', 'danger')
+        
+    return redirect(url_for('main.toolbase'))

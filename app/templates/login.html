@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Login{% endblock %}
+
+{% block content %}
+<!-- 
+    LAYOUT CONTAINER
+    Uses Flexbox to center the card vertically and horizontally.
+    min-height: 70vh ensures it sits in the middle of the viewport.
+-->
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-6 col-lg-4">
+
+        <!-- LOGIN CARD -->
+        <div class="card shadow-lg border-0">
+            <div class="card-body p-4 p-md-5">
+
+                <!-- Header Icon & Text -->
+                <div class="text-center mb-4">
+                    <div class="h1 text-highlight mb-3"><i class="fas fa-chalkboard-user"></i></div>
+                    <h2 class="h4 fw-bold">Teacher Access</h2>
+                    <p class="text-muted small">Secure Staff Portal</p>
+                </div>
+
+                <form method="POST" action="">
+                    <!-- CSRF Token (Required for security) -->
+                    {{ form.hidden_tag() }}
+
+                    <!-- Email Field -->
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-muted">Email Address</label>
+                        {% if form.email.errors %}
+                        {{ form.email(class="form-control is-invalid", placeholder="name@school.com") }}
+                        <div class="invalid-feedback">{{ form.email.errors[0] }}</div>
+                        {% else %}
+                        {{ form.email(class="form-control", placeholder="name@school.com") }}
+                        {% endif %}
+                    </div>
+
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold text-muted">Password</label>
+                        {% if form.password.errors %}
+                        {{ form.password(class="form-control is-invalid") }}
+                        <div class="invalid-feedback">{{ form.password.errors[0] }}</div>
+                        {% else %}
+                        {{ form.password(class="form-control") }}
+                        {% endif %}
+                    </div>
+
+                    <!-- Remember Me Checkbox -->
+                    <div class="mb-4 form-check">
+                        {{ form.remember(class="form-check-input") }}
+                        {{ form.remember.label(class="form-check-label small text-muted") }}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-lime btn-lg") }}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="card-footer bg-transparent text-center py-3 border-0">
+                <div class="d-grid gap-2">
+                    <a href="/student/login" class="btn btn-outline-secondary btn-sm d-md-none">
+                        <i class="fas fa-user-graduate me-2"></i>Login as Student
+                    </a>
+                    <a href="/" class="small text-muted text-decoration-none">← Return Home</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

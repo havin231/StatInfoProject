@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}{{ subject.name }}{% endblock %}
+
+{% block content %}
+<!--
+    HEADER SECTION
+    Contains Breadcrumbs for navigation and the Subject Title/Description.
+-->
+<div class="mb-4 border-bottom pb-3">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-2">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ subject.name }}</li>
+        </ol>
+    </nav>
+    <h1 class="display-5 fw-bold">{{ subject.name }}</h1>
+    <p class="lead text-muted">{{ subject.description }}</p>
+</div>
+
+<div class="row g-4">
+
+    <!-- LEFT COLUMN: STUDY MATERIALS (LECTURES) -->
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="h5 fw-bold text-uppercase text-muted mb-0">
+                <i class="fas fa-book-reader me-2"></i>Study Materials
+            </h3>
+        </div>
+
+        {% if subject.pages %}
+            <div class="list-group shadow-sm">
+                {% for page in subject.pages %}
+                <!-- Clickable Page Item -->
+                <a href="/subject/{{ subject.slug }}/page/{{ page.id }}" class="list-group-item list-group-item-action p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1 fw-bold text-highlight">{{ page.title }}</h5>
+                        <p class="mb-1 text-muted small">{{ page.content_body | striptags | truncate(80) }}</p>
+
+                        <!--
+                             FIX: Check 'page.resources' (List) instead of 'page.resource_link' (Old Column).
+                             If the list has items, show the badge.
+                        -->
+                        {% if page.resources %}
+                            <span class="badge bg-secondary-subtle text-secondary border mt-2">
+                                <i class="fas fa-paperclip me-1"></i> {{ page.resources|length }} Resource(s)
+                            </span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <i class="fas fa-chevron-right text-muted"></i>
+                    </div>
+                </a>
+
+                <!-- TEACHER EDIT CONTROLS (Only visible to authenticated staff) -->
+                {% if current_user.is_authenticated %}
+                <div class="bg-body-tertiary border-start border-end border-bottom p-2 text-end mb-3 rounded-bottom">
+                    <small class="text-muted me-2">Instructor Controls:</small>
+                    <a href="/teacher/edit/page/{{ page.id }}" class="btn btn-sm btn-outline-secondary py-0">Edit</a>
+                    <a href="/teacher/delete/page/{{ page.id }}" class="btn btn-sm btn-outline-danger py-0" onclick="return confirm('Delete this page?');">Delete</a>
+                </div>
+                {% endif %}
+
+                {% endfor %}
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="card border-dashed py-5 text-center">
+                <div class="text-muted h1"><i class="far fa-folder-open"></i></div>
+                <p class="text-muted">No study materials available yet.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- RIGHT COLUMN: EXAMS & TOOLS -->
+    <div class="col-lg-4">
+
+        <!-- EXAM CARD (Visible to Everyone) -->
+        <div class="card card-accent mb-4 shadow-sm">
+            <div class="card-body text-center p-4">
+                <div class="h1 text-danger mb-3"><i class="fas fa-clock"></i></div>
+                <h4 class="fw-bold">Class Exam</h4>
+
+                {% if subject.questions %}
+                    <p class="text-muted small mb-4">The exam is active. You will be graded immediately upon submission.</p>
+                    <div class="d-grid">
+                        <a href="/subject/{{ subject.slug }}/exam" class="btn btn-primary btn-lg">
+                            <i class="fas fa-pen-alt me-2"></i>Take Final Exam
+                        </a>
+                    </div>
+                {% else %}
+                    <p class="text-muted small">No exams available yet.</p>
+                    <button class="btn btn-secondary disabled w-100">Exam Closed</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- TEACHER ONLY: QUESTION BANK PREVIEW -->
+        {% if current_user.is_authenticated %}
+        <div class="card border-warning">
+            <div class="card-header bg-warning-subtle text-warning-emphasis fw-bold border-bottom-0">
+                <i class="fas fa-database me-2"></i>Question Bank
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for q in subject.questions[:5] %} <!-- Limit preview to 5 -->
+                    <div class="list-group-item">
+                        <p class="small mb-1 fw-bold text-truncate">{{ q.question_text }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="badge bg-success-subtle text-success border">Ans: {{ q.correct_answer }}</span>
+                            <!-- Show Lecture Tag if assigned -->
+                            {% if q.page_id %}
+                                <span class="badge bg-info-subtle text-info border" title="Lecture Specific">Lec</span>
+                            {% endif %}
+
+                            <div class="btn-group btn-group-sm">
+                                <a href="/teacher/edit/question/{{ q.id }}" class="btn btn-outline-secondary"><i class="fas fa-edit"></i></a>
+                                <a href="/teacher/delete/question/{{ q.id }}" class="btn btn-outline-danger" onclick="return confirm('Delete?');"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="p-3 text-center text-muted small">No questions yet.</div>
+                    {% endfor %}
+
+                    {% if subject.questions|length > 5 %}
+                    <div class="list-group-item text-center small text-muted fst-italic">
+                        ...and {{ subject.questions|length - 5 }} more
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+                <a href="/teacher/builder/exam?subject={{ subject.id }}" class="btn btn-sm btn-outline-warning w-100">
+                    <i class="fas fa-plus me-1"></i>Manage Questions (Bulk Editor)
+                </a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

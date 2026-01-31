@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Student Portal{% endblock %}
+
+{% block content %}
+<!--
+    LAYOUT CONTAINER
+    Vertically and horizontally centered card.
+-->
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-6 col-lg-4">
+
+        <div class="card shadow-lg border-0 card-accent">
+            <div class="card-body p-4 p-md-5">
+
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <div class="h1 text-primary mb-3"><i class="fas fa-user-graduate"></i></div>
+                    <h2 class="h4 fw-bold">Student Portal</h2>
+                    <p class="text-muted small">Enter your unique access code to continue.</p>
+                </div>
+
+                <!--
+                    CRITICAL FIX: action=""
+                    This tells the form to post back to the EXACT same URL,
+                    preserving any '?next=...' parameters for redirection.
+                -->
+                <form method="POST" action="">
+                    <!-- CSRF Token for Security -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                    <div class="mb-4">
+                        <label for="access_code" class="form-label small fw-bold text-muted">Access Code</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-body-tertiary"><i class="fas fa-key text-muted"></i></span>
+                            <!--
+                                Special styling for the Code Input:
+                                - font-monospace: Looks like code
+                                - text-uppercase: Forces caps visual
+                                - text-center: Centers the code
+                            -->
+                            <input type="text" name="access_code" id="access_code"
+                                class="form-control font-monospace text-uppercase fw-bold text-center"
+                                placeholder="XXX-0000" required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            Enter Classroom <i class="fas fa-sign-in-alt ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer Link -->
+            <div class="card-footer bg-transparent text-center py-3 border-0">
+                <div class="d-grid gap-2">
+                    <a href="/login" class="btn btn-outline-secondary btn-sm d-md-none">
+                        <i class="fas fa-chalkboard-user me-2"></i>Login as Teacher
+                    </a>
+                    <a href="/" class="small text-muted text-decoration-none">← Return Home</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

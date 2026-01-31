@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}{{ info.title if info else 'About Us' }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        
+        <!-- HEADER SECTION -->
+        <div class="text-center mb-5">
+            <h1 class="display-5 fw-bold text-highlight">
+                {{ info.title if info else 'About Us' }}
+            </h1>
+        </div>
+
+        <!-- MAIN CONTENT CARD -->
+        <div class="card shadow-lg border-0 card-accent">
+            <div class="card-body p-4 p-md-5">
+                {% if info and info.content %}
+                    <!-- 
+                        RICH TEXT CONTENT
+                        The 'safe' filter is required here because the content 
+                        comes from CKEditor and contains raw HTML tags.
+                    -->
+                    <div class="rich-text-content">
+                        {{ info.content | safe }}
+                    </div>
+                {% else %}
+                    <!-- FALLBACK STATE (If no content created yet) -->
+                    <div class="text-center py-5 text-muted">
+                        <div class="display-1 mb-3"><i class="fas fa-school"></i></div>
+                        <h3>Information Coming Soon</h3>
+                        <p>The administration is currently updating this page.</p>
+                        <a href="/" class="btn btn-outline-primary mt-3">Return Home</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- ADMIN EDIT SHORTCUT -->
+        <!-- Only visible to the Headmaster -->
+        {% if current_user.is_authenticated and current_user.is_admin %}
+        <div class="text-center mt-4">
+            <a href="/admin/edit/about" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-edit me-2"></i>Edit This Page (Admin Only)
+            </a>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<!-- 
+    RICH TEXT STYLING OVERRIDES
+    These styles ensure that HTML content (images, headers, lists) 
+    pasted into the editor looks good within the theme.
+-->
+<style>
+    .rich-text-content img { 
+        max-width: 100%; 
+        height: auto; 
+        border-radius: 8px; 
+        margin: 1rem 0; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .rich-text-content h2, .rich-text-content h3 { 
+        margin-top: 2rem; 
+        margin-bottom: 1rem;
+        color: var(--text-main); 
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.5rem;
+    }
+    .rich-text-content ul, .rich-text-content ol { 
+        padding-left: 1.5rem; 
+        margin-bottom: 1.5rem;
+    }
+    .rich-text-content blockquote {
+        border-left: 4px solid var(--primary-color);
+        padding-left: 1rem;
+        font-style: italic;
+        color: var(--text-muted);
+        background: rgba(0,0,0,0.02);
+        padding: 1rem;
+        border-radius: 0 8px 8px 0;
+    }
+</style>
+{% endblock %}

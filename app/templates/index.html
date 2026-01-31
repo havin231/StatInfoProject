@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<!-- 
+    HERO SECTION 
+    A welcoming introduction to the LMS.
+    Centered text with responsive padding.
+-->
+<div class="text-center py-5">
+    <h1 class="display-4 fw-bold mb-3">Welcome to <span class="text-highlight">StatInfoProject</span></h1>
+    <p class="lead text-muted mx-auto mb-4" style="max-width: 600px;">
+        A place to learn
+    </p>
+    
+    <!-- Show Login Buttons only to Guests -->
+    {% if not current_user.is_authenticated and not session.get('student_id') %}
+        <div class="d-flex gap-3 justify-content-center">
+            <a href="/student/login" class="btn btn-primary btn-lg px-4">Student Portal</a>
+            <a href="/login" class="btn btn-outline btn-lg px-4">Teacher Access</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 
+    SUBJECTS GRID 
+    Uses Bootstrap's row-cols classes for automatic responsiveness:
+    - Mobile: 1 card per row
+    - Tablet: 2 cards per row
+    - Desktop: 3 cards per row
+-->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+
+    {% for subject in subjects %}
+    <div class="col">
+        <div class="card h-100 card-accent">
+            <div class="card-body d-flex flex-column">
+                <!-- Card Header -->
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h3 class="h5 fw-bold">{{ subject.name }}</h3>
+                    <i class="fas fa-book text-highlight"></i>
+                </div>
+                
+                <!-- Description (Truncated to keep cards even) -->
+                <p class="text-muted small flex-grow-1">{{ subject.description | truncate(100) }}</p>
+                
+                <!-- Action Button -->
+                <a href="/subject/{{ subject.slug }}" class="btn btn-primary mt-3">
+                    Enter Classroom <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    
+    <!-- EMPTY STATE (Shown if database has no subjects) -->
+    <div class="col">
+        <div class="card h-100 border-warning">
+            <div class="card-body text-center">
+                <div class="h1 text-warning mb-3"><i class="fas fa-exclamation-circle"></i></div>
+                <h3 class="h5 fw-bold">No Subjects Yet</h3>
+                <p class="text-muted small">Teachers have not added any courses yet. Please check back later.</p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}

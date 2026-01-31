@@ -1,0 +1,266 @@
+/* 
+   =========================================
+   SCHOOL LMS - DESIGN SYSTEM
+   =========================================
+   1. ROOT VARIABLES (The Foundation)
+   2. THEME: ACADEMIC GLASS
+   3. THEME: CYBER COMMAND
+   4. GLOBAL RESETS & TYPOGRAPHY
+   5. COMPONENT: CARDS
+   6. COMPONENT: BUTTONS
+   7. COMPONENT: NAVBAR & NAVIGATION
+   8. COMPONENT: TABLES & FORMS
+   9. UTILITIES & PRINT STYLES
+   =========================================
+*/
+
+/* 1. ROOT VARIABLES (The Foundation) */
+:root {
+    /* Semantic Color Names - Defaults */
+    --primary-hue: 80; /* Lime Green Base */
+    --primary-color: hsl(var(--primary-hue), 70%, 40%);
+    --primary-glow: hsl(var(--primary-hue), 70%, 40%, 0.5);
+    
+    --bg-body: #f8f9fa;
+    --bg-card: #ffffff;
+    --text-main: #212529;
+    --text-muted: #6c757d;
+    
+    --border-radius: 12px;
+    --border-width: 1px;
+    --border-color: rgba(0,0,0,0.1);
+    
+    --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+    
+    --font-main: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --backdrop-blur: 0px;
+}
+
+/* 2. THEME: ACADEMIC GLASS (Modern, Soft, Friendly) */
+[data-theme="glass"] {
+    --border-radius: 20px;
+    --font-main: "Segoe UI", system-ui, -apple-system, sans-serif;
+    --backdrop-blur: 12px;
+}
+
+/* Glass - Light Mode */
+[data-theme="glass"][data-bs-theme="light"] {
+    --bg-body: linear-gradient(135deg, #e0eaec 0%, #f0f2f5 100%);
+    --bg-card: rgba(255, 255, 255, 0.7); /* Translucent */
+    --border-color: rgba(255, 255, 255, 0.6);
+    --shadow-lg: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+    --primary-color: #7ab800; /* Original School Lime */
+}
+
+/* Glass - Dark Mode */
+[data-theme="glass"][data-bs-theme="dark"] {
+    --bg-body: linear-gradient(135deg, #1a1c20 0%, #0f1012 100%);
+    --bg-card: rgba(30, 30, 35, 0.6); /* Translucent Dark */
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-main: #e0e0e0;
+    --text-muted: #a0a0a0;
+    --primary-color: #9cdb24; /* Lighter Lime for contrast */
+}
+
+/* 3. THEME: CYBER COMMAND (Technical, Sharp, High Contrast) */
+[data-theme="cyber"] {
+    --border-radius: 2px; /* Sharp Edges */
+    --font-main: "Courier New", Courier, monospace;
+    --backdrop-blur: 0px;
+}
+
+/* Cyber - Light Mode (Blueprint Style) */
+[data-theme="cyber"][data-bs-theme="light"] {
+    --bg-body: #f0f4f8; 
+    --bg-card: #ffffff;
+    --border-color: #0d6efd; /* Tech Blue */
+    --border-width: 2px;
+    --primary-color: #0d6efd;
+    --shadow-sm: none;
+    --shadow-lg: 4px 4px 0px rgba(13, 110, 253, 0.2); /* Hard Shadow */
+}
+
+/* Cyber - Dark Mode (Hacker Style) */
+[data-theme="cyber"][data-bs-theme="dark"] {
+    --bg-body: #050505;
+    --bg-card: #0a0a0a;
+    --text-main: #00ff41; /* Matrix Green */
+    --text-muted: #008f11;
+    --border-color: #00ff41;
+    --border-width: 1px;
+    --primary-color: #00ff41;
+    --shadow-sm: 0 0 5px rgba(0, 255, 65, 0.2); /* Neon Glow */
+    --shadow-lg: 0 0 15px rgba(0, 255, 65, 0.15);
+}
+
+/* 4. GLOBAL RESETS & TYPOGRAPHY */
+body {
+    background: var(--bg-body);
+    background-attachment: fixed; /* Keeps gradient stable on scroll */
+    color: var(--text-main);
+    font-family: var(--font-main);
+    transition: background 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-main);
+    font-weight: 700;
+}
+
+.text-highlight {
+    color: var(--primary-color);
+}
+
+/* 5. COMPONENT: CARDS */
+.card {
+    background-color: var(--bg-card);
+    border: var(--border-width) solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    /* Glassmorphism Effect */
+    backdrop-filter: blur(var(--backdrop-blur));
+    -webkit-backdrop-filter: blur(var(--backdrop-blur));
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Accent Borders (Used on Subject Cards) */
+.card-accent {
+    border-left: 5px solid var(--primary-color) !important;
+}
+
+/* Mobile: Move accent to top to save horizontal space */
+@media (max-width: 768px) {
+    .card-accent {
+        border-left: var(--border-width) solid var(--border-color) !important;
+        border-top: 5px solid var(--primary-color) !important;
+    }
+}
+
+/* 6. COMPONENT: BUTTONS */
+.btn-primary, .btn-lime {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff !important; /* Always white text on primary */
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover, .btn-lime:hover {
+    filter: brightness(110%);
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.btn-outline {
+    border: 2px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: var(--border-radius);
+    background: transparent;
+}
+
+.btn-outline:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
+}
+
+/* 7. COMPONENT: NAVBAR & NAVIGATION */
+.navbar {
+    background-color: var(--bg-card) !important;
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: blur(var(--backdrop-blur));
+}
+
+.navbar-brand {
+    font-weight: 800;
+    color: var(--text-main) !important;
+}
+
+.navbar-brand span {
+    color: var(--primary-color);
+}
+
+.nav-link {
+    color: var(--text-main) !important;
+    opacity: 0.8;
+}
+
+.nav-link:hover {
+    opacity: 1;
+    color: var(--primary-color) !important;
+}
+
+/* 8. COMPONENT: TABLES & FORMS */
+/* Force tables to scroll on mobile */
+.table-responsive {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--bg-card);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; 
+}
+
+table {
+    color: var(--text-main) !important;
+    margin-bottom: 0;
+}
+
+th {
+    border-bottom: 2px solid var(--border-color) !important;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    background-color: rgba(0,0,0,0.02); /* Slight header tint */
+}
+
+td {
+    border-bottom: 1px solid var(--border-color) !important;
+    vertical-align: middle;
+}
+
+/* Inputs */
+.form-control, .form-select {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: var(--border-radius);
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: var(--bg-card);
+    border-color: var(--primary-color);
+    color: var(--text-main);
+    box-shadow: 0 0 0 0.25rem var(--primary-glow);
+}
+
+/* 9. UTILITIES & PRINT STYLES */
+/* Ensure Rich Text content (CKEditor) respects theme colors */
+.rich-text-content {
+    color: var(--text-main);
+    line-height: 1.6;
+}
+.rich-text-content a { color: var(--primary-color); }
+
+/* Hover effect for footer links */
+.hover-link:hover {
+    color: var(--primary-color) !important;
+    text-decoration: underline !important;
+}
+
+/* Print Optimization */
+@media print {
+    body { background: white !important; color: black !important; }
+    .card { border: 1px solid #ccc !important; box-shadow: none !important; }
+    .navbar, .btn, .d-print-none { display: none !important; }
+    .text-highlight { color: black !important; }
+}

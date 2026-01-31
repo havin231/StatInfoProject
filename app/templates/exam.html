@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+
+{% block title %}{{ quiz_title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+
+        <!-- EXAM HEADER -->
+        <div class="text-center mb-5">
+            <h1 class="fw-bold text-highlight h2">{{ quiz_title }}</h1>
+            <div class="d-inline-block bg-body-tertiary border px-4 py-2 rounded-pill shadow-sm">
+                <i class="fas fa-user-graduate me-2 text-primary"></i>
+                <span class="fw-bold">{{ student.full_name }}</span>
+            </div>
+            <p class="text-muted small mt-3">
+                <i class="fas fa-info-circle me-1"></i>
+                Select the best answer for each question below.
+            </p>
+        </div>
+
+        <form method="POST" action="/subject/{{ subject.slug }}/exam/submit" id="examForm">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+            {% for q in questions %}
+            <!--
+                RTL LOGIC:
+                If q.is_kurdish is True, we add the 'rtl-question' class.
+                The CSS below handles the flipping.
+            -->
+            <div class="card mb-5 border-0 shadow-sm question-card {% if q.is_kurdish %} rtl-question {% endif %}">
+
+                <!-- Question Text -->
+                <div class="card-header bg-transparent border-bottom-0 pt-4 px-4">
+                    <h5 class="fw-bold mb-0 question-title">
+                        <span class="badge bg-primary me-2 shadow-sm q-badge">Q{{ loop.index }}</span>
+                        {{ q.question_text }}
+                    </h5>
+                </div>
+
+                <!-- Options Area -->
+                <div class="card-body px-4 pb-4">
+                    <div class="d-flex flex-column gap-3">
+
+                        <label class="option-container">
+                            <input type="radio" name="q_{{ q.id }}" value="A" required>
+                            <div class="option-card">
+                                <div class="option-indicator">A</div>
+                                <div class="option-text">{{ q.option_a }}</div>
+                                <div class="check-icon"><i class="fas fa-check"></i></div>
+                            </div>
+                        </label>
+
+                        <label class="option-container">
+                            <input type="radio" name="q_{{ q.id }}" value="B" required>
+                            <div class="option-card">
+                                <div class="option-indicator">B</div>
+                                <div class="option-text">{{ q.option_b }}</div>
+                                <div class="check-icon"><i class="fas fa-check"></i></div>
+                            </div>
+                        </label>
+
+                        <label class="option-container">
+                            <input type="radio" name="q_{{ q.id }}" value="C" required>
+                            <div class="option-card">
+                                <div class="option-indicator">C</div>
+                                <div class="option-text">{{ q.option_c }}</div>
+                                <div class="check-icon"><i class="fas fa-check"></i></div>
+                            </div>
+                        </label>
+
+                        <label class="option-container">
+                            <input type="radio" name="q_{{ q.id }}" value="D" required>
+                            <div class="option-card">
+                                <div class="option-indicator">D</div>
+                                <div class="option-text">{{ q.option_d }}</div>
+                                <div class="check-icon"><i class="fas fa-check"></i></div>
+                            </div>
+                        </label>
+
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="alert alert-warning text-center py-5">
+                <div class="display-1 text-warning mb-3"><i class="fas fa-clipboard-list"></i></div>
+                <h4>No Questions Found</h4>
+                <p>There are no questions assigned to this exam/lecture yet.</p>
+                <a href="/subject/{{ subject.slug }}" class="btn btn-outline-dark mt-3">Go Back</a>
+            </div>
+            {% endfor %}
+
+            {% if questions %}
+            <div class="submit-container">
+                <button type="button" id="submitBtn" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow-lg">
+                    Submit Exam <i class="fas fa-paper-plane ms-2"></i>
+                </button>
+            </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay" class="d-none">
+    <div class="text-center text-white">
+        <div class="spinner-border text-light mb-4" style="width: 4rem; height: 4rem;" role="status"></div>
+        <h2 class="fw-bold mb-2">Submitting Exam...</h2>
+        <p class="lead mb-4" id="loadingText">Connecting to server...</p>
+        <div class="alert alert-warning d-inline-block text-dark fw-bold">
+            <i class="fas fa-exclamation-triangle me-2"></i> DO NOT REFRESH THE PAGE
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('submitBtn').addEventListener('click', function () {
+        if (confirm("Are you sure you want to submit your answers?")) {
+            startSafeSubmission();
+        }
+    });
+
+    function startSafeSubmission() {
+        const overlay = document.getElementById('loadingOverlay');
+        overlay.classList.remove('d-none');
+        overlay.classList.add('d-flex');
+        checkServerStatus();
+    }
+
+    function checkServerStatus() {
+        const statusText = document.getElementById('loadingText');
+        fetch('/keep_alive')
+            .then(response => {
+                if (response.ok) {
+                    statusText.innerText = "Server verified. Uploading answers...";
+                    document.getElementById('examForm').submit();
+                } else { throw new Error('Server not ready'); }
+            })
+            .catch(error => {
+                statusText.innerText = "Waking up server (this may take 20s)...";
+                setTimeout(checkServerStatus, 2000);
+            });
+    }
+</script>
+
+<style>
+    /* Overlay */
+    #loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(5px);
+    }
+
+    /* Cards */
+    .option-container input[type="radio"] {
+        display: none;
+    }
+
+    .option-card {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        background-color: var(--bg-card);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .option-indicator {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #eee;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 15px;
+        flex-shrink: 0;
+        transition: all 0.2s;
+    }
+
+    .option-text {
+        font-size: 1.05rem;
+        line-height: 1.4;
+        color: var(--text-main);
+        flex-grow: 1;
+    }
+
+    .check-icon {
+        opacity: 0;
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        transform: scale(0);
+        transition: all 0.2s;
+    }
+
+    /* Selected State */
+    input:checked+.option-card {
+        border-color: var(--primary-color);
+        background-color: rgba(var(--primary-hue), 100%, 95%, 0.1);
+        transform: scale(1.01);
+    }
+
+    input:checked+.option-card .option-indicator {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    input:checked+.option-card .check-icon {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /*
+       =========================================
+       RTL SUPPORT (KURDISH MODE)
+       =========================================
+    */
+    .rtl-question .question-title {
+        text-align: right;
+        direction: rtl;
+    }
+
+    /* Move the Q1 Badge to the right in RTL mode */
+    .rtl-question .q-badge {
+        float: right;
+        margin-left: 10px;
+        margin-right: 0 !important;
+    }
+
+    /* Flip the Option Card flex direction */
+    .rtl-question .option-card {
+        flex-direction: row-reverse;
+    }
+
+    /* Adjust margins for the flipped layout */
+    .rtl-question .option-indicator {
+        margin-right: 0;
+        margin-left: 15px;
+    }
+
+    .rtl-question .option-text {
+        text-align: right;
+        direction: rtl;
+    }
+
+    @media (max-width: 768px) {
+        .question-card {
+            border-radius: 16px;
+        }
+
+        .option-card {
+            padding: 18px;
+        }
+
+        .submit-container {
+            position: fixed;
+            bottom: 80px;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: var(--bg-body);
+            border-top: 1px solid var(--border-color);
+            z-index: 1000;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            padding-bottom: 160px;
+        }
+    }
+</style>
+{% endblock %}

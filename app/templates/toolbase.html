@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Tool Base{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center">
+                <div class="icon-square bg-primary text-white rounded-3 me-3 d-flex align-items-center justify-content-center"
+                    style="width: 48px; height: 48px;">
+                    <i class="fas fa-toolbox fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-0 fw-bold">Tool Base</h1>
+                    <p class="text-muted mb-0 small">External Links & Resource Manager</p>
+                </div>
+            </div>
+            <a href="/teacher/dashboard" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Dashboard
+            </a>
+        </div>
+
+        <!-- NEW TOOL FORM -->
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted">
+                Add New Tool
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Tool Name</label>
+                        {{ form.title(class="form-control", placeholder="e.g. Google Drive") }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">URL / Link</label>
+                        {{ form.link(class="form-control", placeholder="https://...") }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">Description (Optional)</label>
+                        {{ form.description(class="form-control", rows="3", placeholder="Brief description...") }}
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>Add to Library
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- TOOLS LIST -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted">
+                Existing Tools
+            </div>
+            <div class="list-group list-group-flush pt-2">
+                {% for tool in tools %}
+                <div class="list-group-item p-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3 text-secondary">
+                            <a href="{{ tool.link }}" target="_blank" class="btn btn-light rounded-circle"
+                                title="Go to Link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                        <div>
+                            <h6 class="fw-bold mb-0 text-highlight">
+                                <a href="{{ tool.link }}" target="_blank" class="text-decoration-none text-reset">
+                                    {{ tool.title }}
+                                </a>
+                            </h6>
+                            {% if tool.description %}
+                            <div class="text-muted small mt-1">{{ tool.description }}</div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-1 font-monospace" style="font-size: 0.75rem;">
+                                {{ tool.link }}
+                            </small>
+                        </div>
+                    </div>
+                    <div>
+                        <form action="{{ url_for('main.delete_tool', tool_id=tool.id) }}" method="POST"
+                            onsubmit="return confirm('Delete this tool?');">
+                            {{ form.hidden_tag() }} <!-- reusing form token for csrf -->
+                            <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Delete Tool">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% else %}
+                <div class="list-group-item p-4 text-center text-muted">
+                    No tools added yet.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

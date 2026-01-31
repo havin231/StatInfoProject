@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+
+        <!--
+            TOP CONTROLS
+            Contains the 'Back' navigation, 'Take Quiz' (Task 4), and Language Toggle.
+        -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+            <a href="/subject/{{ subject.slug }}" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-2"></i>Back to Subject
+            </a>
+
+            <div class="d-flex gap-2">
+                <!--
+                    TASK 4: LECTURE QUIZ INTEGRATION
+                    This button only appears if specific questions have been tagged to this page.
+                -->
+                {% if has_quiz %}
+                <a href="/subject/{{ subject.slug }}/lecture/{{ page.id }}/quiz"
+                    class="btn btn-danger btn-sm shadow-sm px-3">
+                    <i class="fas fa-stopwatch me-2"></i>Take Lecture Quiz
+                </a>
+                {% endif %}
+
+                <!-- KURDISH TOGGLE MOVED TO FLOATING BUTTON -->
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT CARD -->
+        <div class="card shadow-lg border-0 mb-5" style="min-height: 65vh;">
+            <div class="card-body p-4 p-md-5">
+
+                <!-- Page Title -->
+                <h1 class="display-6 fw-bold mb-4 pb-3 border-bottom text-highlight">
+                    {{ page.title }}
+                </h1>
+
+                <!-- ENGLISH CONTENT (Default View) -->
+                <!-- 'overflow-hidden' prevents wide images/tables from breaking layout -->
+                <div id="content-en" class="rich-text-content overflow-hidden">
+                    {{ page.content_body | safe }}
+                </div>
+
+                <!-- KURDISH CONTENT (Hidden by default) -->
+                {% if page.content_body_kurdish %}
+                <div id="content-ku" class="rich-text-content d-none overflow-hidden"
+                    style="direction: rtl; text-align: right;">
+                    {{ page.content_body_kurdish | safe }}
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!--
+                NEW: MULTIPLE RESOURCES FOOTER
+                Loops through all resources attached to this page.
+            -->
+            {% if page.resources %}
+            <div class="card-footer bg-body-tertiary p-4">
+                <h5 class="fw-bold mb-3 small text-uppercase text-muted"><i class="fas fa-paperclip me-2"></i>Learning
+                    Resources</h5>
+                <div class="list-group shadow-sm">
+                    {% for res in page.resources %}
+                    <a href="{{ res.link }}" target="_blank"
+                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
+                        <div class="d-flex align-items-center">
+                            <div class="me-3 text-primary opacity-50">
+                                <i class="fas fa-external-link-alt"></i>
+                            </div>
+                            <!-- FIXED BUG: Changed 'text-dark' to 'text-body-emphasis' for Dark Mode support -->
+                            <span class="fw-bold text-body-emphasis">{{ res.title }}</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-muted small"></i>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+<!--
+    FLOATING LANGUAGE TOGGLE
+-->
+{% if page.content_body_kurdish %}
+<div class="position-fixed top-0 start-0 m-3 mt-5 pt-4" style="z-index: 1050;">
+    <!-- Mobile: Circle Button (Fills the icon) -->
+    <button onclick="toggleLanguage()"
+        class="btn btn-primary rounded-circle shadow-lg d-md-none d-flex justify-content-center align-items-center p-0"
+        style="width: 50px; height: 50px;">
+        <i class="fa-solid fa-earth-americas fa-xl"></i>
+    </button>
+
+    <!-- Desktop: Pill Button with Text -->
+    <button onclick="toggleLanguage()"
+        class="btn btn-primary rounded-pill shadow-lg d-none d-md-flex align-items-center gap-2 px-3 py-2">
+        <i class="fa-solid fa-earth-americas fa-xl"></i>
+        <span class="fw-bold">Read in Kurdish / وەرگێڕان</span>
+    </button>
+</div>
+{% endif %}
+
+<!--
+    LANGUAGE SWITCHER LOGIC
+-->
+<script>
+    function toggleLanguage() {
+        var en = document.getElementById("content-en");
+        var ku = document.getElementById("content-ku");
+        var label = document.getElementById("langLabel");
+
+        // Save scroll position relative to viewport
+        // Actually, simple d-none replacement preserves scroll Y exactly, 
+        // but if content is shorter validation might be needed.
+        // For now, simple toggling is the requested behavior.
+
+        if (en.classList.contains('d-none')) {
+            // Switch to ENGLISH
+            en.classList.remove('d-none');
+            ku.classList.add('d-none');
+            // Update Text
+            if (label) label.innerHTML = "Read in Kurdish / وەرگێڕان";
+        } else {
+            // Switch to KURDISH
+            en.classList.add('d-none');
+            ku.classList.remove('d-none');
+            // Update Text
+            if (label) label.innerHTML = "Read in English";
+        }
+    }
+</script>
+
+<!--
+    RICH TEXT CSS OVERRIDES
+-->
+<style>
+    .rich-text-content {
+        line-height: 1.8;
+        font-size: 1.1rem;
+        max-width: 100%;
+    }
+
+    /* Force images to fit within the container width */
+    .rich-text-content img,
+    .rich-text-content figure {
+        max-width: 100% !important;
+        height: auto !important;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        display: block;
+    }
+
+    /* Ensure tables scroll if they are too wide */
+    .rich-text-content table {
+        width: 100%;
+        margin-bottom: 1.5rem;
+        border-collapse: collapse;
+        display: block;
+        overflow-x: auto;
+    }
+
+    .rich-text-content table,
+    .rich-text-content th,
+    .rich-text-content td {
+        border: 1px solid var(--border-color);
+        padding: 0.75rem;
+    }
+
+    .rich-text-content h2,
+    .rich-text-content h3 {
+        color: var(--primary-color);
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .rich-text-content ul,
+    .rich-text-content ol {
+        margin-bottom: 1.5rem;
+        padding-left: 2rem;
+    }
+</style>
+{% endblock %}

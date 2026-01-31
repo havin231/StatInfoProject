@@ -2036,6 +2036,15 @@ def export_full_backup():
             w_obj.writerow([info.key, info.title, info.content])
         master_zip.writestr('10_siteinfo.csv', s_obj.getvalue())
 
+        # 11. ToolBase (Tools)
+        s_obj = io.StringIO()
+        s_obj.write('\ufeff')
+        w_obj = csv.writer(s_obj, quoting=csv.QUOTE_ALL)
+        w_obj.writerow(['ID', 'Title', 'Link', 'Description', 'Created_At'])
+        for tool in Tool.query.all():
+            w_obj.writerow([tool.id, tool.title, tool.link, tool.description, tool.created_at])
+        master_zip.writestr('11_tools.csv', s_obj.getvalue())
+
     binary_stream.seek(0)
     current_time_str = datetime.now().strftime("%Y_%m_%d_%H%M")
     backup_file_name = f"StatInfo_FULL_BACKUP_{current_time_str}.zip"
@@ -2091,6 +2100,7 @@ def restore_system():
                     db.session.query(Subject).delete()
                     db.session.query(SiteInfo).delete()
                     db.session.query(SystemCommand).delete()
+                    db.session.query(Tool).delete()
                     # We do NOT delete users, as that would kill the current admin session immediately.
                     # We will update/upsert users instead.
                     db.session.commit()
@@ -2286,6 +2296,27 @@ def restore_system():
                         key=row['Key'],
                         title=row['Title'],
                         content=row['Content']
+                    ))
+                
+                db.session.commit()
+
+                # K. Tools (ToolBase)
+                for row in stream_csv('11_tools.csv'):
+                    c_str = row['Created_At']
+                    try:
+                        c_obj = datetime.strptime(c_str, '%Y-%m-%d %H:%M:%S.%f')
+                    except ValueError:
+                        try:
+                            c_obj = datetime.strptime(c_str, '%Y-%m-%d %H:%M:%S')
+                        except ValueError:
+                            c_obj = datetime.utcnow()
+
+                    db.session.add(Tool(
+                        id=int(row['ID']),
+                        title=row['Title'],
+                        link=row['Link'],
+                        description=row['Description'],
+                        created_at=c_obj
                     ))
                 
                 db.session.commit()

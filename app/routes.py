@@ -2330,16 +2330,25 @@ def edit_about():
 # ==============================================================================
 
 @main.route('/toolbase', methods=['GET', 'POST'])
-@login_required
 def toolbase():
     """
     TOOL BASE / EXTERNAL LINKS MANAGER
     """
-    if not current_user.is_admin:
-        abort(403)
+    # Check if user is logged in (either as Staff via Flask-Login or Student via session)
+    is_admin = False
+    if current_user.is_authenticated:
+        is_admin = current_user.is_admin
+    elif 'student_id' in session:
+        # Students are allowed read-only access
+        pass
+    else:
+        # Not logged in at all
+        return redirect(url_for('main.student_login'))
         
     form = ToolForm()
-    if form.validate_on_submit():
+    
+    # Only process form submission if user is admin
+    if is_admin and form.validate_on_submit():
         new_tool = Tool(
             title=form.title.data,
             link=form.link.data,
@@ -2355,7 +2364,7 @@ def toolbase():
             flash(f'Error adding tool: {str(e)}', 'danger')
             
     tools = Tool.query.order_by(desc(Tool.created_at)).all()
-    return render_template('toolbase.html', form=form, tools=tools)
+    return render_template('toolbase.html', form=form, tools=tools, is_admin=is_admin)
 
 @main.route('/toolbase/delete/<int:tool_id>', methods=['POST'])
 @login_required

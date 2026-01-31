@@ -24,6 +24,7 @@
         </div>
 
         <!-- NEW TOOL FORM -->
+        {% if is_admin %}
         <div class="card mb-4 shadow-sm border-0">
             <div class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted">
                 Add New Tool
@@ -51,6 +52,7 @@
                 </form>
             </div>
         </div>
+        {% endif %}
 
         <!-- TOOLS LIST -->
         <div class="card shadow-sm border-0">
@@ -82,13 +84,18 @@
                         </div>
                     </div>
                     <div>
-                        <form action="{{ url_for('main.delete_tool', tool_id=tool.id) }}" method="POST"
-                            onsubmit="return confirm('Delete this tool?');">
-                            {{ form.hidden_tag() }} <!-- reusing form token for csrf -->
-                            <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Delete Tool">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
+                        <div>
+                            {% if is_admin %}
+                            <form action="{{ url_for('main.delete_tool', tool_id=tool.id) }}" method="POST"
+                                onsubmit="return confirm('Delete this tool?');">
+                                {{ form.hidden_tag() }} <!-- reusing form token for csrf -->
+                                <button type="submit" class="btn btn-sm btn-outline-danger border-0"
+                                    title="Delete Tool">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 {% else %}

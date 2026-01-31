@@ -2338,12 +2338,7 @@ def toolbase():
     is_admin = False
     if current_user.is_authenticated:
         is_admin = current_user.is_admin
-    elif 'student_id' in session:
-        # Students are allowed read-only access
-        pass
-    else:
-        # Not logged in at all
-        return redirect(url_for('main.student_login'))
+    # Guests and Students are allowed read-only access (fall-through)
         
     form = ToolForm()
     

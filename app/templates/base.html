@@ -112,9 +112,6 @@
             <!-- Mobile 'About Us' Text Link (Visible only on < lg) -->
             <!-- Mobile Menu Toggler Links -->
             <div class="d-lg-none ms-auto me-3 d-flex gap-3">
-                {% if current_user.is_authenticated or session.get('student_id') %}
-                <a href="/toolbase" class="nav-link fw-bold text-decoration-none">Tools</a>
-                {% endif %}
                 <a href="/about" class="nav-link fw-bold text-decoration-none">About Us</a>
             </div>
 
@@ -129,6 +126,7 @@
 
                     <!-- Public Links -->
                     <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/toolbase">Tools</a></li>
                     <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
                     <li class="nav-item"><a class="nav-link" href="/public/stats">Stats</a></li>
 
@@ -149,7 +147,7 @@
                     <li class="nav-item"><a class="nav-link fw-bold" href="/teacher/dashboard">Teacher Dash</a></li>
 
 
-                    <li class="nav-item"><a class="nav-link" href="/toolbase">ToolBase</a></li>
+
 
                     <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a></li>
                     {% elif session.get('student_id') %}
@@ -157,7 +155,7 @@
                     <!-- Logged in as Student -->
                     <li class="nav-item"><a class="nav-link fw-bold text-highlight" href="/student/dashboard">Student
                             Dash</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/toolbase">ToolBase</a></li>
+
                     <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a></li>
                     {% else %}
                     <!-- Guest -->
@@ -287,12 +285,11 @@
         </a>
 
         <!-- Tools (Mobile) - Visible if logged in -->
-        {% if current_user.is_authenticated or session.get('student_id') %}
+        <!-- Tools (Mobile) - Public -->
         <a href="/toolbase" class="text-reset text-decoration-none text-center flex-grow-1">
             <i
                 class="fa-solid fa-toolbox fa-2x {{ 'text-highlight' if 'toolbase' in request.endpoint else 'text-muted' }}"></i>
         </a>
-        {% endif %}
 
         <!-- Profile / Login -->
         {% if current_user.is_authenticated %}

@@ -2231,6 +2231,17 @@ def restore_system():
                         for row in reader:
                             yield row
 
+                # CONTENT SANITIZER - Fixes Windows line ending artifacts
+                def sanitize_content(text):
+                    """Removes rn/rnrn artifacts from CKEditor HTML content."""
+                    if not text:
+                        return text
+                    # Fix literal 'rn' artifacts from Windows line endings
+                    text = text.replace('rnrn', '\n').replace('rn', '\n')
+                    # Normalize line endings
+                    text = text.replace('\r\n', '\n').replace('\r', '\n')
+                    return text
+
                 # BUFFERED COMMIT HELPER
                 def commit_batch(objects, limit=100):
                     db.session.add_all(objects)
@@ -2278,14 +2289,37 @@ def restore_system():
                     ))
                 db.session.commit()
 
-                # C. Students
+                # C. Students (with new fields: email, timestamps)
                 batch = []
                 for row in stream_csv('3_students.csv'):
+                    # Parse timestamps if present in backup
+                    created = None
+                    updated = None
+                    if row.get('Created_At') and row['Created_At']:
+                        try:
+                            created = datetime.strptime(row['Created_At'], '%Y-%m-%d %H:%M:%S.%f')
+                        except ValueError:
+                            try:
+                                created = datetime.strptime(row['Created_At'], '%Y-%m-%d %H:%M:%S')
+                            except ValueError:
+                                created = datetime.utcnow()
+                    if row.get('Updated_At') and row['Updated_At']:
+                        try:
+                            updated = datetime.strptime(row['Updated_At'], '%Y-%m-%d %H:%M:%S.%f')
+                        except ValueError:
+                            try:
+                                updated = datetime.strptime(row['Updated_At'], '%Y-%m-%d %H:%M:%S')
+                            except ValueError:
+                                updated = datetime.utcnow()
+                    
                     batch.append(Student(
                         id=int(row['ID']),
                         full_name=row['Full_Name'],
                         access_code=row['Access_Code'],
-                        group_id=row['Group_ID']
+                        group_id=row['Group_ID'],
+                        email=row.get('Email') or None,
+                        created_at=created,
+                        updated_at=updated
                     ))
                     if len(batch) >= 100:
                         db.session.add_all(batch)
@@ -2295,15 +2329,15 @@ def restore_system():
                     db.session.add_all(batch)
                     db.session.commit()
 
-                # D. Pages
+                # D. Pages (with content sanitization to fix rn artifacts)
                 batch = []
                 for row in stream_csv('4_pages.csv'):
                     batch.append(Page(
                         id=int(row['ID']),
                         subject_id=int(row['Subject_ID']),
                         title=row['Title'],
-                        content_body=row['Content_EN'],
-                        content_body_kurdish=row['Content_KU']
+                        content_body=sanitize_content(row['Content_EN']),
+                        content_body_kurdish=sanitize_content(row['Content_KU'])
                     ))
                     if len(batch) >= 50: # HTML content is heavy, smaller batch
                         db.session.add_all(batch)
@@ -2323,7 +2357,7 @@ def restore_system():
                     ))
                 db.session.commit()
 
-                # F. Questions
+                # F. Questions (with content sanitization)
                 batch = []
                 for row in stream_csv('6_questions.csv'):
                     pid = int(row['Page_ID']) if row['Page_ID'] else None
@@ -2331,11 +2365,11 @@ def restore_system():
                         id=int(row['ID']),
                         subject_id=int(row['Subject_ID']),
                         page_id=pid,
-                        question_text=row['Question_Text'],
-                        option_a=row['Option_A'],
-                        option_b=row['Option_B'],
-                        option_c=row['Option_C'],
-                        option_d=row['Option_D'],
+                        question_text=sanitize_content(row['Question_Text']),
+                        option_a=sanitize_content(row['Option_A']),
+                        option_b=sanitize_content(row['Option_B']),
+                        option_c=sanitize_content(row['Option_C']),
+                        option_d=sanitize_content(row['Option_D']),
                         correct_answer=row['Correct'],
                         is_kurdish=(row['Is_Kurdish'] == 'True')
                     ))
@@ -2405,7 +2439,7 @@ def restore_system():
                     db.session.add(SiteInfo(
                         key=row['Key'],
                         title=row['Title'],
-                        content=row['Content']
+                        content=sanitize_content(row['Content'])
                     ))
                 
                 db.session.commit()

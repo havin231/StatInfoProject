@@ -1656,10 +1656,12 @@ def builder_exam():
     import_form = BulkImportForm()
 
     # Prepare lecture list for the spreadsheet column
-    subject_lectures_list = [{'id': p.id, 'title': p.title} for p in target_subject.pages]
+    subject_lectures_list = [{'id': p.id, 'title': p.title} for p in Page.query.filter_by(subject_id=target_subject.id).all()]
 
+    # Use direct query instead of relationship for reliability after restoration
     existing_questions_data = []
-    for question in target_subject.questions:
+    all_questions = Question.query.filter_by(subject_id=target_subject.id).all()
+    for question in all_questions:
         existing_questions_data.append({
             'id': question.id,
             'text': question.question_text,

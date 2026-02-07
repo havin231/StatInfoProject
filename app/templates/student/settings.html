@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}My Settings{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-transparent border-bottom-0 pt-4 pb-2">
+                <h3 class="fw-bold"><i class="fas fa-cog me-2 text-primary"></i>Account Settings</h3>
+            </div>
+            <div class="card-body p-4">
+
+                {% if not student.email %}
+                <div class="alert alert-warning border-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Action Required:</strong> Please add your email address to secure your account.
+                </div>
+                {% endif %}
+
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Personal Information</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="fas fa-envelope text-muted"></i></span>
+                            {{ form.email(class="form-control", placeholder="Enter your email address") }}
+                        </div>
+                        {% for error in form.email.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                        <div class="form-text small">We will use this for important notifications and account recovery.
+                        </div>
+                    </div>
+
+                    <hr class="my-4 text-muted opacity-25">
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-danger">Security</label>
+                        <div class="p-3 bg-light rounded border">
+                            <label class="form-label small text-uppercase text-muted fw-bold">My Access Code</label>
+                            <div class="input-group mb-2">
+                                <span class="input-group-text bg-white"><i class="fas fa-key text-muted"></i></span>
+                                {{ form.access_code(class="form-control font-monospace fw-bold", style="letter-spacing:
+                                1px;") }}
+                            </div>
+                            {% for error in form.access_code.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                            <div class="form-text text-warning small">
+                                <i class="fas fa-info-circle me-1"></i>
+                                If you change this, you will need to use the new code to login next time.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('main.student_dashboard') }}"
+                            class="btn btn-light border me-md-2">Cancel</a>
+                        {{ form.submit(class="btn btn-primary px-4") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

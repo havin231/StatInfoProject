@@ -299,6 +299,103 @@ def logout():
     return redirect(url_for('main.index'))
 
 # ==============================================================================
+# SECTION 3.5: STUDENT SELF-SERVICE (SIGNUP & SETTINGS)
+# ==============================================================================
+
+@main.route('/student/signup', methods=['GET', 'POST'])
+def student_signup():
+    """
+    STUDENT SELF-REGISTRATION
+    """
+    if 'student_id' in session:
+        return redirect(url_for('main.student_dashboard'))
+    
+    form = StudentSignupForm()
+    
+    if form.validate_on_submit():
+        # check if access code already exists (should be rare as we generate it, 
+        # but if we let them choose or if we auto-gen and it conflicts)
+        # Wait, the form doesn't have access_code field? 
+        # Plan said: StudentSignupForm: full_name, email, group_id, access_code?
+        # Actually in my forms.py update I didn't add access_code to SignupForm.
+        # Let's auto-generate it.
+        
+        # Check email uniqueness
+        if Student.query.filter_by(email=form.email.data).first():
+            flash('Error: This email is already registered.', 'danger')
+            return render_template('student_signup.html', form=form)
+            
+        # Generate unique access code
+        new_code = generate_access_code()
+        while Student.query.filter_by(access_code=new_code).first():
+            new_code = generate_access_code()
+            
+        new_student = Student(
+            full_name=form.full_name.data,
+            email=form.email.data,
+            group_id=form.group_id.data,
+            access_code=new_code
+        )
+        
+        try:
+            db.session.add(new_student)
+            db.session.commit()
+            
+            # Auto-login
+            session['student_id'] = new_student.id
+            flash(f'Account created! Your Access Code is: {new_code}. Please save it!', 'success')
+            return redirect(url_for('main.student_dashboard'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating account: {e}', 'danger')
+            
+    return render_template('student_signup.html', form=form)
+
+@main.route('/student/settings', methods=['GET', 'POST'])
+def student_settings():
+    """
+    STUDENT PROFILE SETTINGS
+    Allows updating email and access code.
+    """
+    if 'student_id' not in session:
+        return redirect(url_for('main.student_login'))
+        
+    student = Student.query.get_or_404(session['student_id'])
+    form = StudentSettingsForm()
+    
+    if request.method == 'GET':
+        form.email.data = student.email
+        form.access_code.data = student.access_code
+        
+    if form.validate_on_submit():
+        # Check email uniqueness if changed
+        if form.email.data != student.email:
+            if Student.query.filter_by(email=form.email.data).first():
+                flash('Error: Email already in use by another student.', 'danger')
+                return render_template('student/settings.html', form=form, student=student)
+        
+        # Check access code uniqueness if changed
+        if form.access_code.data != student.access_code:
+            if Student.query.filter_by(access_code=form.access_code.data).first():
+                flash('Error: Access code already taken.', 'danger')
+                return render_template('student/settings.html', form=form, student=student)
+                
+        student.email = form.email.data
+        student.access_code = form.access_code.data
+        
+        try:
+            db.session.commit()
+            flash('Settings updated successfully.', 'success')
+            return redirect(url_for('main.student_dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating settings: {e}', 'danger')
+            
+    return render_template('student/settings.html', form=form, student=student)
+
+
+# ==============================================================================
 # SECTION 3: STUDENT EXPERIENCE (DASHBOARD, LECTURES, & REVIEWS)
 # ==============================================================================
 
@@ -873,19 +970,22 @@ def admin_students():
         # Uniqueness Check
         if Student.query.filter_by(access_code=form_manual.access_code.data).first():
             flash('Error: This Access Code is already in use.', 'danger')
+        elif form_manual.email.data and Student.query.filter_by(email=form_manual.email.data).first():
+            flash('Error: This Email is already in use.', 'danger')
         else:
             new_student = Student(
                 full_name=form_manual.full_name.data,
                 access_code=form_manual.access_code.data,
-                group_id=form_manual.group_id.data
+                group_id=form_manual.group_id.data,
+                email=form_manual.email.data
             )
             db.session.add(new_student)
             db.session.commit()
             flash(f'Student "{form_manual.full_name.data}" registered successfully.', 'success')
             return redirect(url_for('main.admin_students'))
 
-    # Fetch all students for the table
-    all_students_roster = Student.query.all()
+    # Fetch all students for the table (Sorted by Newest First)
+    all_students_roster = Student.query.order_by(Student.created_at.desc()).all()
 
     return render_template(
         'admin/students.html',
@@ -919,8 +1019,16 @@ def edit_student(student_id):
                 flash('Critical Error: The new access code is already assigned to someone else.', 'danger')
                 return render_template('admin/edit_student.html', form=form, student=student_record)
 
+        # Check if email was changed and uniqueness
+        if form.email.data and student_record.email != form.email.data:
+            email_check = Student.query.filter_by(email=form.email.data).first()
+            if email_check:
+                flash('Critical Error: The new email is already assigned to someone else.', 'danger')
+                return render_template('admin/edit_student.html', form=form, student=student_record)
+
         # Update Record
         student_record.full_name = form.full_name.data
+        student_record.email = form.email.data
         student_record.access_code = form.access_code.data
         student_record.group_id = form.group_id.data
 

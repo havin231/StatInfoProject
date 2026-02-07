@@ -1,5 +1,9 @@
 # AGENT SKILL: StatInfoPRO LMS Specialist
 
+> [!IMPORTANT]
+> **MAINTENANCE RULE:** This `SKILL.md` file MUST be updated after EVERY change to the codebase to maintain an accurate source of truth for the agent.
+
+
 ## 1. PROJECT IDENTITY & CONTEXT
 - **System Name:** StatInfoProject (StatInfoPRO)
 - **Deployment:** PythonAnywhere (Linux/Bash/MySQL).
@@ -20,10 +24,14 @@
     ├── routes.py             # CORE LOGIC (1200+ lines: Auth, Import, Export, Views)
     ├── static/
     │   ├── style.css         # CSS Variables for Themes (Glass/Cyber)
-    │   ├── logo.png          # Branding
+    │   ├── Logo/             # Branding Assets
+    │   │   ├── Light_CyberCommand.svg
+    │   │   ├── light_AcademicGlass.svg
+    │   │   ├── Dark_CyberCommand.svg
+    │   │   └── Dark_AcademicGlass.svg (Default Favicon)
     │   └── uploads/          # (Unused - We use text links for external resources)
     └── templates/
-        ├── base.html         # Master Layout (MathJax, Navbar, Flash Messages)
+        ├── base.html         # Master Layout (MathJax, Navbar, Flash, Favicon)
         ├── login.html        # Staff Login
         ├── student_login.html# Student Access Code Login
         ├── index.html        # Public Homepage

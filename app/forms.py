@@ -55,15 +55,34 @@ class StudentForm(FlaskForm):
     Form for registering new students.
     """
     full_name = StringField('Full Name', validators=[DataRequired()])
+    email = StringField('Email Address', validators=[Optional(), Email()])
     access_code = StringField('Access Code (Unique)', validators=[DataRequired()])
     group_id = StringField('Group/Class ID', validators=[DataRequired(), Length(max=20)])
     submit = SubmitField('Add Student')
+
+class StudentSignupForm(FlaskForm):
+    """
+    Form for students to sign up themselves.
+    """
+    full_name = StringField('Full Name', validators=[DataRequired()])
+    email = StringField('Email Address', validators=[DataRequired(), Email()])
+    group_id = StringField('Group/Class ID', validators=[DataRequired(), Length(max=20)])
+    submit = SubmitField('Register Account')
+
+class StudentSettingsForm(FlaskForm):
+    """
+    Form for students to update their profile (email and access code).
+    """
+    email = StringField('Email Address', validators=[DataRequired(), Email()])
+    access_code = StringField('Change Access Code', validators=[DataRequired(), Length(min=6)])
+    submit = SubmitField('Save Changes')
 
 class StudentEditForm(FlaskForm):
     """
     Form for editing existing student details (Task 1).
     """
     full_name = StringField('Full Name', validators=[DataRequired()])
+    email = StringField('Email Address', validators=[Optional(), Email()])
     access_code = StringField('Access Code', validators=[DataRequired()])
     group_id = StringField('Group/Class ID', validators=[DataRequired(), Length(max=20)])
     submit = SubmitField('Update Student Details')

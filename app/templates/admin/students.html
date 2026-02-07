@@ -18,7 +18,8 @@
                 <p class="small text-muted mb-4">Manage large groups of students efficiently.</p>
 
                 <!-- Import Button -->
-                <button type="button" class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal" data-bs-target="#importModal">
+                <button type="button" class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal"
+                    data-bs-target="#importModal">
                     <i class="fas fa-file-import me-2"></i>Import Excel/CSV
                 </button>
 
@@ -33,7 +34,8 @@
                 <div class="alert alert-danger border-danger p-2 mb-2 small">
                     <i class="fas fa-exclamation-triangle me-1"></i> <strong>Danger Zone</strong>
                 </div>
-                <form action="{{ url_for('main.delete_all_students') }}" method="POST" onsubmit="return confirm('⚠️ CRITICAL WARNING ⚠️\n\nAre you sure you want to delete ALL students?\n\nThis action will PERMANENTLY ERASE:\n- All student accounts\n- All exam results\n- All detailed answer logs\n\nThis cannot be undone. Click OK to wipe the database.');">
+                <form action="{{ url_for('main.delete_all_students') }}" method="POST"
+                    onsubmit="return confirm('⚠️ CRITICAL WARNING ⚠️\n\nAre you sure you want to delete ALL students?\n\nThis action will PERMANENTLY ERASE:\n- All student accounts\n- All exam results\n- All detailed answer logs\n\nThis cannot be undone. Click OK to wipe the database.');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-danger w-100 fw-bold">
                         <i class="fas fa-radiation me-2"></i>Delete ALL Students
@@ -56,7 +58,8 @@
 
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted text-uppercase">Access Code</label>
-                        {{ form.access_code(class="form-control font-monospace fw-bold", style="letter-spacing: 1px;") }}
+                        {{ form.access_code(class="form-control font-monospace fw-bold", style="letter-spacing: 1px;")
+                        }}
                         <div class="form-text small">Auto-generated secure token.</div>
                     </div>
 
@@ -84,7 +87,8 @@
 
             <!-- Header for Screen View -->
             <div class="card-header bg-transparent d-flex justify-content-between align-items-center d-print-none py-3">
-                <h3 class="h5 mb-0 fw-bold">Active Roster <span class="badge bg-body-secondary text-primary border ms-2">{{ students|length }}</span></h3>
+                <h3 class="h5 mb-0 fw-bold">Active Roster <span
+                        class="badge bg-body-secondary text-primary border ms-2">{{ students|length }}</span></h3>
                 <div class="d-flex gap-2">
                     <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
                         <i class="fas fa-print me-2"></i>Print
@@ -107,6 +111,7 @@
                     <thead class="bg-body-secondary sticky-top">
                         <tr>
                             <th class="ps-4">Full Name</th>
+                            <th>Email</th>
                             <th>Access Code</th>
                             <th>Group</th>
                             <th class="d-print-none text-end pe-4">Manage</th>
@@ -119,22 +124,32 @@
                                 <span class="fw-bold text-body-emphasis">{{ s.full_name }}</span>
                             </td>
                             <td>
-                                <code class="text-primary fw-bold bg-light px-2 py-1 rounded border">{{ s.access_code }}</code>
+                                {% if s.email %}
+                                <a href="mailto:{{ s.email }}" class="text-decoration-none small text-muted"><i
+                                        class="fas fa-envelope me-1"></i>{{ s.email }}</a>
+                                {% else %}
+                                <span class="badge bg-warning text-dark">Missing</span>
+                                {% endif %}
                             </td>
                             <td>
-                                <span class="badge bg-secondary-subtle text-dark border fw-normal px-2">{{ s.group_id }}</span>
+                                <code
+                                    class="text-primary fw-bold bg-light px-2 py-1 rounded border">{{ s.access_code }}</code>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary-subtle text-dark border fw-normal px-2">{{ s.group_id
+                                    }}</span>
                             </td>
                             <td class="d-print-none text-end pe-4">
                                 <div class="btn-group shadow-sm">
                                     <!-- Edit Button (Task 1) -->
-                                    <a href="/admin/edit/student/{{ s.id }}" class="btn btn-sm btn-white border" title="Edit Details">
+                                    <a href="/admin/edit/student/{{ s.id }}" class="btn btn-sm btn-white border"
+                                        title="Edit Details">
                                         <i class="fas fa-edit text-muted"></i>
                                     </a>
                                     <!-- Single Delete Button -->
-                                    <a href="/admin/delete/student/{{ s.id }}"
-                                       class="btn btn-sm btn-white border"
-                                       onclick="return confirm('Delete {{ s.full_name }}? This removes their exam history.')"
-                                       title="Delete Student">
+                                    <a href="/admin/delete/student/{{ s.id }}" class="btn btn-sm btn-white border"
+                                        onclick="return confirm('Delete {{ s.full_name }}? This removes their exam history.')"
+                                        title="Delete Student">
                                         <i class="fas fa-trash text-danger"></i>
                                     </a>
                                 </div>
@@ -163,7 +178,8 @@
         <div class="modal-content border-0 shadow-lg">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title"><i class="fas fa-file-csv me-2"></i>Bulk Student Import</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <form method="POST" action="/admin/import/students" enctype="multipart/form-data">
                 <div class="modal-body p-4">
@@ -193,13 +209,60 @@
 <!-- PRINT STYLES -->
 <style>
     @media print {
-        .navbar, .alert, footer, .d-print-none, .btn-group, .badge { display: none !important; }
-        .container, .row, .col-lg-8 { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
-        .card { box-shadow: none !important; border: none !important; }
-        table { border: 1px solid #dee2e6 !important; width: 100%; border-collapse: collapse; }
-        th { background-color: #f8f9fa !important; color: #000 !important; border: 1px solid #dee2e6 !important; padding: 12px; font-size: 10px; text-transform: uppercase; }
-        td { border: 1px solid #dee2e6 !important; padding: 12px; color: #000 !important; font-size: 12px; }
-        code { color: #000 !important; font-weight: bold; background: none !important; border: none !important; font-family: monospace; font-size: 14px; }
+
+        .navbar,
+        .alert,
+        footer,
+        .d-print-none,
+        .btn-group,
+        .badge {
+            display: none !important;
+        }
+
+        .container,
+        .row,
+        .col-lg-8 {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        .card {
+            box-shadow: none !important;
+            border: none !important;
+        }
+
+        table {
+            border: 1px solid #dee2e6 !important;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+            border: 1px solid #dee2e6 !important;
+            padding: 12px;
+            font-size: 10px;
+            text-transform: uppercase;
+        }
+
+        td {
+            border: 1px solid #dee2e6 !important;
+            padding: 12px;
+            color: #000 !important;
+            font-size: 12px;
+        }
+
+        code {
+            color: #000 !important;
+            font-weight: bold;
+            background: none !important;
+            border: none !important;
+            font-family: monospace;
+            font-size: 14px;
+        }
     }
 </style>
 {% endblock %}

@@ -47,15 +47,22 @@ class Student(db.Model):
     # The unique token used for login
     access_code = db.Column(db.String(20), unique=True, nullable=False, index=True)
 
+    # NEW: Email (Optional for old students, Required for new)
+    email = db.Column(db.String(120), unique=True, nullable=True)
+
     # Group Identifier (e.g., 'Class A', 'Grade 10')
     group_id = db.Column(db.String(20), nullable=False)
+
+    # Timestamps
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     # Relationships
     results = db.relationship('ExamResult', backref='student', lazy=True)
     answers = db.relationship('StudentAnswer', backref='student', lazy=True)
 
     def __repr__(self):
-        return f"Student('{self.full_name}', Group: {self.group_id})"
+        return f"Student('{self.full_name}', Group: {self.group_id}')"
 
 # ==========================================
 # 3. SUBJECT MODEL

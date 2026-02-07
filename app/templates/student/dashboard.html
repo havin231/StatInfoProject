@@ -31,24 +31,13 @@
         <!-- SETTINGS CARD (Theme Switcher) -->
         <div class="card">
             <div class="card-header bg-transparent fw-bold small text-uppercase text-muted border-bottom-0">
-                Interface Customization
+                Quick Actions
             </div>
             <div class="card-body pt-0">
-                <p class="small text-muted mb-3">Choose your preferred workspace theme:</p>
                 <div class="d-grid gap-2">
-                    <button class="btn btn-outline text-start" onclick="setTheme('glass')">
-                        <i class="fas fa-layer-group me-2"></i>Academic Glass
-                    </button>
-                    <button class="btn btn-outline text-start" onclick="setTheme('cyber')">
-                        <i class="fas fa-terminal me-2"></i>Cyber Command
-                    </button>
-
-                    <hr class="my-2 text-muted">
-
                     <a href="{{ url_for('main.student_settings') }}" class="btn btn-outline-dark text-start">
                         <i class="fas fa-cog me-2"></i>My Settings
                     </a>
-
                     <a href="/logout" class="btn btn-outline-danger text-start">
                         <i class="fas fa-sign-out-alt me-2"></i>Sign Out
                     </a>

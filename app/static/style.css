@@ -288,3 +288,15 @@ td {
     .navbar, .btn, .d-print-none { display: none !important; }
     .text-highlight { color: black !important; }
 }
+/* Theme-Adaptive Outline Button - Visible in both light and dark modes */
+.btn-outline-body {
+    border: 1px solid var(--text-main);
+    color: var(--text-main);
+    background-color: transparent;
+}
+
+.btn-outline-body:hover {
+    background-color: var(--text-main);
+    color: var(--bg-card);
+    border-color: var(--text-main);
+}

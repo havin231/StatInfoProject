@@ -56,6 +56,8 @@ from app.forms import (
     QuestionForm,
     TeacherSignupForm,
     StudentForm,
+    StudentSignupForm,
+    StudentSettingsForm,
     StudentEditForm,
     TeacherEditForm,
     InfoPageForm,

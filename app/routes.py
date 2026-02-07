@@ -2072,13 +2072,13 @@ def export_full_backup():
             w_obj.writerow([subj.id, subj.name, subj.slug, subj.description, subj.teacher_id])
         master_zip.writestr('2_subjects.csv', s_obj.getvalue())
 
-        # 3. Students
+        # 3. Students (with all fields including email and timestamps)
         s_obj = io.StringIO()
         s_obj.write('\ufeff')
         w_obj = csv.writer(s_obj, quoting=csv.QUOTE_ALL)
-        w_obj.writerow(['ID', 'Full_Name', 'Access_Code', 'Group_ID'])
+        w_obj.writerow(['ID', 'Full_Name', 'Access_Code', 'Group_ID', 'Email', 'Created_At', 'Updated_At'])
         for student in Student.query.all():
-            w_obj.writerow([student.id, student.full_name, student.access_code, student.group_id])
+            w_obj.writerow([student.id, student.full_name, student.access_code, student.group_id, student.email or '', student.created_at, student.updated_at])
         master_zip.writestr('3_students.csv', s_obj.getvalue())
 
         # 4. Pages (Lectures)

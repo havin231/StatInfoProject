@@ -10,7 +10,7 @@
 <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
     <div class="col-md-6 col-lg-4">
 
-        <div class="card shadow-lg border-0 card-accent">
+        <div class="card border-primary border-opacity-25 card-accent">
             <div class="card-body p-4 p-md-5">
 
                 <!-- Header -->
@@ -32,7 +32,8 @@
                     <div class="mb-4">
                         <label for="access_code" class="form-label small fw-bold text-muted">Access Code</label>
                         <div class="input-group input-group-lg">
-                            <span class="input-group-text bg-body-tertiary"><i class="fas fa-key text-muted"></i></span>
+                            <span class="input-group-text bg-transparent border-end-0"><i
+                                    class="fas fa-key text-muted"></i></span>
                             <!--
                                 Special styling for the Code Input:
                                 - font-monospace: Looks like code
@@ -40,8 +41,8 @@
                                 - text-center: Centers the code
                             -->
                             <input type="text" name="access_code" id="access_code"
-                                class="form-control font-monospace text-uppercase fw-bold text-center"
-                                placeholder="XXX-0000" required autocomplete="off">
+                                class="form-control font-monospace text-uppercase fw-bold text-center border-start-0 ps-0 bg-transparent text-body"
+                                placeholder="XXX-0000" style="letter-spacing: 2px;" required autocomplete="off">
                         </div>
                     </div>
 
@@ -54,7 +55,7 @@
             </div>
 
             <!-- Footer Link -->
-            <div class="card-footer bg-transparent text-center py-3 border-0">
+            <div class="card-footer bg-transparent text-center py-3 border-top border-light border-opacity-10">
                 <div class="d-grid gap-2">
                     <a href="{{ url_for('main.student_signup') }}" class="btn btn-outline-primary shadow-sm">
                         <i class="fas fa-user-plus me-2"></i>Register New Student

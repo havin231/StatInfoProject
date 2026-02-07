@@ -229,4 +229,16 @@ Error 500 (Internal Server): Usually a Jinja template trying to access a variabl
 
 Error 2013 (Lost Connection): MySQL timeout. Ensure pool_recycle: 280 is in config.py.
 
-Error 404 on Delete: The route definition in routes.py is missing or not reloaded.
+
+## 8. DEPLOYMENT AUTOMATION
+**Git Credentials:**
+- Username: `havin231`
+- Token: *[HIDDEN FOR SECURITY - Use your saved token]*
+
+**Auto-Push Protocol:**
+After every significant change, run:
+```bash
+git add .
+git commit -m "feat: [Description of change]"
+git push
+```

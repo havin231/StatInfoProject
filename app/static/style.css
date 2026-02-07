@@ -143,6 +143,30 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
+/* ========================================= */
+/* 10. CKEDITOR DARK MODE FIX */
+/* ========================================= */
+/* Fix CKEditor source mode textarea visibility in dark mode */
+[data-bs-theme="dark"] .cke_source,
+[data-bs-theme="dark"] .cke_wysiwyg_frame {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+}
+
+[data-bs-theme="dark"] .cke_contents {
+    background-color: #1e1e1e !important;
+}
+
+[data-bs-theme="dark"] .cke_top,
+[data-bs-theme="dark"] .cke_bottom {
+    background: #2d2d2d !important;
+    border-color: #444 !important;
+}
+
+[data-bs-theme="dark"] .cke_button_icon {
+    filter: invert(1);
+}
+
 /* 6. COMPONENT: BUTTONS */
 .btn-primary, .btn-lime {
     background-color: var(--primary-color);

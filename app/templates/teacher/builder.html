@@ -271,13 +271,23 @@
     document.addEventListener("DOMContentLoaded", function () {
         // Init Standard CKEditor
         if (document.getElementById('content_body')) {
-            CKEDITOR.replace('content_body', { height: 400 });
+            CKEDITOR.replace('content_body', {
+                height: 400,
+                contentsCss: [
+                    'body { background-color: #ffffff; color: #000000; padding: 10px; }',
+                    'body.night-mode { background-color: #1e1e1e; color: #e0e0e0; }'
+                ]
+            });
         }
         // Init Kurdish CKEditor
         if (document.getElementById('content_body_kurdish')) {
             CKEDITOR.replace('content_body_kurdish', {
                 height: 400,
-                contentsLangDirection: 'rtl'
+                contentsLangDirection: 'rtl',
+                contentsCss: [
+                    'body { background-color: #ffffff; color: #000000; padding: 10px; }',
+                    'body.night-mode { background-color: #1e1e1e; color: #e0e0e0; }'
+                ]
             });
         }
 

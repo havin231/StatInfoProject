@@ -265,8 +265,8 @@
 
 <script>
     // --- 1. DATA INITIALIZATION ---
-    let questionsData = {% if questions_json is defined %}{ { questions_json | tojson } } {% else %} []{% endif %};
-    let lectureMapping = {% if pages is defined %}{ { pages | tojson } } {% else %} []{% endif %};
+    let questionsData = {% if questions_json is defined %}{{ questions_json | tojson }} {% else %} []{% endif %};
+    let lectureMapping = {% if pages is defined %}{{ pages | tojson }} {% else %} []{% endif %};
 
     document.addEventListener("DOMContentLoaded", function () {
         // Init Standard CKEditor

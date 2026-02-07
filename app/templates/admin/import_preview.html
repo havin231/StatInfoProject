@@ -13,7 +13,8 @@
                         <h2 class="h4 mb-1"><i class="fas fa-table me-2"></i>Review Data Import</h2>
                         <p class="mb-0 opacity-75">Please verify the data below before saving to the database.</p>
                     </div>
-                    <span class="badge bg-white text-primary fs-6">{{ data|length }} Rows Found</span>
+                    <span class="badge bg-primary bg-opacity-10 text-primary border border-primary fs-6">{{ data|length
+                        }} Rows Found</span>
                 </div>
             </div>
 
@@ -25,7 +26,7 @@
                 <input type="hidden" name="data" value='{{ data | tojson }}'>
                 <input type="hidden" name="import_type" value="{{ import_type }}">
                 {% if subject_id %}
-                    <input type="hidden" name="subject_id" value="{{ subject_id }}">
+                <input type="hidden" name="subject_id" value="{{ subject_id }}">
                 {% endif %}
 
                 <div class="card-body p-0">
@@ -36,22 +37,24 @@
                     -->
                     {% if import_type == 'question' %}
                     <div class="bg-body-tertiary p-3 border-bottom d-flex flex-wrap gap-3 align-items-center">
-                        <div class="fw-bold text-muted text-uppercase small"><i class="fas fa-sliders-h me-2"></i>Batch Settings:</div>
+                        <div class="fw-bold text-muted text-uppercase small"><i class="fas fa-sliders-h me-2"></i>Batch
+                            Settings:</div>
 
                         <!-- 1. Bulk Lecture Assignment -->
                         <div class="input-group input-group-sm" style="max-width: 300px;">
-                            <span class="input-group-text bg-white">Assign to Lecture:</span>
+                            <span class="input-group-text bg-transparent">Assign to Lecture:</span>
                             <select name="bulk_lecture_id" class="form-select">
                                 <option value="">(None - General Subject Exam)</option>
                                 {% for lec in lectures %}
-                                    <option value="{{ lec.id }}">{{ lec.title }}</option>
+                                <option value="{{ lec.id }}">{{ lec.title }}</option>
                                 {% endfor %}
                             </select>
                         </div>
 
                         <!-- 2. Language/RTL Toggle -->
                         <div class="form-check form-switch ms-auto">
-                            <input class="form-check-input" type="checkbox" role="switch" id="bulkLanguage" name="bulk_language">
+                            <input class="form-check-input" type="checkbox" role="switch" id="bulkLanguage"
+                                name="bulk_language">
                             <label class="form-check-label fw-bold" for="bulkLanguage">Mark all as Kurdish (RTL)</label>
                         </div>
                     </div>
@@ -63,7 +66,8 @@
                             <i class="fas fa-exclamation-triangle fs-4 me-3 mt-1"></i>
                             <div>
                                 <strong>Preview Mode Only</strong><br>
-                                This data is held in memory. It will <strong>not</strong> be saved until you click "Confirm Import".
+                                This data is held in memory. It will <strong>not</strong> be saved until you click
+                                "Confirm Import".
                             </div>
                         </div>
                     </div>
@@ -71,17 +75,17 @@
                     <!-- SCROLLABLE TABLE -->
                     <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
                         <table class="table table-striped table-hover align-middle mb-0" id="previewTable">
-                            <thead class="bg-light sticky-top" style="z-index: 5;">
+                            <thead class="bg-body-secondary sticky-top" style="z-index: 5;">
                                 <tr>
                                     <th class="ps-4">#</th>
                                     {% if import_type == 'student' %}
-                                        <th>Full Name</th>
-                                        <th>Group ID</th>
-                                        <th>Generated Access Code</th>
+                                    <th>Full Name</th>
+                                    <th>Group ID</th>
+                                    <th>Generated Access Code</th>
                                     {% elif import_type == 'question' %}
-                                        <th style="width: 40%;">Question</th>
-                                        <th>Options (A / B / C / D)</th>
-                                        <th>Answer</th>
+                                    <th style="width: 40%;">Question</th>
+                                    <th>Options (A / B / C / D)</th>
+                                    <th>Answer</th>
                                     {% endif %}
                                 </tr>
                             </thead>
@@ -91,20 +95,20 @@
                                     <td class="ps-4 text-muted">{{ loop.index }}</td>
 
                                     {% if import_type == 'student' %}
-                                        <td class="fw-bold">{{ row.full_name }}</td>
-                                        <td><span class="badge bg-secondary">{{ row.group_id }}</span></td>
-                                        <td><code class="text-primary fw-bold">{{ row.access_code }}</code></td>
+                                    <td class="fw-bold">{{ row.full_name }}</td>
+                                    <td><span class="badge bg-secondary">{{ row.group_id }}</span></td>
+                                    <td><code class="text-primary fw-bold">{{ row.access_code }}</code></td>
 
                                     {% elif import_type == 'question' %}
-                                        <!-- Added class 'preview-text' for JS targeting -->
-                                        <td class="preview-text">{{ row.question_text | truncate(100) }}</td>
-                                        <td class="small text-muted preview-text">
-                                            A: {{ row.option_a }}<br>
-                                            B: {{ row.option_b }}<br>
-                                            C: {{ row.option_c }}<br>
-                                            D: {{ row.option_d }}
-                                        </td>
-                                        <td class="fw-bold text-success text-center">{{ row.correct_answer }}</td>
+                                    <!-- Added class 'preview-text' for JS targeting -->
+                                    <td class="preview-text">{{ row.question_text | truncate(100) }}</td>
+                                    <td class="small text-muted preview-text">
+                                        A: {{ row.option_a }}<br>
+                                        B: {{ row.option_b }}<br>
+                                        C: {{ row.option_c }}<br>
+                                        D: {{ row.option_d }}
+                                    </td>
+                                    <td class="fw-bold text-success text-center">{{ row.correct_answer }}</td>
                                     {% endif %}
                                 </tr>
                                 {% endfor %}
@@ -114,7 +118,7 @@
                 </div>
 
                 <!-- ACTION FOOTER -->
-                <div class="card-footer bg-white p-4 text-end border-top">
+                <div class="card-footer bg-transparent p-4 text-end border-top">
                     <a href="javascript:history.back()" class="btn btn-outline-secondary me-2">Cancel & Discard</a>
                     <button type="submit" class="btn btn-success px-4 fw-bold shadow-sm">
                         <i class="fas fa-check-circle me-2"></i>Confirm Import
@@ -128,12 +132,12 @@
 
 <!-- JAVASCRIPT FOR RTL PREVIEW -->
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         const toggle = document.getElementById('bulkLanguage');
         const textElements = document.querySelectorAll('.preview-text');
 
         if (toggle) {
-            toggle.addEventListener('change', function() {
+            toggle.addEventListener('change', function () {
                 if (this.checked) {
                     // Switch to Kurdish Mode (RTL)
                     textElements.forEach(el => {

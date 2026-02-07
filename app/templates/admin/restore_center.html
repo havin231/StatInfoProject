@@ -5,7 +5,7 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-md-8 col-lg-6">
-        
+
         <div class="text-center mb-5">
             <h1 class="display-5 text-danger fw-bold">
                 <i class="fas fa-biohazard me-3"></i>Disaster Recovery
@@ -16,12 +16,13 @@
         <div class="card card-accent border-danger shadow-lg">
             <div class="card-header bg-danger text-white fw-bold d-flex justify-content-between align-items-center">
                 <span><i class="fas fa-exclamation-triangle me-2"></i>DANGER ZONE</span>
-                <span class="badge bg-white text-danger">ADMIN ONLY</span>
+                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">ADMIN ONLY</span>
             </div>
             <div class="card-body p-4">
-                
+
                 <div class="alert alert-danger border-danger">
-                    <h5 class="alert-heading fw-bold"><i class="fas fa-skull-crossbones me-2"></i>WARNING: NUCLEAR OPTION</h5>
+                    <h5 class="alert-heading fw-bold"><i class="fas fa-skull-crossbones me-2"></i>WARNING: NUCLEAR
+                        OPTION</h5>
                     <p class="mb-0">
                         This process will <strong>WIPE ALL CURRENT DATA</strong> from the database.
                         It will then attempt to reconstruct the system state from your backup file.
@@ -31,7 +32,7 @@
 
                 <form method="POST" enctype="multipart/form-data" action="{{ url_for('main.restore_system') }}">
                     {{ form.hidden_tag() }}
-                    
+
                     <div class="mb-4">
                         <label class="form-label fw-bold">Select Backup Archive</label>
                         {{ form.backup_file(class="form-control form-control-lg") }}
@@ -48,7 +49,8 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-danger btn-lg fw-bold" onclick="return confirm('FINAL WARNING: Are you absolutely sure?')">
+                        <button type="submit" class="btn btn-danger btn-lg fw-bold"
+                            onclick="return confirm('FINAL WARNING: Are you absolutely sure?')">
                             <i class="fas fa-radiation me-2"></i>INITIATE RESTORE SEQUENCE
                         </button>
                         <a href="/teacher/dashboard" class="btn btn-outline-secondary">

@@ -14,7 +14,8 @@
             <div>
                 <h1 class="h3 mb-1">{{ title }}</h1>
                 {% if subject %}
-                    <p class="text-muted small mb-0">Subject Context: <span class="fw-bold text-highlight">{{ subject.name }}</span></p>
+                <p class="text-muted small mb-0">Subject Context: <span class="fw-bold text-highlight">{{ subject.name
+                        }}</span></p>
                 {% endif %}
             </div>
             <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
@@ -42,12 +43,14 @@
                     <!-- Lecture Title -->
                     <div class="mb-4">
                         <label class="form-label fw-bold text-muted small text-uppercase">Lecture Title</label>
-                        {{ form.title(class="form-control form-control-lg", placeholder="e.g., Introduction to Informatic Systems") }}
+                        {{ form.title(class="form-control form-control-lg", placeholder="e.g., Introduction to
+                        Informatic Systems") }}
                     </div>
 
                     <!-- English Content (Standard) -->
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase">Lecture Content (English)</label>
+                        <label class="form-label fw-bold text-muted small text-uppercase">Lecture Content
+                            (English)</label>
                         {{ form.content_body(id="content_body", class="form-control") }}
                     </div>
 
@@ -55,8 +58,10 @@
                     <div class="mb-4 p-3 bg-body-tertiary rounded border border-dashed">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <label class="form-label fw-bold text-muted small text-uppercase mb-0">Bilingual Support</label>
-                                <p class="text-muted small mb-0">Optionally add a Kurdish translation for this lecture.</p>
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-0">Bilingual
+                                    Support</label>
+                                <p class="text-muted small mb-0">Optionally add a Kurdish translation for this lecture.
+                                </p>
                             </div>
                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleKurdish()">
                                 <i class="fas fa-plus me-1"></i> Add / Edit Kurdish Section
@@ -86,9 +91,11 @@
                         <div class="list-group-item d-flex justify-content-between align-items-center">
                             <div>
                                 <strong>{{ res.title }}</strong>
-                                <a href="{{ res.link }}" target="_blank" class="small ms-2 text-muted"><i class="fas fa-external-link-alt"></i> Test Link</a>
+                                <a href="{{ res.link }}" target="_blank" class="small ms-2 text-muted"><i
+                                        class="fas fa-external-link-alt"></i> Test Link</a>
                             </div>
-                            <a href="/teacher/resource/delete/{{ res.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this resource?')">
+                            <a href="/teacher/resource/delete/{{ res.id }}" class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Remove this resource?')">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -101,13 +108,16 @@
                     <!-- Add New Resource Form -->
                     <div class="bg-body-tertiary p-3 rounded border">
                         <h6 class="small fw-bold text-uppercase text-muted mb-2">Add New Link</h6>
-                        <form method="POST" action="/teacher/resource/add/{{ page.id }}" class="row g-2 align-items-end">
+                        <form method="POST" action="/teacher/resource/add/{{ page.id }}"
+                            class="row g-2 align-items-end">
                             {{ resource_form.hidden_tag() }}
                             <div class="col-md-5">
-                                {{ resource_form.title(class="form-control form-control-sm", placeholder="Title (e.g. Lecture Slides)") }}
+                                {{ resource_form.title(class="form-control form-control-sm", placeholder="Title (e.g.
+                                Lecture Slides)") }}
                             </div>
                             <div class="col-md-5">
-                                {{ resource_form.link(class="form-control form-control-sm", placeholder="https://...") }}
+                                {{ resource_form.link(class="form-control form-control-sm", placeholder="https://...")
+                                }}
                             </div>
                             <div class="col-md-2">
                                 {{ resource_form.submit(class="btn btn-success btn-sm w-100") }}
@@ -119,7 +129,8 @@
                 {% if not questions_json %}
                 <!-- Message for New Pages -->
                 <div class="mt-4 alert alert-info small">
-                    <i class="fas fa-info-circle me-2"></i> To add resource links (PDFs, Videos), please <strong>Save</strong> this lecture first. You can then add them in the Edit screen.
+                    <i class="fas fa-info-circle me-2"></i> To add resource links (PDFs, Videos), please
+                    <strong>Save</strong> this lecture first. You can then add them in the Edit screen.
                 </div>
                 {% endif %}
                 {% endif %}
@@ -133,58 +144,61 @@
                 -->
                 {% elif questions_json is defined %}
 
-                    <!-- Hidden inputs for data context -->
-                    <input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
-                    <input type="hidden" id="subject_id" value="{{ subject.id }}">
+                <!-- Hidden inputs for data context -->
+                <input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" id="subject_id" value="{{ subject.id }}">
 
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
-                        <div>
-                            <h5 class="fw-bold mb-0 text-muted text-uppercase">Detailed Question Bank</h5>
-                            <small class="text-muted">Manage questions, assign lectures, and set languages.</small>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <!-- Import Button -->
-                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importModal">
-                                <i class="fas fa-file-excel me-2"></i>Import Excel
-                            </button>
-                            <!-- Global Save Button -->
-                            <button type="button" class="btn btn-sm btn-primary px-3 shadow-sm" onclick="saveChanges()" id="saveBtn">
-                                <i class="fas fa-save me-2"></i>Save All Changes
-                            </button>
-                        </div>
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                    <div>
+                        <h5 class="fw-bold mb-0 text-muted text-uppercase">Detailed Question Bank</h5>
+                        <small class="text-muted">Manage questions, assign lectures, and set languages.</small>
                     </div>
-
-                    <!-- The Spreadsheet Table -->
-                    <div class="table-responsive border rounded bg-white shadow-sm" style="max-height: 65vh; overflow-y: auto;">
-                        <table class="table table-sm table-hover align-middle mb-0">
-                            <thead class="bg-light sticky-top" style="z-index: 5;">
-                                <tr>
-                                    <th class="ps-3" style="width: 40px;">#</th>
-                                    <!-- TASK 4: Language Column -->
-                                    <th style="width: 50px;" class="text-center" title="Is Kurdish? (RTL)">RTL</th>
-
-                                    <th style="min-width: 300px;">Question Text</th>
-                                    <!-- TASK 4: Lecture Column -->
-                                    <th style="min-width: 180px;">Assigned Lecture</th>
-                                    <th style="min-width: 100px;">Opt A</th>
-                                    <th style="min-width: 100px;">Opt B</th>
-                                    <th style="min-width: 100px;">Opt C</th>
-                                    <th style="min-width: 100px;">Opt D</th>
-                                    <th style="width: 70px;">Ans</th>
-                                    <th style="width: 50px;"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="questionsBody">
-                                <!-- JavaScript will inject rows here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="d-grid mt-3">
-                        <button type="button" class="btn btn-outline-secondary border-dashed py-2 fw-bold" onclick="addQuestion()">
-                            <i class="fas fa-plus me-2"></i>Add New Question Row
+                    <div class="d-flex gap-2">
+                        <!-- Import Button -->
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
+                            data-bs-target="#importModal">
+                            <i class="fas fa-file-excel me-2"></i>Import Excel
+                        </button>
+                        <!-- Global Save Button -->
+                        <button type="button" class="btn btn-sm btn-primary px-3 shadow-sm" onclick="saveChanges()"
+                            id="saveBtn">
+                            <i class="fas fa-save me-2"></i>Save All Changes
                         </button>
                     </div>
+                </div>
+
+                <!-- The Spreadsheet Table -->
+                <div class="table-responsive border rounded shadow-sm" style="max-height: 65vh; overflow-y: auto;">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="bg-body-secondary sticky-top" style="z-index: 5;">
+                            <tr>
+                                <th class="ps-3" style="width: 40px;">#</th>
+                                <!-- TASK 4: Language Column -->
+                                <th style="width: 50px;" class="text-center" title="Is Kurdish? (RTL)">RTL</th>
+
+                                <th style="min-width: 300px;">Question Text</th>
+                                <!-- TASK 4: Lecture Column -->
+                                <th style="min-width: 180px;">Assigned Lecture</th>
+                                <th style="min-width: 100px;">Opt A</th>
+                                <th style="min-width: 100px;">Opt B</th>
+                                <th style="min-width: 100px;">Opt C</th>
+                                <th style="min-width: 100px;">Opt D</th>
+                                <th style="width: 70px;">Ans</th>
+                                <th style="width: 50px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="questionsBody">
+                            <!-- JavaScript will inject rows here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-grid mt-3">
+                    <button type="button" class="btn btn-outline-secondary border-dashed py-2 fw-bold"
+                        onclick="addQuestion()">
+                        <i class="fas fa-plus me-2"></i>Add New Question Row
+                    </button>
+                </div>
 
                 <!--
                     ==========================================
@@ -251,10 +265,10 @@
 
 <script>
     // --- 1. DATA INITIALIZATION ---
-    let questionsData = {% if questions_json is defined %}{{ questions_json | tojson }}{% else %}[]{% endif %};
-    let lectureMapping = {% if pages is defined %}{{ pages | tojson }}{% else %}[]{% endif %};
+    let questionsData = {% if questions_json is defined %}{ { questions_json | tojson } } {% else %} []{% endif %};
+    let lectureMapping = {% if pages is defined %}{ { pages | tojson } } {% else %} []{% endif %};
 
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         // Init Standard CKEditor
         if (document.getElementById('content_body')) {
             CKEDITOR.replace('content_body', { height: 400 });
@@ -375,7 +389,7 @@
             const q = questionsData[i];
             if (!q.text.trim()) {
                 alertBox.className = 'alert alert-danger';
-                alertBox.innerHTML = `<strong>Error in row ${i+1}:</strong> Question text cannot be empty.`;
+                alertBox.innerHTML = `<strong>Error in row ${i + 1}:</strong> Question text cannot be empty.`;
                 alertBox.classList.remove('d-none');
                 return;
             }
@@ -392,24 +406,24 @@
             },
             body: JSON.stringify(questionsData)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alertBox.className = 'alert alert-success';
-                alertBox.innerHTML = 'All changes saved to the Question Bank!';
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alertBox.className = 'alert alert-success';
+                    alertBox.innerHTML = 'All changes saved to the Question Bank!';
+                    alertBox.classList.remove('d-none');
+                    setTimeout(() => location.reload(), 1200);
+                } else {
+                    throw new Error(data.message);
+                }
+            })
+            .catch(error => {
+                alertBox.className = 'alert alert-danger';
+                alertBox.innerHTML = `<strong>Failed to save:</strong> ${error.message}`;
                 alertBox.classList.remove('d-none');
-                setTimeout(() => location.reload(), 1200);
-            } else {
-                throw new Error(data.message);
-            }
-        })
-        .catch(error => {
-            alertBox.className = 'alert alert-danger';
-            alertBox.innerHTML = `<strong>Failed to save:</strong> ${error.message}`;
-            alertBox.classList.remove('d-none');
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-save me-2"></i>Save All Changes';
-        });
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-2"></i>Save All Changes';
+            });
     }
 </script>
 
@@ -418,11 +432,13 @@
         border-radius: 0;
         padding: 0.5rem;
     }
+
     #questionsBody input:focus {
         background-color: var(--bg-body);
         box-shadow: none;
         border-bottom: 2px solid var(--primary-color) !important;
     }
+
     .border-dashed {
         border: 2px dashed var(--border-color) !important;
     }

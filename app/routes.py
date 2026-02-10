@@ -760,22 +760,26 @@ def teacher_dashboard():
 def toggle_visibility(subject_id):
     """
     TOGGLE SUBJECT VISIBILITY
-    
+
     Allows Teachers and Admins to show/hide a subject on the public homepage.
+    Uses a traditional form POST + redirect for maximum reliability.
     """
     subject = Subject.query.get_or_404(subject_id)
-    
+
     # Permission Check: Must be Admin OR Owner
     if not current_user.is_admin and subject.teacher_id != current_user.id:
-        return jsonify(success=False, message="Permission denied"), 403
-        
+        abort(403)
+
     try:
         subject.is_public = not subject.is_public
         db.session.commit()
-        return jsonify(success=True, is_public=subject.is_public)
+        status = "visible" if subject.is_public else "hidden"
+        flash(f'Subject "{subject.name}" is now {status} on the public homepage.', 'success')
     except Exception as e:
         db.session.rollback()
-        return jsonify(success=False, message=str(e)), 500
+        flash(f'Error updating visibility: {str(e)}', 'danger')
+
+    return redirect(url_for('main.teacher_dashboard'))
 
 
 @main.route('/admin/add_teacher', methods=['POST'])
@@ -2094,13 +2098,13 @@ def export_full_backup():
             w_obj.writerow([staff.id, staff.username, staff.email, staff.password_hash, staff.is_admin])
         master_zip.writestr('1_users.csv', s_obj.getvalue())
 
-        # 2. Subjects (The missing piece)
+        # 2. Subjects (with visibility flag)
         s_obj = io.StringIO()
         s_obj.write('\ufeff')
         w_obj = csv.writer(s_obj, quoting=csv.QUOTE_ALL)
-        w_obj.writerow(['ID', 'Name', 'Slug', 'Description', 'Teacher_ID'])
+        w_obj.writerow(['ID', 'Name', 'Slug', 'Description', 'Teacher_ID', 'Is_Public'])
         for subj in Subject.query.all():
-            w_obj.writerow([subj.id, subj.name, subj.slug, subj.description, subj.teacher_id])
+            w_obj.writerow([subj.id, subj.name, subj.slug, subj.description, subj.teacher_id, subj.is_public])
         master_zip.writestr('2_subjects.csv', s_obj.getvalue())
 
         # 3. Students (with all fields including email and timestamps)
@@ -2309,14 +2313,19 @@ def restore_system():
                         db.session.add(u)
                 db.session.commit()
 
-                # B. Subjects
+                # B. Subjects (with visibility flag)
                 for row in stream_csv('2_subjects.csv'):
+                    # Backwards compatible: older backups may not have Is_Public
+                    is_public_val = True
+                    if 'Is_Public' in row:
+                        is_public_val = (row['Is_Public'] == 'True')
                     db.session.add(Subject(
                         id=int(row['ID']),
                         name=row['Name'],
                         slug=row['Slug'],
                         description=row['Description'],
-                        teacher_id=int(row['Teacher_ID'])
+                        teacher_id=int(row['Teacher_ID']),
+                        is_public=is_public_val
                     ))
                 db.session.commit()
 

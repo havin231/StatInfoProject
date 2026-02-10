@@ -126,15 +126,28 @@
 
                         <!-- Action Area -->
                         <div class="mt-auto">
-                            <!-- Visibility Toggle -->
-                            <div class="form-check form-switch mb-3">
-                                <input class="form-check-input" type="checkbox" id="visSwitch{{ sub.id }}" {% if
-                                    sub.is_public %}checked{% endif %}
-                                    onchange="toggleSubjectVisibility({{ sub.id }}, this)">
-                                <label class="form-check-label small text-muted" for="visSwitch{{ sub.id }}">
-                                    Publicly Visible
-                                </label>
-                            </div>
+                            <!-- Visibility Toggle (Form POST) -->
+                            <form method="POST" action="/subject/{{ sub.id }}/toggle_visibility" class="mb-3">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="small text-muted">
+                                        <i class="fas fa-globe me-1"></i>
+                                        {% if sub.is_public %}
+                                        <span class="text-success">Public</span>
+                                        {% else %}
+                                        <span class="text-danger">Hidden</span>
+                                        {% endif %}
+                                    </span>
+                                    <button type="submit"
+                                        class="btn btn-sm {% if sub.is_public %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                        {% if sub.is_public %}
+                                        <i class="fas fa-eye-slash me-1"></i>Hide
+                                        {% else %}
+                                        <i class="fas fa-eye me-1"></i>Show
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </form>
 
                             <!-- Primary Action -->
                             <div class="d-grid mb-2">
@@ -177,35 +190,3 @@
     </div>
 </div>
 {% endblock %}
-
-<script>
-    function toggleSubjectVisibility(subjectId, checkbox) {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        checkbox.disabled = true;
-
-        fetch(`/subject/${subjectId}/toggle_visibility`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrfToken
-            }
-        })
-            .then(response => response.json())
-            .then(data => {
-                checkbox.disabled = false;
-                if (data.success) {
-                    console.log(`Subject ${subjectId} visibility: ${data.is_public}`);
-                } else {
-                    alert('Error updating visibility: ' + (data.message || 'Unknown error'));
-                    checkbox.checked = !checkbox.checked; // Revert
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                checkbox.disabled = false;
-                checkbox.checked = !checkbox.checked; // Revert
-                alert('Communication error with server.');
-            });
-    }
-</script>

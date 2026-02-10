@@ -156,8 +156,8 @@ Logic:
 2.  Rehydrate: Parse ZIP of CSVs.
 3.  Strict Order: User -> Subject -> Student -> Page -> Resource -> Question -> ExamResult -> Answer.
 
-Constraint: Export function now includes `2_subjects.csv` and PK/FK columns to ensure lossless restoration.
-Backup Compatibility: Only Backups created AFTER Jan 2026 (v2.1) are supported.
+Constraint: Export function now includes `2_subjects.csv` (with `is_public`), and PK/FK columns to ensure lossless restoration.
+Backup Compatibility: Only Backups created AFTER Jan 2026 (v2.1) are supported. Old backups are backwards compatible with the `is_public` field.
 
 5. UI/UX STANDARDS
 

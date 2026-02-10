@@ -173,7 +173,7 @@ def index():
 
     Lists all academic subjects currently offered.
     """
-    subject_list = Subject.query.all()
+    subject_list = Subject.query.filter_by(is_public=True).all()
     return render_template('index.html', subjects=subject_list)
 
 
@@ -518,6 +518,12 @@ def subject_detail(slug):
     Open to authenticated students and staff.
     """
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
+    
+    # Visibility Check: If hidden, restrict access to staff only
+    if not target_subject.is_public:
+        if not current_user.is_authenticated:
+            abort(403)
+            
     return render_template('subject.html', subject=target_subject)
 
 
@@ -747,6 +753,29 @@ def teacher_dashboard():
             subjects=assigned_subjects,
             total_results=aggregate_results_count
         )
+
+
+@main.route('/subject/<int:subject_id>/toggle_visibility', methods=['POST'])
+@login_required
+def toggle_visibility(subject_id):
+    """
+    TOGGLE SUBJECT VISIBILITY
+    
+    Allows Teachers and Admins to show/hide a subject on the public homepage.
+    """
+    subject = Subject.query.get_or_404(subject_id)
+    
+    # Permission Check: Must be Admin OR Owner
+    if not current_user.is_admin and subject.teacher_id != current_user.id:
+        return jsonify(success=False, message="Permission denied"), 403
+        
+    try:
+        subject.is_public = not subject.is_public
+        db.session.commit()
+        return jsonify(success=True, is_public=subject.is_public)
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(success=False, message=str(e)), 500
 
 
 @main.route('/admin/add_teacher', methods=['POST'])

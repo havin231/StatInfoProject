@@ -78,6 +78,9 @@ class Subject(db.Model):
     # URL-friendly identifier (e.g., 'physics-101')
     slug = db.Column(db.String(100), unique=True, nullable=False)
     description = db.Column(db.Text, nullable=True)
+    
+    # Visibility Flag: If False, subject is hidden from public home page
+    is_public = db.Column(db.Boolean, default=True)
 
     # Foreign Key: Link to the Teacher who owns this subject
     teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

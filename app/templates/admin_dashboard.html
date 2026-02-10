@@ -112,6 +112,43 @@
     -->
     <div class="col-lg-9">
 
+        <!-- GLOBAL SUBJECT MANAGEMENT -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">Global Subject Control</h1>
+        </div>
+
+        <div class="row g-4 mb-5">
+            {% for sub in subjects %}
+            <div class="col-md-6 col-xl-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title text-truncate mb-0" title="{{ sub.name }}">{{ sub.name }}</h5>
+                            <span class="badge bg-light text-dark border">{{ sub.teacher.username }}</span>
+                        </div>
+                        <p class="small text-muted flex-grow-1">{{ sub.description | truncate(60) }}</p>
+
+                        <div class="mt-auto pt-3 border-top">
+                            <!-- Visibility Toggle -->
+                            <div class="form-check form-switch w-100 d-flex justify-content-between align-items-center">
+                                <label class="form-check-label small" for="adminVisSwitch{{ sub.id }}">
+                                    <i class="fas fa-globe me-1 text-muted"></i> Public
+                                </label>
+                                <input class="form-check-input" type="checkbox" id="adminVisSwitch{{ sub.id }}" {% if
+                                    sub.is_public %}checked{% endif %}
+                                    onchange="toggleSubjectVisibility({{ sub.id }}, this)">
+                            </div>
+
+                            <div class="d-grid mt-2">
+                                <a href="/subject/{{ sub.slug }}" class="btn btn-sm btn-outline-primary">Open</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h1 class="h3 mb-0">Admin Headquarters</h1>
             <!-- Print Button (Hidden on mobile and print) -->
@@ -298,3 +335,35 @@
     }
 </style>
 {% endblock %}
+
+<script>
+    function toggleSubjectVisibility(subjectId, checkbox) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        checkbox.disabled = true;
+
+        fetch(`/subject/${subjectId}/toggle_visibility`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                checkbox.disabled = false;
+                if (data.success) {
+                    console.log(`Subject ${subjectId} visibility updated.`);
+                } else {
+                    alert('Error: ' + (data.message || 'Action failed'));
+                    checkbox.checked = !checkbox.checked;
+                }
+            })
+            .catch(error => {
+                console.error('Network Error:', error);
+                checkbox.disabled = false;
+                checkbox.checked = !checkbox.checked;
+                alert('Network error.');
+            });
+    }
+</script>

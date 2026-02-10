@@ -126,6 +126,16 @@
 
                         <!-- Action Area -->
                         <div class="mt-auto">
+                            <!-- Visibility Toggle -->
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="visSwitch{{ sub.id }}" {% if
+                                    sub.is_public %}checked{% endif %}
+                                    onchange="toggleSubjectVisibility({{ sub.id }}, this)">
+                                <label class="form-check-label small text-muted" for="visSwitch{{ sub.id }}">
+                                    Publicly Visible
+                                </label>
+                            </div>
+
                             <!-- Primary Action -->
                             <div class="d-grid mb-2">
                                 <a href="/subject/{{ sub.slug }}" class="btn btn-primary btn-sm">
@@ -167,3 +177,35 @@
     </div>
 </div>
 {% endblock %}
+
+<script>
+    function toggleSubjectVisibility(subjectId, checkbox) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        checkbox.disabled = true;
+
+        fetch(`/subject/${subjectId}/toggle_visibility`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                checkbox.disabled = false;
+                if (data.success) {
+                    console.log(`Subject ${subjectId} visibility: ${data.is_public}`);
+                } else {
+                    alert('Error updating visibility: ' + (data.message || 'Unknown error'));
+                    checkbox.checked = !checkbox.checked; // Revert
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                checkbox.disabled = false;
+                checkbox.checked = !checkbox.checked; // Revert
+                alert('Communication error with server.');
+            });
+    }
+</script>

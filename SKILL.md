@@ -65,7 +65,7 @@ User: id, username, email, password_hash, is_admin (Bool).
 
 Student: id, full_name, access_code (Unique Index), group_id.
 
-Subject: id, name, slug, description, teacher_id.
+Subject: id, name, slug, description, teacher_id, is_public (Bool, default=True).
 
 Page (Lecture): id, title, content_body (HTML), content_body_kurdish (HTML), subject_id.
 

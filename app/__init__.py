@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_wtf.csrf import CSRFProtect 
@@ -42,5 +43,17 @@ def create_app(config_class=Config):
     # Automatically create database tables if they don't exist.
     with app.app_context():
         db.create_all()
+
+        # --- AUTO-MIGRATION ---
+        # db.create_all() only creates NEW tables, it does NOT add new columns
+        # to existing tables. This block handles that safely.
+        try:
+            with db.engine.connect() as conn:
+                conn.execute(text("ALTER TABLE subject ADD COLUMN is_public BOOLEAN DEFAULT 1"))
+                conn.commit()
+            app.logger.info("Migration: 'is_public' column added to subject table.")
+        except Exception:
+            # Column already exists — this is expected after first run.
+            pass
 
     return app

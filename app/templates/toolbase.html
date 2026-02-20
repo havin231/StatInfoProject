@@ -97,7 +97,7 @@
                 <span>{{ _('Existing Tools') }}</span>
                 {% if is_admin and tools %}
                 <form action="{{ url_for('main.delete_all_tools') }}" method="POST"
-                    onsubmit="return confirm('{{ _(\'WARNING: Are you sure you want to delete ALL tools? This cannot be undone.\') }}');">
+                    onsubmit="return confirm('{{ _('WARNING: Are you sure you want to delete ALL tools? This cannot be undone.') }}');">
                     {{ form.hidden_tag() }}
                     <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none p-0"
                         style="font-size: 0.75rem;">
@@ -135,7 +135,7 @@
                         <div>
                             {% if is_admin %}
                             <form action="{{ url_for('main.delete_tool', tool_id=tool.id) }}" method="POST"
-                                onsubmit="return confirm('{{ _(\'Delete this tool?\') }}');">
+                                onsubmit="return confirm('{{ _('Delete this tool?') }}');">
                                 {{ form.hidden_tag() }} <!-- reusing form token for csrf -->
                                 <button type="submit" class="btn btn-sm btn-outline-danger border-0"
                                     title="Delete Tool">

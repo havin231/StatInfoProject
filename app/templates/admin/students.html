@@ -35,7 +35,7 @@
                     <i class="fas fa-exclamation-triangle me-1"></i> <strong>{{ _('Danger Zone') }}</strong>
                 </div>
                 <form action="{{ url_for('main.delete_all_students') }}" method="POST"
-                    onsubmit="return confirm('{{ _(\'⚠️ CRITICAL WARNING ⚠️\\n\\nAre you sure you want to delete ALL students?\\n\\nThis action will PERMANENTLY ERASE:\\n- All student accounts\\n- All exam results\\n- All detailed answer logs\\n\\nThis cannot be undone. Click OK to wipe the database.\') }}');">
+                    onsubmit="return confirm('{{ _('⚠️ CRITICAL WARNING ⚠️\\n\\nAre you sure you want to delete ALL students?\\n\\nThis action will PERMANENTLY ERASE:\\n- All student accounts\\n- All exam results\\n- All detailed answer logs\\n\\nThis cannot be undone. Click OK to wipe the database.') }}');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-danger w-100 fw-bold">
                         <i class="fas fa-radiation me-2"></i>{{ _('Delete ALL Students') }}
@@ -144,7 +144,7 @@
                                     <!-- Single Delete Button -->
                                     <a href="/admin/delete/student/{{ s.id }}"
                                         class="btn btn-sm btn-outline-danger border"
-                                        onclick="return confirm('{{ _(\'Delete\') }} {{ s.full_name }}? {{ _(\'This removes their exam history.\') }}')"
+                                        onclick="return confirm('{{ _('Delete') }} {{ s.full_name }}? {{ _('This removes their exam history.') }}')"
                                         title="{{ _('Delete Student') }}">
                                         <i class="fas fa-trash"></i>
                                     </a>

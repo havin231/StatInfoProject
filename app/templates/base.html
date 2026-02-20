@@ -139,10 +139,10 @@
                 <ul class="navbar-nav ms-auto align-items-center gap-2">
 
                     <!-- Public Links -->
-                    <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/toolbase">Tools</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/about">About Us</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/public/stats">Stats</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/">{{ _('Home') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/toolbase">{{ _('Tools') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">{{ _('About Us') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/public/stats">{{ _('Stats') }}</a></li>
 
                     <!-- Language Switcher -->
                     <li class="nav-item">
@@ -166,23 +166,27 @@
                     <!-- Dynamic Auth Links -->
                     {% if current_user.is_authenticated %}
                     <!-- Logged in as Teacher/Admin -->
-                    <li class="nav-item"><a class="nav-link fw-bold" href="/teacher/dashboard">Teacher Dash</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" href="/teacher/dashboard">{{ _('Teacher Dash')
+                            }}</a></li>
 
 
 
 
-                    <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a></li>
+                    <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">{{ _('Logout') }}</a>
+                    </li>
                     {% elif session.get('student_id') %}
                     <!-- Logged in as Student -->
                     <!-- Logged in as Student -->
-                    <li class="nav-item"><a class="nav-link fw-bold text-highlight" href="/student/dashboard">Student
-                            Dash</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold text-highlight" href="/student/dashboard">{{
+                            _('Student Dash') }}</a></li>
 
-                    <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">Logout</a></li>
+                    <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">{{ _('Logout') }}</a>
+                    </li>
                     {% else %}
                     <!-- Guest -->
-                    <li class="nav-item"><a class="nav-link" href="/student/login">Student</a></li>
-                    <li class="nav-item"><a class="btn btn-primary px-4 btn-sm" href="/login">Teacher</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/student/login">{{ _('Student') }}</a></li>
+                    <li class="nav-item"><a class="btn btn-primary px-4 btn-sm" href="/login">{{ _('Teacher') }}</a>
+                    </li>
                     {% endif %}
                 </ul>
             </div>

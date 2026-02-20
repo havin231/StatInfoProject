@@ -1,0 +1,88 @@
+# Kurdish translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-02-20 22:37+0300\n"
+"PO-Revision-Date: 2026-02-20 22:37+0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ku\n"
+"Language-Team: ku <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/templates/base.html:142
+msgid "Home"
+msgstr "سەرەکی"
+
+#: app/templates/base.html:143
+msgid "Tools"
+msgstr "ئامرازەکان"
+
+#: app/templates/base.html:144
+msgid "About Us"
+msgstr "دەربارەی ئێمە"
+
+#: app/templates/base.html:145
+msgid "Stats"
+msgstr "ئامارەکان"
+
+#: app/templates/base.html:169
+msgid "Teacher Dash"
+msgstr "داشبۆردی مامۆستا"
+
+#: app/templates/base.html:175 app/templates/base.html:183
+msgid "Logout"
+msgstr "چوونە دەرەوە"
+
+#: app/templates/base.html:181
+msgid "Student Dash"
+msgstr "داشبۆردی خوێندکار"
+
+#: app/templates/base.html:187
+msgid "Student"
+msgstr "خوێندکار"
+
+#: app/templates/base.html:188
+msgid "Teacher"
+msgstr "مامۆستا"
+
+#: app/templates/index.html:13
+msgid "this website is still under construction."
+msgstr "ئەم ماڵپەڕە هێشتا لە ژێر دروستکردندایە."
+
+#: app/templates/index.html:15
+msgid "Welcome to"
+msgstr "بەخێربێیت بۆ"
+
+#: app/templates/index.html:17
+msgid "A place to learn"
+msgstr "شوێنێک بۆ فێربوون"
+
+#: app/templates/index.html:23
+msgid "Student Portal"
+msgstr "پۆرتاڵی خوێندکار"
+
+#: app/templates/index.html:24
+msgid "Teacher Access"
+msgstr "چوونەژوورەوەی مامۆستا"
+
+#: app/templates/index.html:53
+msgid "Enter Classroom"
+msgstr "چوونە ناو پۆل"
+
+#: app/templates/index.html:65
+msgid "No Subjects Yet"
+msgstr "هێشتا هیچ بابەتێک نییە"
+
+#: app/templates/index.html:66
+msgid "Teachers have not added any courses yet. Please check back later."
+msgstr "هێشتا مامۆستایان هیچ خولێکیان زیاد نەکردووە. تکایە دواتر سەردان بکەرەوە."
+

@@ -3,8 +3,8 @@
 {% block title %}Content Builder{% endblock %}
 
 {% block content %}
-<!-- Rich Text Editor Library (CKEditor) -->
-<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<!-- Rich Text Editor Library (TinyMCE) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
 
 <div class="row justify-content-center">
     <div class="col-lg-12">
@@ -288,25 +288,30 @@
     let lectureMapping = {% if pages is defined %}{ { pages | tojson } } {% else %} []{% endif %};
 
     document.addEventListener("DOMContentLoaded", function () {
-        // Init Standard CKEditor
+        const tinyPlugins = 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table wordcount directionality';
+        const tinyToolbar = 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | ltr rtl | code | help';
+
+        // Init Standard TinyMCE
         if (document.getElementById('content_body')) {
-            CKEDITOR.replace('content_body', {
+            tinymce.init({
+                selector: '#content_body',
                 height: 400,
-                contentsCss: [
-                    'body { background-color: #ffffff; color: #000000; padding: 10px; }',
-                    'body.night-mode { background-color: #1e1e1e; color: #e0e0e0; }'
-                ]
+                plugins: tinyPlugins,
+                toolbar: tinyToolbar,
+                promotion: false,
+                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
             });
         }
-        // Init Kurdish CKEditor
+        // Init Kurdish TinyMCE
         if (document.getElementById('content_body_kurdish')) {
-            CKEDITOR.replace('content_body_kurdish', {
+            tinymce.init({
+                selector: '#content_body_kurdish',
                 height: 400,
-                contentsLangDirection: 'rtl',
-                contentsCss: [
-                    'body { background-color: #ffffff; color: #000000; padding: 10px; }',
-                    'body.night-mode { background-color: #1e1e1e; color: #e0e0e0; }'
-                ]
+                directionality: 'rtl',
+                plugins: tinyPlugins,
+                toolbar: tinyToolbar,
+                promotion: false,
+                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
             });
         }
 

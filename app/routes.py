@@ -2250,7 +2250,7 @@ def restore_system():
 
                 # CONTENT SANITIZER - Fixes Windows line ending artifacts
                 def sanitize_content(text):
-                    """Removes rn/rnrn artifacts from CKEditor HTML content."""
+                    """Removes rn/rnrn artifacts from HTML content."""
                     if not text:
                         return text
                     # Fix literal 'rn' artifacts from Windows line endings

@@ -3,8 +3,8 @@
 {% block title %}Edit Site Info{% endblock %}
 
 {% block content %}
-<!-- Rich Text Editor Library -->
-<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<!-- Rich Text Editor Library (TinyMCE) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"></script>
 
 <div class="row justify-content-center">
     <div class="col-lg-10">
@@ -54,28 +54,18 @@
 </div>
 
 <script>
-    // --- CKEDITOR INITIALIZATION ---
-    // This config enables the "Source" button and allows any HTML tag.
+    // --- TINYMCE INITIALIZATION ---
     document.addEventListener("DOMContentLoaded", function () {
-        CKEDITOR.replace('content', {
+        tinymce.init({
+            selector: '#content',
             height: 500,
-
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount directionality',
+            toolbar: 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | code | ltr rtl | help',
+            promotion: false,
             // CRITICAL: Allows all content, including custom HTML/CSS.
-            allowedContent: true,
-
-            // Toolbar configuration to include the 'Source' button.
-            toolbarGroups: [
-                { name: 'document', groups: ['mode', 'document', 'doctools'] },
-                { name: 'clipboard', groups: ['clipboard', 'undo'] },
-                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
-                { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align'] },
-                { name: 'styles' },
-                { name: 'colors' },
-                { name: 'insert' },
-                { name: 'links' },
-                { name: 'tools' }
-            ],
-            removeButtons: '' // Keep all default buttons for this power-user tool
+            valid_elements: '*[*]',
+            extended_valid_elements: 'script[src|async|defer|type|charset]',
+            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
         });
     });
 </script>

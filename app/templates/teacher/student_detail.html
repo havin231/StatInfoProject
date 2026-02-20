@@ -12,7 +12,6 @@
     <div>
         <h1 class="h3 mb-1">{{ student.full_name }}</h1>
         <p class="text-muted small mb-0">
-            Group: <span class="font-monospace fw-bold text-body">{{ student.group_id }}</span> | 
             Access Code: <span class="font-monospace text-body">{{ student.access_code }}</span>
         </p>
     </div>
@@ -41,9 +40,11 @@
         </div>
         <div>
             {% if item.exam.score >= 50 %}
-                <span class="badge fs-6 bg-success-subtle text-success border border-success">Score: {{ item.exam.score }}%</span>
+            <span class="badge fs-6 bg-success-subtle text-success border border-success">Score: {{ item.exam.score
+                }}%</span>
             {% else %}
-                <span class="badge fs-6 bg-danger-subtle text-danger border border-danger">Score: {{ item.exam.score }}%</span>
+            <span class="badge fs-6 bg-danger-subtle text-danger border border-danger">Score: {{ item.exam.score
+                }}%</span>
             {% endif %}
         </div>
     </div>
@@ -65,17 +66,21 @@
                     <tr>
                         <td class="ps-3 small text-muted">{{ ans.question.question_text }}</td>
                         <td class="text-center font-monospace fw-bold">{{ ans.selected_option }}</td>
-                        <td class="text-center font-monospace text-success fw-bold">{{ ans.question.correct_answer }}</td>
+                        <td class="text-center font-monospace text-success fw-bold">{{ ans.question.correct_answer }}
+                        </td>
                         <td class="text-center pe-3">
                             {% if ans.is_correct %}
-                                <span class="badge bg-success-subtle text-success">Correct</span>
+                            <span class="badge bg-success-subtle text-success">Correct</span>
                             {% else %}
-                                <span class="badge bg-danger-subtle text-danger">Wrong</span>
+                            <span class="badge bg-danger-subtle text-danger">Wrong</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="4" class="text-center py-3 text-muted">Answer log for this exam is unavailable.</td></tr>
+                    <tr>
+                        <td colspan="4" class="text-center py-3 text-muted">Answer log for this exam is unavailable.
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>

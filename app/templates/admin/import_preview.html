@@ -80,7 +80,6 @@
                                     <th class="ps-4">#</th>
                                     {% if import_type == 'student' %}
                                     <th>Full Name</th>
-                                    <th>Group ID</th>
                                     <th>Generated Access Code</th>
                                     {% elif import_type == 'question' %}
                                     <th style="width: 40%;">Question</th>
@@ -96,7 +95,6 @@
 
                                     {% if import_type == 'student' %}
                                     <td class="fw-bold">{{ row.full_name }}</td>
-                                    <td><span class="badge bg-secondary">{{ row.group_id }}</span></td>
                                     <td><code class="text-primary fw-bold">{{ row.access_code }}</code></td>
 
                                     {% elif import_type == 'question' %}

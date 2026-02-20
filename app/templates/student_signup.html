@@ -34,14 +34,7 @@
                         {% endfor %}
                     </div>
 
-                    <div class="mb-4">
-                        {{ form.group_id.label(class="form-label fw-bold small text-uppercase text-muted") }}
-                        {{ form.group_id(class="form-control form-control-lg bg-transparent", placeholder="e.g. Class
-                        A-1") }}
-                        {% for error in form.group_id.errors %}
-                        <span class="text-danger small">{{ error }}</span>
-                        {% endfor %}
-                    </div>
+
 
                     <div class="d-grid mb-3">
                         {{ form.submit(class="btn btn-primary btn-lg shadow-sm") }}

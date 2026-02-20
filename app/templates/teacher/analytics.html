@@ -41,16 +41,7 @@
     Bar chart for group comparisons, Doughnut for grade breakdown.
 -->
 <div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <h3 class="h6 fw-bold text-uppercase text-muted mb-3">Group Performance</h3>
-                <div style="height: 250px; position: relative;">
-                    <canvas id="groupChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
+
     <div class="col-md-6">
         <div class="card h-100 shadow-sm border-0">
             <div class="card-body">
@@ -79,7 +70,6 @@
                     <thead class="bg-body-secondary sticky-top">
                         <tr>
                             <th class="ps-3">Name</th>
-                            <th>Group</th>
                             <th class="text-end pe-3">Avg Score</th>
                         </tr>
                     </thead>
@@ -87,21 +77,22 @@
                         {% for s in student_data %}
                         <tr>
                             <td class="ps-3">
-                                <a href="/teacher/analytics/student/{{ s.id }}" class="fw-bold text-decoration-none text-highlight">
+                                <a href="/teacher/analytics/student/{{ s.id }}"
+                                    class="fw-bold text-decoration-none text-highlight">
                                     {{ s.name }}
                                 </a>
                             </td>
-                            <td class="small">{{ s.group }}</td>
                             <td class="text-end pe-3 fw-bold">
-                                {% if s.avg_score < 50 %}
-                                    <span class="text-danger">{{ s.avg_score }}%</span>
-                                {% else %}
+                                {% if s.avg_score < 50 %} <span class="text-danger">{{ s.avg_score }}%</span>
+                                    {% else %}
                                     <span class="text-success">{{ s.avg_score }}%</span>
-                                {% endif %}
+                                    {% endif %}
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="3" class="text-center py-4 text-muted">No students found.</td></tr>
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">No students found.</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -132,11 +123,14 @@
                             </td>
                             <td class="text-center text-danger fw-bold">{{ q.failures }}</td>
                             <td class="text-center pe-3">
-                                <span class="badge bg-danger-subtle text-danger border border-danger">{{ q.difficulty }}%</span>
+                                <span class="badge bg-danger-subtle text-danger border border-danger">{{ q.difficulty
+                                    }}%</span>
                             </td>
                         </tr>
                         {% else %}
-                        <tr><td colspan="3" class="text-center py-4 text-muted">No data available.</td></tr>
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">No data available.</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
@@ -167,15 +161,17 @@
                     <td>{{ act.subject.name }}</td>
                     <td>
                         {% if act.score >= 50 %}
-                            <span class="badge bg-success-subtle text-success">{{ act.score }}%</span>
+                        <span class="badge bg-success-subtle text-success">{{ act.score }}%</span>
                         {% else %}
-                            <span class="badge bg-danger-subtle text-danger">{{ act.score }}%</span>
+                        <span class="badge bg-danger-subtle text-danger">{{ act.score }}%</span>
                         {% endif %}
                     </td>
                     <td class="text-end pe-3 text-muted small">{{ act.date_submitted.strftime('%H:%M - %d %b') }}</td>
                 </tr>
                 {% else %}
-                <tr><td colspan="4" class="text-center py-4 text-muted">No activity recorded yet.</td></tr>
+                <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">No activity recorded yet.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -205,13 +201,13 @@
         type: 'line',
         data: {
             labels: {{ trend_dates | tojson }},
-            datasets: [{
-                label: 'Class Avg',
-                data: {{ trend_scores | tojson }},
-                borderColor: '#7ab800',
-                backgroundColor: 'rgba(122, 184, 0, 0.2)',
-                tension: 0.3,
-                fill: true
+        datasets: [{
+            label: 'Class Avg',
+            data: {{ trend_scores | tojson }},
+        borderColor: '#7ab800',
+        backgroundColor: 'rgba(122, 184, 0, 0.2)',
+        tension: 0.3,
+        fill: true
             }]
         },
         options: commonOpts
@@ -222,34 +218,21 @@
         type: 'radar',
         data: {
             labels: {{ radar_labels | tojson }},
-            datasets: [{
-                label: 'Mastery',
-                data: {{ radar_values | tojson }},
-                backgroundColor: 'rgba(13, 110, 253, 0.4)',
-                borderColor: '#0d6efd',
-                pointBackgroundColor: '#0d6efd'
+        datasets: [{
+            label: 'Mastery',
+            data: {{ radar_values | tojson }},
+        backgroundColor: 'rgba(13, 110, 253, 0.4)',
+        borderColor: '#0d6efd',
+        pointBackgroundColor: '#0d6efd'
             }]
         },
         options: {
-            ...commonOpts,
-            scales: { r: { min: 0, max: 100, grid: { color: gridColor }, pointLabels: { color: textColor } } }
-        }
+        ...commonOpts,
+        scales: { r: { min: 0, max: 100, grid: { color: gridColor }, pointLabels: { color: textColor } } }
+    }
     });
 
-    // --- 3. GROUP PERFORMANCE (BAR CHART) ---
-    new Chart(document.getElementById('groupChart'), {
-        type: 'bar',
-        data: {
-            labels: {{ group_labels | tojson }},
-            datasets: [{
-                label: 'Avg Score',
-                data: {{ group_values | tojson }},
-                backgroundColor: '#20c997',
-                borderRadius: 4
-            }]
-        },
-        options: commonOpts
-    });
+
 
     // --- 4. GRADE DISTRIBUTION (DOUGHNUT CHART) ---
     new Chart(document.getElementById('gradeChart'), {
@@ -257,16 +240,17 @@
         data: {
             labels: ['Excellent (90+)', 'Good (70-89)', 'Pass (50-69)', 'Fail (<50)'],
             datasets: [{
-                data: {{ dist_values | tojson }},
-                backgroundColor: ['#198754', '#0dcaf0', '#ffc107', '#dc3545'],
-                borderWidth: 0
+                data: {{ dist_values | tojson }
+    },
+        backgroundColor: ['#198754', '#0dcaf0', '#ffc107', '#dc3545'],
+        borderWidth: 0
             }]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'right', labels: { color: textColor } } }
-        }
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'right', labels: { color: textColor } } }
+    }
     });
 </script>
 {% endblock %}

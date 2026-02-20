@@ -335,7 +335,6 @@ def student_signup():
         new_student = Student(
             full_name=form.full_name.data,
             email=form.email.data,
-            group_id=form.group_id.data,
             access_code=new_code
         )
         
@@ -1011,7 +1010,6 @@ def admin_students():
             new_student = Student(
                 full_name=form_manual.full_name.data,
                 access_code=form_manual.access_code.data,
-                group_id=form_manual.group_id.data,
                 email=form_manual.email.data
             )
             db.session.add(new_student)
@@ -1065,7 +1063,6 @@ def edit_student(student_id):
         student_record.full_name = form.full_name.data
         student_record.email = form.email.data
         student_record.access_code = form.access_code.data
-        student_record.group_id = form.group_id.data
 
         try:
             db.session.commit()
@@ -1247,8 +1244,8 @@ def import_students_step1():
             data_frame.columns = [col_name.lower().strip() for col_name in data_frame.columns]
 
             # Validate required columns
-            if 'name' not in data_frame.columns or 'group' not in data_frame.columns:
-                flash('Import Error: Your file must contain columns named "Name" and "Group".', 'danger')
+            if 'name' not in data_frame.columns:
+                flash('Import Error: Your file must contain a column named "Name".', 'danger')
                 return redirect(url_for('main.admin_students'))
 
             # Construct the preview list
@@ -1256,7 +1253,6 @@ def import_students_step1():
             for index, row in data_frame.iterrows():
                 batch_preview_list.append({
                     'full_name': str(row['name']),
-                    'group_id': str(row['group']),
                     'access_code': generate_access_code()
                 })
 
@@ -1382,8 +1378,7 @@ def process_import_confirmation():
 
                 db.session.add(Student(
                     full_name=student_row['full_name'],
-                    access_code=final_code,
-                    group_id=student_row['group_id'][:20] # Strict string truncation
+                    access_code=final_code
                 ))
                 save_count += 1
 
@@ -1916,7 +1911,6 @@ def teacher_analytics():
         student_obj = {
             'id': active_student.id,
             'name': active_student.full_name,
-            'group': active_student.group_id,
             'avg_score': personal_average
         }
         student_metric_data.append(student_obj)
@@ -1924,15 +1918,6 @@ def teacher_analytics():
             at_risk_student_list.append(student_obj)
 
     # 3. Chart Data Preparations
-    # Group Chart
-    group_metric_map = {}
-    for r in set_results:
-        g_id = r.student.group_id
-        if g_id not in group_metric_map: group_metric_map[g_id] = []
-        group_metric_map[g_id].append(r.score)
-
-    g_labels = list(group_metric_map.keys())
-    g_values = [round(sum(group_metric_map[k])/len(group_metric_map[k]), 1) for k in g_labels]
 
     # Distribution Chart
     dist_buckets = {'Excellent': 0, 'Good': 0, 'Pass': 0, 'Fail': 0}
@@ -1971,8 +1956,6 @@ def teacher_analytics():
         question_data=question_stats_list,
         student_data=student_metric_data,
         at_risk_students=at_risk_student_list,
-        group_labels=g_labels,
-        group_values=g_values,
         dist_values=list(dist_buckets.values()),
         trend_dates=t_labels,
         trend_scores=t_values,
@@ -2028,11 +2011,10 @@ def export_grades():
     output_stream.write('\ufeff') # BOM
     writer = csv.writer(output_stream, quoting=csv.QUOTE_ALL)
 
-    writer.writerow(['Student', 'Group', 'Course', 'Score (%)', 'Date'])
+    writer.writerow(['Student', 'Course', 'Score (%)', 'Date'])
     for res in results_to_export:
         writer.writerow([
             res.student.full_name,
-            res.student.group_id,
             res.subject.name,
             res.score,
             res.date_submitted.strftime('%Y-%m-%d')
@@ -2111,9 +2093,9 @@ def export_full_backup():
         s_obj = io.StringIO()
         s_obj.write('\ufeff')
         w_obj = csv.writer(s_obj, quoting=csv.QUOTE_ALL)
-        w_obj.writerow(['ID', 'Full_Name', 'Access_Code', 'Group_ID', 'Email', 'Created_At', 'Updated_At'])
+        w_obj.writerow(['ID', 'Full_Name', 'Access_Code', 'Email', 'Created_At', 'Updated_At'])
         for student in Student.query.all():
-            w_obj.writerow([student.id, student.full_name, student.access_code, student.group_id, student.email or '', student.created_at, student.updated_at])
+            w_obj.writerow([student.id, student.full_name, student.access_code, student.email or '', student.created_at, student.updated_at])
         master_zip.writestr('3_students.csv', s_obj.getvalue())
 
         # 4. Pages (Lectures)
@@ -2356,7 +2338,6 @@ def restore_system():
                         id=int(row['ID']),
                         full_name=row['Full_Name'],
                         access_code=row['Access_Code'],
-                        group_id=row['Group_ID'],
                         email=row.get('Email') or None,
                         created_at=created,
                         updated_at=updated
@@ -2671,3 +2652,10 @@ def delete_all_tools():
         flash(f'Error deleting all tools: {str(e)}', 'danger')
         
     return redirect(url_for('main.toolbase'))
+
+# --- LANGUAGE SETTINGS ---
+@main.route('/set_lang/<lang>')
+def set_lang(lang):
+    if lang in ['en', 'ku']:
+        session['lang'] = lang
+    return redirect(request.referrer or url_for('main.index'))

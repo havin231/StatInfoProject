@@ -3,8 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import text
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
-from flask_wtf.csrf import CSRFProtect 
+from flask_wtf.csrf import CSRFProtect
+from flask_babel import Babel
+from flask import session
 from config import Config
+
+def get_locale():
+    return session.get('lang', 'en')
 
 # --- EXTENSION INITIALIZATION ---
 # We create the extension instances here, but they are not attached to the app yet.
@@ -13,6 +18,7 @@ from config import Config
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 csrf = CSRFProtect()
+babel = Babel()
 
 login_manager = LoginManager()
 # The login_view tells Flask-Login where to redirect users if they try to access a protected page.
@@ -33,6 +39,7 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app) # Enables global CSRF protection for forms
+    babel.init_app(app, locale_selector=get_locale)
 
     # --- REGISTER BLUEPRINTS ---
     # Imports are placed here to avoid circular import errors.

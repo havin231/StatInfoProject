@@ -57,7 +57,6 @@ class StudentForm(FlaskForm):
     full_name = StringField('Full Name', validators=[DataRequired()])
     email = StringField('Email Address', validators=[Optional(), Email()])
     access_code = StringField('Access Code (Unique)', validators=[DataRequired()])
-    group_id = StringField('Group/Class ID', validators=[DataRequired(), Length(max=20)])
     submit = SubmitField('Add Student')
 
 class StudentSignupForm(FlaskForm):
@@ -66,7 +65,6 @@ class StudentSignupForm(FlaskForm):
     """
     full_name = StringField('Full Name', validators=[DataRequired()])
     email = StringField('Email Address', validators=[DataRequired(), Email()])
-    group_id = StringField('Group/Class ID', validators=[DataRequired(), Length(max=20)])
     submit = SubmitField('Register Account')
 
 class StudentSettingsForm(FlaskForm):
@@ -84,7 +82,6 @@ class StudentEditForm(FlaskForm):
     full_name = StringField('Full Name', validators=[DataRequired()])
     email = StringField('Email Address', validators=[Optional(), Email()])
     access_code = StringField('Access Code', validators=[DataRequired()])
-    group_id = StringField('Group/Class ID', validators=[DataRequired(), Length(max=20)])
     submit = SubmitField('Update Student Details')
 
 # ==========================================

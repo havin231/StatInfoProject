@@ -63,10 +63,7 @@
                         <div class="form-text small">Auto-generated secure token.</div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase">Group / Class ID</label>
-                        {{ form.group_id(class="form-control", placeholder="e.g., Class A-1") }}
-                    </div>
+
 
                     <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-lime shadow-sm">
@@ -113,7 +110,6 @@
                             <th class="ps-4">Full Name</th>
                             <th>Email</th>
                             <th>Access Code</th>
-                            <th>Group</th>
                             <th class="d-print-none text-end pe-4">Manage</th>
                         </tr>
                     </thead>
@@ -136,10 +132,7 @@
                                 <code
                                     class="text-primary fw-bold bg-primary bg-opacity-10 px-2 py-1 rounded border border-primary border-opacity-25">{{ s.access_code }}</code>
                             </td>
-                            <td>
-                                <span class="badge bg-secondary-subtle text-body border fw-normal px-2">{{ s.group_id
-                                    }}</span>
-                            </td>
+
                             <td class="d-print-none text-end pe-4">
                                 <div class="btn-group shadow-sm">
                                     <!-- Edit Button (Task 1) -->
@@ -189,7 +182,7 @@
 
                     <div class="alert alert-info small mb-4">
                         <i class="fas fa-info-circle me-2"></i><strong>Format Requirement:</strong><br>
-                        File must have columns: <strong>"Name"</strong> and <strong>"Group"</strong>.<br>
+                        File must have a column: <strong>"Name"</strong>.<br>
                         Access codes are generated automatically.
                     </div>
 

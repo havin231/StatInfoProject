@@ -12,7 +12,7 @@
         -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
             <a href="/subject/{{ subject.slug }}" class="btn btn-outline-secondary btn-sm">
-                <i class="fas fa-arrow-left me-2"></i>Back to Subject
+                <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Subject') }}
             </a>
 
             <div class="d-flex gap-2">
@@ -23,7 +23,7 @@
                 {% if has_quiz %}
                 <a href="/subject/{{ subject.slug }}/lecture/{{ page.id }}/quiz"
                     class="btn btn-danger btn-sm shadow-sm px-3">
-                    <i class="fas fa-stopwatch me-2"></i>Take Lecture Quiz
+                    <i class="fas fa-stopwatch me-2"></i>{{ _('Take Lecture Quiz') }}
                 </a>
                 {% endif %}
 
@@ -62,8 +62,8 @@
             -->
             {% if page.resources %}
             <div class="card-footer bg-body-tertiary p-4">
-                <h5 class="fw-bold mb-3 small text-uppercase text-muted"><i class="fas fa-paperclip me-2"></i>Learning
-                    Resources</h5>
+                <h5 class="fw-bold mb-3 small text-uppercase text-muted"><i class="fas fa-paperclip me-2"></i>{{
+                    _('Learning Resources') }}</h5>
                 <div class="list-group shadow-sm">
                     {% for res in page.resources %}
                     <a href="{{ res.link }}" target="_blank"
@@ -102,7 +102,7 @@
     <button onclick="toggleLanguage()"
         class="btn btn-primary rounded-pill shadow-lg d-none d-md-flex align-items-center gap-2 px-3 py-2">
         <i class="fa-solid fa-earth-americas fa-xl"></i>
-        <span class="fw-bold">Read in Kurdish / وەرگێڕان</span>
+        <span class="fw-bold" id="langLabel">{{ _('Read in Kurdish / وەرگێڕان') }}</span>
     </button>
 </div>
 {% endif %}
@@ -126,13 +126,13 @@
             en.classList.remove('d-none');
             ku.classList.add('d-none');
             // Update Text
-            if (label) label.innerHTML = "Read in Kurdish / وەرگێڕان";
+            if (label) label.innerHTML = "{{ _('Read in Kurdish / وەرگێڕان') }}";
         } else {
             // Switch to KURDISH
             en.classList.add('d-none');
             ku.classList.remove('d-none');
             // Update Text
-            if (label) label.innerHTML = "Read in English";
+            if (label) label.innerHTML = "{{ _('Read in English') }}";
         }
     }
 </script>

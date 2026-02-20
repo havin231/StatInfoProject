@@ -15,7 +15,7 @@
             </div>
             <p class="text-muted small mt-3">
                 <i class="fas fa-info-circle me-1"></i>
-                Select the best answer for each question below.
+                {{ _('Select the best answer for each question below.') }}
             </p>
         </div>
 
@@ -84,16 +84,16 @@
             {% else %}
             <div class="alert alert-warning text-center py-5">
                 <div class="display-1 text-warning mb-3"><i class="fas fa-clipboard-list"></i></div>
-                <h4>No Questions Found</h4>
-                <p>There are no questions assigned to this exam/lecture yet.</p>
-                <a href="/subject/{{ subject.slug }}" class="btn btn-outline-dark mt-3">Go Back</a>
+                <h4>{{ _('No Questions Found') }}</h4>
+                <p>{{ _('There are no questions assigned to this exam/lecture yet.') }}</p>
+                <a href="/subject/{{ subject.slug }}" class="btn btn-outline-dark mt-3">{{ _('Go Back') }}</a>
             </div>
             {% endfor %}
 
             {% if questions %}
             <div class="submit-container">
                 <button type="button" id="submitBtn" class="btn btn-primary btn-lg w-100 py-3 fw-bold shadow-lg">
-                    Submit Exam <i class="fas fa-paper-plane ms-2"></i>
+                    {{ _('Submit Exam') }} <i class="fas fa-paper-plane ms-2"></i>
                 </button>
             </div>
             {% endif %}
@@ -105,17 +105,17 @@
 <div id="loadingOverlay" class="d-none">
     <div class="text-center text-white">
         <div class="spinner-border text-light mb-4" style="width: 4rem; height: 4rem;" role="status"></div>
-        <h2 class="fw-bold mb-2">Submitting Exam...</h2>
-        <p class="lead mb-4" id="loadingText">Connecting to server...</p>
+        <h2 class="fw-bold mb-2">{{ _('Submitting Exam...') }}</h2>
+        <p class="lead mb-4" id="loadingText">{{ _('Connecting to server...') }}</p>
         <div class="alert alert-warning d-inline-block fw-bold">
-            <i class="fas fa-exclamation-triangle me-2"></i> DO NOT REFRESH THE PAGE
+            <i class="fas fa-exclamation-triangle me-2"></i> {{ _('DO NOT REFRESH THE PAGE') }}
         </div>
     </div>
 </div>
 
 <script>
     document.getElementById('submitBtn').addEventListener('click', function () {
-        if (confirm("Are you sure you want to submit your answers?")) {
+        if (confirm("{{ _('Are you sure you want to submit your answers?') }}")) {
             startSafeSubmission();
         }
     });
@@ -132,12 +132,12 @@
         fetch('/keep_alive')
             .then(response => {
                 if (response.ok) {
-                    statusText.innerText = "Server verified. Uploading answers...";
+                    statusText.innerText = "{{ _('Server verified. Uploading answers...') }}";
                     document.getElementById('examForm').submit();
                 } else { throw new Error('Server not ready'); }
             })
             .catch(error => {
-                statusText.innerText = "Waking up server (this may take 20s)...";
+                statusText.innerText = "{{ _('Waking up server (this may take 20s)...') }}";
                 setTimeout(checkServerStatus, 2000);
             });
     }

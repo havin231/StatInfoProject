@@ -16,8 +16,8 @@
                 <!-- Header -->
                 <div class="text-center mb-4">
                     <div class="h1 text-primary mb-3"><i class="fas fa-user-graduate"></i></div>
-                    <h2 class="h4 fw-bold">Student Portal</h2>
-                    <p class="text-muted small">Enter your unique access code to continue.</p>
+                    <h2 class="h4 fw-bold">{{ _('Student Portal') }}</h2>
+                    <p class="text-muted small">{{ _('Enter your unique access code to continue.') }}</p>
                 </div>
 
                 <!--
@@ -30,7 +30,8 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                     <div class="mb-4">
-                        <label for="access_code" class="form-label small fw-bold text-muted">Access Code</label>
+                        <label for="access_code" class="form-label small fw-bold text-muted">{{ _('Access Code')
+                            }}</label>
                         <div class="input-group input-group-lg">
                             <span class="input-group-text bg-transparent border-end-0"><i
                                     class="fas fa-key text-muted"></i></span>
@@ -48,7 +49,7 @@
 
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary btn-lg shadow-sm">
-                            Enter Classroom <i class="fas fa-sign-in-alt ms-2"></i>
+                            {{ _('Enter Classroom') }} <i class="fas fa-sign-in-alt ms-2"></i>
                         </button>
                     </div>
                 </form>
@@ -58,12 +59,12 @@
             <div class="card-footer bg-transparent text-center py-3 border-top border-light border-opacity-10">
                 <div class="d-grid gap-2">
                     <a href="{{ url_for('main.student_signup') }}" class="btn btn-outline-primary shadow-sm">
-                        <i class="fas fa-user-plus me-2"></i>Register New Student
+                        <i class="fas fa-user-plus me-2"></i>{{ _('Register New Student') }}
                     </a>
                     <a href="/login" class="btn btn-outline-secondary btn-sm d-md-none">
-                        <i class="fas fa-chalkboard-user me-2"></i>Login as Teacher
+                        <i class="fas fa-chalkboard-user me-2"></i>{{ _('Login as Teacher') }}
                     </a>
-                    <a href="/" class="small text-muted text-decoration-none">← Return Home</a>
+                    <a href="/" class="small text-muted text-decoration-none">← {{ _('Return Home') }}</a>
                 </div>
             </div>
         </div>

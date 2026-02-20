@@ -9,11 +9,12 @@
         <!-- HEADER -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h1 class="h3 mb-1"><i class="fas fa-terminal me-2 text-primary"></i>Command Center</h1>
-                <p class="text-muted small mb-0">Documentation for server maintenance and emergency scripts.</p>
+                <h1 class="h3 mb-1"><i class="fas fa-terminal me-2 text-primary"></i>{{ _('Command Center') }}</h1>
+                <p class="text-muted small mb-0">{{ _('Documentation for server maintenance and emergency scripts.') }}
+                </p>
             </div>
             <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Dashboard') }}
             </a>
         </div>
 
@@ -21,8 +22,8 @@
         <div class="card shadow-sm border-0 mb-5">
             <div class="card-header bg-body-tertiary d-flex justify-content-between align-items-center pointer"
                 data-bs-toggle="collapse" data-bs-target="#addForm" style="cursor: pointer;">
-                <h6 class="fw-bold mb-0 text-uppercase text-muted"><i class="fas fa-plus-circle me-2"></i>Add New
-                    Command</h6>
+                <h6 class="fw-bold mb-0 text-uppercase text-muted"><i class="fas fa-plus-circle me-2"></i>{{ _('Add New
+                    Command') }}</h6>
                 <i class="fas fa-chevron-down text-muted"></i>
             </div>
             <div class="collapse show" id="addForm">
@@ -66,7 +67,7 @@
                             <h5 class="fw-bold text-primary">{{ cmd.title }}</h5>
                             <a href="/admin/system/commands/delete/{{ cmd.id }}"
                                 class="btn btn-sm btn-outline-danger border-0"
-                                onclick="return confirm('Delete this documentation?')">
+                                onclick="return confirm('{{ _(\'Delete this documentation?\') }}')">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
@@ -80,7 +81,7 @@
 
                             <button class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 copy-btn"
                                 onclick="copyToClipboard('cmd-{{ cmd.id }}', this)">
-                                <i class="fas fa-copy"></i> Copy
+                                <i class="fas fa-copy"></i> {{ _('Copy') }}
                             </button>
                         </div>
                     </div>
@@ -91,8 +92,8 @@
         {% else %}
         <div class="alert alert-info text-center py-5">
             <div class="display-4 mb-3"><i class="fas fa-book"></i></div>
-            <h4>No Commands Saved</h4>
-            <p>Add common terminal commands here to keep a safe backup of your server knowledge.</p>
+            <h4>{{ _('No Commands Saved') }}</h4>
+            <p>{{ _('Add common terminal commands here to keep a safe backup of your server knowledge.') }}</p>
         </div>
         {% endif %}
 
@@ -106,7 +107,7 @@
         navigator.clipboard.writeText(text).then(() => {
             // Visual Feedback
             const originalHtml = btnElement.innerHTML;
-            btnElement.innerHTML = '<i class="fas fa-check text-success"></i> Copied!';
+            btnElement.innerHTML = `<i class="fas fa-check text-success"></i> ${"{{ _('Copied!') }}"}`;
             btnElement.classList.add('border-success');
 
             setTimeout(() => {

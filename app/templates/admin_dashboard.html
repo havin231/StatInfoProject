@@ -14,44 +14,44 @@
         <!-- MOBILE ONLY: Logout Button -->
         <div class="d-lg-none mb-3 d-grid">
             <a href="/logout" class="btn btn-outline-danger shadow-sm">
-                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                <i class="fas fa-sign-out-alt me-2"></i>{{ _('Logout') }}
             </a>
         </div>
 
         <!-- GLOBAL ACTIONS CARD -->
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-transparent fw-bold text-muted text-uppercase small border-bottom-0">
-                System Management
+                {{ _('System Management') }}
             </div>
             <div class="card-body d-grid gap-2">
                 <a href="/admin/students" class="btn btn-primary">
-                    <i class="fas fa-user-graduate me-2"></i>Manage Students
+                    <i class="fas fa-user-graduate me-2"></i>{{ _('Manage Students') }}
                 </a>
                 <a href="/teacher/analytics" class="btn btn-outline-primary">
-                    <i class="fas fa-chart-line me-2"></i>Global Analytics
+                    <i class="fas fa-chart-line me-2"></i>{{ _('Global Analytics') }}
                 </a>
                 <a href="/admin/system/commands" class="btn btn-outline-body btn-sm">
-                    <i class="fas fa-terminal me-2"></i>System Commands
+                    <i class="fas fa-terminal me-2"></i>{{ _('System Commands') }}
                 </a>
                 <a href="/toolbase" class="btn btn-outline-body btn-sm">
-                    <i class="fas fa-toolbox me-2"></i>Tool Base
+                    <i class="fas fa-toolbox me-2"></i>{{ _('Tool Base') }}
                 </a>
                 <a href="/admin/edit/about" class="btn btn-outline-body btn-sm">
-                    <i class="fas fa-globe me-2"></i>Edit "About Us"
+                    <i class="fas fa-globe me-2"></i>{{ _('Edit "About Us"') }}
                 </a>
 
                 <hr class="text-muted opacity-25 my-2">
 
                 <!-- FULL BACKUP BUTTON -->
                 <a href="{{ url_for('main.export_full_backup') }}" class="btn btn-outline-success btn-sm">
-                    <i class="fas fa-file-archive me-2"></i>Download Full Backup (.zip)
+                    <i class="fas fa-file-archive me-2"></i>{{ _('Download Full Backup (.zip)') }}
                 </a>
 
                 <hr class="text-muted opacity-25 my-2">
 
                 <!-- RESTORE CENTER BUTTON -->
                 <a href="/admin/system/restore" class="btn btn-outline-danger btn-sm">
-                    <i class="fas fa-biohazard me-2"></i>Restore System
+                    <i class="fas fa-biohazard me-2"></i>{{ _('Restore System') }}
                 </a>
             </div>
         </div>
@@ -59,32 +59,32 @@
         <!-- CREATE SUBJECT FORM -->
         <div class="card mb-4 card-accent shadow-sm">
             <div class="card-body">
-                <h6 class="fw-bold small text-uppercase mb-3"><i class="fas fa-book me-2 text-highlight"></i>Create New
-                    Subject</h6>
+                <h6 class="fw-bold small text-uppercase mb-3"><i class="fas fa-book me-2 text-highlight"></i>{{
+                    _('Create New Subject') }}</h6>
                 <form method="POST" action="/teacher/add_subject">
                     {{ subject_form.hidden_tag() }}
 
                     <div class="mb-2">
-                        <label class="form-label small fw-bold">Subject Name</label>
+                        <label class="form-label small fw-bold">{{ _('Subject Name') }}</label>
                         {{ subject_form.name(class="form-control form-control-sm", placeholder="e.g., Economics 101") }}
                     </div>
                     <div class="mb-2">
-                        <label class="form-label small fw-bold">URL Slug</label>
+                        <label class="form-label small fw-bold">{{ _('URL Slug') }}</label>
                         {{ subject_form.slug(class="form-control form-control-sm font-monospace", placeholder="e.g.,
                         econ-101") }}
                     </div>
                     <div class="mb-2">
-                        <label class="form-label small fw-bold">Assign Teacher</label>
+                        <label class="form-label small fw-bold">{{ _('Assign Teacher') }}</label>
                         {{ subject_form.teacher_id(class="form-select form-select-sm") }}
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold">Description</label>
+                        <label class="form-label small fw-bold">{{ _('Description') }}</label>
                         {{ subject_form.description(class="form-control form-control-sm", rows="2", placeholder="Brief
                         summary of the subject...") }}
                     </div>
 
                     <div class="d-grid">
-                        <button type="submit" class="btn btn-lime btn-sm w-100">Initialize Subject</button>
+                        <button type="submit" class="btn btn-lime btn-sm w-100">{{ _('Initialize Subject') }}</button>
                     </div>
                 </form>
             </div>
@@ -93,13 +93,13 @@
         <!-- THEME SETTINGS -->
         <div class="card shadow-sm">
             <div class="card-body">
-                <h6 class="fw-bold text-muted text-uppercase small mb-3">Interface Theme</h6>
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Interface Theme') }}</h6>
                 <div class="d-grid gap-2">
                     <button class="btn btn-outline btn-sm text-start" onclick="setTheme('glass')">
-                        <i class="fas fa-circle text-info me-2"></i>Academic Glass
+                        <i class="fas fa-circle text-info me-2"></i>{{ _('Academic Glass') }}
                     </button>
                     <button class="btn btn-outline btn-sm text-start" onclick="setTheme('cyber')">
-                        <i class="fas fa-square text-success me-2"></i>Cyber Command
+                        <i class="fas fa-square text-success me-2"></i>{{ _('Cyber Command') }}
                     </button>
                 </div>
             </div>
@@ -114,7 +114,7 @@
 
         <!-- GLOBAL SUBJECT MANAGEMENT -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Global Subject Control</h1>
+            <h1 class="h3 mb-0">{{ _('Global Subject Control') }}</h1>
         </div>
 
         <div class="row g-4 mb-5">
@@ -136,24 +136,25 @@
                                     <span class="small">
                                         <i class="fas fa-globe me-1 text-muted"></i>
                                         {% if sub.is_public %}
-                                        <span class="text-success">Public</span>
+                                        <span class="text-success">{{ _('Public') }}</span>
                                         {% else %}
-                                        <span class="text-danger">Hidden</span>
+                                        <span class="text-danger">{{ _('Hidden') }}</span>
                                         {% endif %}
                                     </span>
                                     <button type="submit"
                                         class="btn btn-sm {% if sub.is_public %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
                                         {% if sub.is_public %}
-                                        <i class="fas fa-eye-slash me-1"></i>Hide
+                                        <i class="fas fa-eye-slash me-1"></i>{{ _('Hide') }}
                                         {% else %}
-                                        <i class="fas fa-eye me-1"></i>Show
+                                        <i class="fas fa-eye me-1"></i>{{ _('Show') }}
                                         {% endif %}
                                     </button>
                                 </div>
                             </form>
 
                             <div class="d-grid mt-2">
-                                <a href="/subject/{{ sub.slug }}" class="btn btn-sm btn-outline-primary">Open</a>
+                                <a href="/subject/{{ sub.slug }}" class="btn btn-sm btn-outline-primary">{{ _('Open')
+                                    }}</a>
                             </div>
                         </div>
                     </div>
@@ -163,11 +164,11 @@
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Admin Headquarters</h1>
+            <h1 class="h3 mb-0">{{ _('Admin Headquarters') }}</h1>
             <!-- Print Button (Hidden on mobile and print) -->
             <button class="btn btn-sm btn-outline-secondary d-none d-md-inline-block d-print-none"
                 onclick="window.print()">
-                <i class="fas fa-print me-2"></i>Print Staff Roster
+                <i class="fas fa-print me-2"></i>{{ _('Print Staff Roster') }}
             </button>
         </div>
 
@@ -175,22 +176,22 @@
         <div class="card mb-4 shadow-sm">
             <div
                 class="card-header bg-transparent fw-bold d-flex justify-content-between align-items-center border-bottom-0 py-3">
-                <span><i class="fas fa-chalkboard-teacher me-2 text-highlight"></i>Teaching Staff</span>
+                <span><i class="fas fa-chalkboard-teacher me-2 text-highlight"></i>{{ _('Teaching Staff') }}</span>
             </div>
 
             <div class="table-responsive border-0">
                 <table class="table align-middle mb-0">
                     <thead class="bg-body-secondary">
                         <tr>
-                            <th class="ps-3">Name</th>
-                            <th class="d-none d-sm-table-cell">Email</th>
-                            <th>Subjects Assigned</th>
+                            <th class="ps-3">{{ _('Name') }}</th>
+                            <th class="d-none d-sm-table-cell">{{ _('Email') }}</th>
+                            <th>{{ _('Subjects Assigned') }}</th>
 
                             <!-- PRINT ONLY HEADER: For writing passwords manually -->
-                            <th class="d-none d-print-table-cell" style="width: 150px;">Manual Password</th>
+                            <th class="d-none d-print-table-cell" style="width: 150px;">{{ _('Manual Password') }}</th>
 
                             <!-- SCREEN ONLY HEADER: Edit buttons -->
-                            <th class="text-end pe-3 d-print-none">Actions</th>
+                            <th class="text-end pe-3 d-print-none">{{ _('Actions') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -211,7 +212,7 @@
                                     <span class="badge bg-body-secondary text-body border fw-normal">{{ sub.name
                                         }}</span>
                                     {% else %}
-                                    <span class="small text-muted fst-italic">None</span>
+                                    <span class="small text-muted fst-italic">{{ _('None') }}</span>
                                     {% endfor %}
                                 </div>
                             </td>
@@ -225,17 +226,18 @@
                             <td class="text-end pe-3 d-print-none">
                                 <div class="btn-group shadow-sm">
                                     <a href="/admin/edit/teacher/{{ t.id }}"
-                                        class="btn btn-sm btn-outline-secondary border" title="Edit Profile">
+                                        class="btn btn-sm btn-outline-secondary border" title="{{ _('Edit Profile') }}">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <a href="/admin/view_teacher/{{ t.id }}"
-                                        class="btn btn-sm btn-outline-primary border" title="View Dashboard As...">
+                                        class="btn btn-sm btn-outline-primary border"
+                                        title="{{ _('View Dashboard As...') }}">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     <a href="/admin/delete/teacher/{{ t.id }}"
                                         class="btn btn-sm btn-outline-danger border"
-                                        onclick="return confirm('Delete {{ t.username }}? This removes all their subjects and questions!')"
-                                        title="Delete Account">
+                                        onclick="return confirm('{{ _(\'Delete\') }} {{ t.username }}? {{ _(\'This removes all their subjects and questions!\') }}')"
+                                        title="{{ _('Delete Account') }}">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
@@ -243,8 +245,8 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">No staff members found. Use the form
-                                below to add the first teacher.</td>
+                            <td colspan="5" class="text-center py-5 text-muted">{{ _('No staff members found. Use the
+                                form below to add the first teacher.') }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -255,7 +257,7 @@
         <!-- QUICK ADD TEACHER FORM (Screen Only) -->
         <div class="card d-print-none shadow-sm">
             <div class="card-body bg-body-tertiary">
-                <h6 class="fw-bold small mb-3">Quick Register Staff</h6>
+                <h6 class="fw-bold small mb-3">{{ _('Quick Register Staff') }}</h6>
                 <form method="POST" action="/admin/add_teacher">
                     {{ teacher_form.hidden_tag() }}
                     <div class="row g-2 align-items-end">
@@ -271,7 +273,7 @@
                         <div class="col-md-2">
                             <div class="form-check form-switch mb-2 small">
                                 {{ teacher_form.is_admin(class="form-check-input", role="switch") }}
-                                <label class="form-check-label" for="is_admin">Admin?</label>
+                                <label class="form-check-label" for="is_admin">{{ _('Admin?') }}</label>
                             </div>
                         </div>
                         <div class="col-12">

@@ -8,26 +8,27 @@
 
 <div class="row justify-content-center">
     <div class="col-lg-10">
-        
+
         <!-- HEADER -->
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 mb-0">Site Content Manager</h1>
+            <h1 class="h3 mb-0">{{ _('Site Content Manager') }}</h1>
             <a href="/about" target="_blank" class="btn btn-outline-secondary btn-sm">
-                <i class="fas fa-external-link-alt me-2"></i>View Live Page
+                <i class="fas fa-external-link-alt me-2"></i>{{ _('View Live Page') }}
             </a>
         </div>
 
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
-                
+
                 <!-- Helper Tip -->
                 <div class="alert alert-info small">
-                    <i class="fas fa-code me-2"></i><strong>Pro Tip:</strong> Click the "Source" button in the toolbar to write raw HTML/CSS.
+                    <i class="fas fa-code me-2"></i><strong>{{ _('Pro Tip:') }}</strong> {{ _('Click the "Source" button
+                    in the toolbar to write raw HTML/CSS.') }}
                 </div>
 
                 <form method="POST" action="">
                     {{ form.hidden_tag() }}
-                    
+
                     <!-- Title Field -->
                     <div class="mb-3">
                         {{ form.title.label(class="form-label fw-bold text-muted small text-uppercase") }}
@@ -42,7 +43,7 @@
 
                     <!-- Action Buttons -->
                     <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                        <a href="/teacher/dashboard" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="/teacher/dashboard" class="btn btn-outline-secondary">{{ _('Cancel') }}</a>
                         {{ form.submit(class="btn btn-primary px-4") }}
                     </div>
                 </form>
@@ -55,19 +56,19 @@
 <script>
     // --- CKEDITOR INITIALIZATION ---
     // This config enables the "Source" button and allows any HTML tag.
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         CKEDITOR.replace('content', {
             height: 500,
-            
+
             // CRITICAL: Allows all content, including custom HTML/CSS.
-            allowedContent: true, 
-            
+            allowedContent: true,
+
             // Toolbar configuration to include the 'Source' button.
             toolbarGroups: [
-                { name: 'document', groups: [ 'mode', 'document', 'doctools' ] },
-                { name: 'clipboard', groups: [ 'clipboard', 'undo' ] },
-                { name: 'basicstyles', groups: [ 'basicstyles', 'cleanup' ] },
-                { name: 'paragraph', groups: [ 'list', 'indent', 'blocks', 'align' ] },
+                { name: 'document', groups: ['mode', 'document', 'doctools'] },
+                { name: 'clipboard', groups: ['clipboard', 'undo'] },
+                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+                { name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align'] },
                 { name: 'styles' },
                 { name: 'colors' },
                 { name: 'insert' },

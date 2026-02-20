@@ -12,15 +12,15 @@
     <div>
         <h1 class="h3 mb-1">{{ student.full_name }}</h1>
         <p class="text-muted small mb-0">
-            Access Code: <span class="font-monospace text-body">{{ student.access_code }}</span>
+            {{ _('Access Code:') }} <span class="font-monospace text-body">{{ student.access_code }}</span>
         </p>
     </div>
     <div class="d-flex gap-2">
         <a href="/teacher/export/student/answers/{{ student.id }}" class="btn btn-success btn-sm">
-            <i class="fas fa-file-csv me-2"></i>Export Detailed Log
+            <i class="fas fa-file-csv me-2"></i>{{ _('Export Detailed Log') }}
         </a>
         <a href="/teacher/analytics" class="btn btn-outline-secondary btn-sm">
-            <i class="fas fa-arrow-left me-2"></i>Back to Analytics
+            <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Analytics') }}
         </a>
     </div>
 </div>
@@ -36,14 +36,16 @@
     <div class="card-header bg-transparent d-flex justify-content-between align-items-center p-3">
         <div>
             <h5 class="h6 fw-bold mb-0 text-highlight">{{ item.exam.subject.name }}</h5>
-            <small class="text-muted">Taken on: {{ item.exam.date_submitted.strftime('%B %d, %Y') }}</small>
+            <small class="text-muted">{{ _('Taken on:') }} {{ item.exam.date_submitted.strftime('%B %d, %Y') }}</small>
         </div>
         <div>
             {% if item.exam.score >= 50 %}
-            <span class="badge fs-6 bg-success-subtle text-success border border-success">Score: {{ item.exam.score
+            <span class="badge fs-6 bg-success-subtle text-success border border-success">{{ _('Score:') }} {{
+                item.exam.score
                 }}%</span>
             {% else %}
-            <span class="badge fs-6 bg-danger-subtle text-danger border border-danger">Score: {{ item.exam.score
+            <span class="badge fs-6 bg-danger-subtle text-danger border border-danger">{{ _('Score:') }} {{
+                item.exam.score
                 }}%</span>
             {% endif %}
         </div>
@@ -55,10 +57,10 @@
             <table class="table align-middle mb-0 table-striped">
                 <thead class="bg-body-secondary">
                     <tr>
-                        <th class="ps-3" style="width: 50%;">Question</th>
-                        <th class="text-center">Selection</th>
-                        <th class="text-center">Correct Ans</th>
-                        <th class="text-center pe-3">Result</th>
+                        <th class="ps-3" style="width: 50%;">{{ _('Question') }}</th>
+                        <th class="text-center">{{ _('Selection') }}</th>
+                        <th class="text-center">{{ _('Correct Ans') }}</th>
+                        <th class="text-center pe-3">{{ _('Result') }}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -70,15 +72,16 @@
                         </td>
                         <td class="text-center pe-3">
                             {% if ans.is_correct %}
-                            <span class="badge bg-success-subtle text-success">Correct</span>
+                            <span class="badge bg-success-subtle text-success">{{ _('Correct') }}</span>
                             {% else %}
-                            <span class="badge bg-danger-subtle text-danger">Wrong</span>
+                            <span class="badge bg-danger-subtle text-danger">{{ _('Wrong') }}</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="4" class="text-center py-3 text-muted">Answer log for this exam is unavailable.
+                        <td colspan="4" class="text-center py-3 text-muted">{{ _('Answer log for this exam is
+                            unavailable.') }}
                         </td>
                     </tr>
                     {% endfor %}
@@ -91,8 +94,8 @@
 <!-- Empty State: Shown if the student has no exam history -->
 <div class="alert alert-info text-center py-5 border-dashed">
     <div class="display-4 text-info mb-3"><i class="fas fa-history"></i></div>
-    <h4>No Exam History Found</h4>
-    <p class="small text-muted">This student has not yet completed any exams.</p>
+    <h4>{{ _('No Exam History Found') }}</h4>
+    <p class="small text-muted">{{ _('This student has not yet completed any exams.') }}</p>
 </div>
 {% endfor %}
 

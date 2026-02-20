@@ -1,18 +1,17 @@
-# Kurdish translations for PROJECT.
+# Translations template for PROJECT.
 # Copyright (C) 2026 ORGANIZATION
 # This file is distributed under the same license as the PROJECT project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
 #
+#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2026-02-20 22:58+0300\n"
-"PO-Revision-Date: 2026-02-20 22:37+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language: ku\n"
-"Language-Team: ku <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -20,278 +19,278 @@ msgstr ""
 
 #: app/templates/about.html:12 app/templates/base.html:144
 msgid "About Us"
-msgstr "دەربارەی ئێمە"
+msgstr ""
 
 #: app/templates/about.html:32
 msgid "Information Coming Soon"
-msgstr "زانیارییەکان بەمزووانە بەردەست دەبن"
+msgstr ""
 
 #: app/templates/about.html:33
 msgid "The administration is currently updating this page."
-msgstr "بەڕێوەبەرایەتی لە ئێستادا ئەم پەڕەیە نوێ دەکاتەوە."
+msgstr ""
 
 #: app/templates/about.html:34 app/templates/login.html:70
 #: app/templates/student_login.html:67
 msgid "Return Home"
-msgstr "گەڕانەوە بۆ سەرەتا"
+msgstr ""
 
 #: app/templates/about.html:45
 msgid "Edit This Page (Admin Only)"
-msgstr "دەستکاریکردنی ئەم پەڕەیە (تەنها بەڕێوەبەر)"
+msgstr ""
 
 #: app/templates/base.html:142
 msgid "Home"
-msgstr "سەرەکی"
+msgstr ""
 
 #: app/templates/base.html:143
 msgid "Tools"
-msgstr "ئامرازەکان"
+msgstr ""
 
 #: app/templates/base.html:145
 msgid "Stats"
-msgstr "ئامارەکان"
+msgstr ""
 
 #: app/templates/base.html:169
 msgid "Teacher Dash"
-msgstr "داشبۆردی مامۆستا"
+msgstr ""
 
 #: app/templates/base.html:175 app/templates/base.html:183
 msgid "Logout"
-msgstr "چوونە دەرەوە"
+msgstr ""
 
 #: app/templates/base.html:181
 msgid "Student Dash"
-msgstr "داشبۆردی خوێندکار"
+msgstr ""
 
 #: app/templates/base.html:187
 msgid "Student"
-msgstr "خوێندکار"
+msgstr ""
 
 #: app/templates/base.html:188
 msgid "Teacher"
-msgstr "مامۆستا"
+msgstr ""
 
 #: app/templates/exam.html:18
 msgid "Select the best answer for each question below."
-msgstr "باشترین وەڵام بۆ هەر پرسیارێکی خوارەوە هەڵبژێرە."
+msgstr ""
 
 #: app/templates/exam.html:87
 msgid "No Questions Found"
-msgstr "هیچ پرسیارێک نەدۆزرایەوە"
+msgstr ""
 
 #: app/templates/exam.html:88
 msgid "There are no questions assigned to this exam/lecture yet."
-msgstr "هێشتا هیچ پرسیارێک بۆ ئەم تاقیکردنەوەیە/وانەیە دانەنراوە."
+msgstr ""
 
 #: app/templates/exam.html:89
 msgid "Go Back"
-msgstr "گەڕانەوە"
+msgstr ""
 
 #: app/templates/exam.html:96
 msgid "Submit Exam"
-msgstr "ناردنی تاقیکردنەوە"
+msgstr ""
 
 #: app/templates/exam.html:108
 msgid "Submitting Exam..."
-msgstr "لە ناردنی تاقیکردنەوەدایە..."
+msgstr ""
 
 #: app/templates/exam.html:109
 msgid "Connecting to server..."
-msgstr "پەیوەندیکردن بە سێرڤەرەوە..."
+msgstr ""
 
 #: app/templates/exam.html:111
 msgid "DO NOT REFRESH THE PAGE"
-msgstr "پەڕەکە نوێ مەکەرەوە"
+msgstr ""
 
 #: app/templates/exam.html:118
 msgid "Are you sure you want to submit your answers?"
-msgstr "دڵنیایت دەتەوێت وەڵامەکانت بنێریت؟"
+msgstr ""
 
 #: app/templates/exam.html:135
 msgid "Server verified. Uploading answers..."
-msgstr "سێرڤەر پشتڕاستکرایەوە. لە بارکردنی وەڵامەکان..."
+msgstr ""
 
 #: app/templates/exam.html:140
 msgid "Waking up server (this may take 20s)..."
-msgstr "بەئاگاهێنانەوەی سێرڤەر (لەوانەیە ٢٠ چرکە بخایەنێت)..."
+msgstr ""
 
 #: app/templates/index.html:13
 msgid "this website is still under construction."
-msgstr "ئەم ماڵپەڕە هێشتا لە ژێر دروستکردندایە."
+msgstr ""
 
 #: app/templates/index.html:15
 msgid "Welcome to"
-msgstr "بەخێربێیت بۆ"
+msgstr ""
 
 #: app/templates/index.html:17
 msgid "A place to learn"
-msgstr "شوێنێک بۆ فێربوون"
+msgstr ""
 
 #: app/templates/index.html:23 app/templates/student_login.html:19
 msgid "Student Portal"
-msgstr "پۆرتاڵی خوێندکار"
+msgstr ""
 
 #: app/templates/index.html:24 app/templates/login.html:21
 msgid "Teacher Access"
-msgstr "چوونەژوورەوەی مامۆستا"
+msgstr ""
 
 #: app/templates/index.html:53 app/templates/student_login.html:52
 msgid "Enter Classroom"
-msgstr "چوونە ناو پۆل"
+msgstr ""
 
 #: app/templates/index.html:65
 msgid "No Subjects Yet"
-msgstr "هێشتا هیچ بابەتێک نییە"
+msgstr ""
 
 #: app/templates/index.html:66
 msgid "Teachers have not added any courses yet. Please check back later."
-msgstr "هێشتا مامۆستایان هیچ خولێکیان زیاد نەکردووە. تکایە دواتر سەردان بکەرەوە."
+msgstr ""
 
 #: app/templates/login.html:22
 msgid "Secure Staff Portal"
-msgstr "پۆرتاڵی پارێزراوی کارمەندان"
+msgstr ""
 
 #: app/templates/admin/edit_student.html:25 app/templates/login.html:31
 msgid "Email Address"
-msgstr "ناونیشانی ئیمەیڵ"
+msgstr ""
 
 #: app/templates/login.html:42
 msgid "Password"
-msgstr "تێپەڕوشە"
+msgstr ""
 
 #: app/templates/login.html:68
 msgid "Login as Student"
-msgstr "چوونەژوورەوە وەک خوێندکار"
+msgstr ""
 
 #: app/templates/page.html:15
 msgid "Back to Subject"
-msgstr "گەڕانەوە بۆ بابەت"
+msgstr ""
 
 #: app/templates/page.html:26
 msgid "Take Lecture Quiz"
-msgstr "تاقیکردنەوەی وانە بکە"
+msgstr ""
 
 #: app/templates/page.html:66
 msgid "Learning Resources"
-msgstr "سەرچاوەکانی فێربوون"
+msgstr ""
 
 #: app/templates/page.html:105 app/templates/page.html:129
 msgid "Read in Kurdish / وەرگێڕان"
-msgstr "خوێندنەوە بە کوردی / وەرگێڕان"
+msgstr ""
 
 #: app/templates/page.html:135
 msgid "Read in English"
-msgstr "خوێندنەوە بە ئینگلیزی"
+msgstr ""
 
 #: app/templates/setup.html:16
 msgid "System Initialization"
-msgstr "دەستپێکردنی سیستەم"
+msgstr ""
 
 #: app/templates/setup.html:17
 msgid "Welcome to SchoolLMS. Please create the primary"
-msgstr "بەخێربێیت بۆ SchoolLMS. تکایە ئەکاونتی سەرەکی"
+msgstr ""
 
 #: app/templates/setup.html:17
 msgid "Headmaster"
-msgstr "بەڕێوەبەر"
+msgstr ""
 
 #: app/templates/setup.html:18
 msgid "account to begin."
-msgstr "دروست بکە بۆ دەستپێکردن."
+msgstr ""
 
 #: app/templates/setup.html:60
 msgid "This is a one-time setup process."
-msgstr "ئەمە پڕۆسەیەکی ڕێکخستنی یەکجارەکییە."
+msgstr ""
 
 #: app/templates/stats.html:8
 msgid "Academic Performance"
-msgstr "ئاستی ئەکادیمی"
+msgstr ""
 
 #: app/templates/stats.html:9
 msgid "Real-time analytics and class metrics."
-msgstr "شیکاری ڕاستەوخۆ و پێوەرەکانی پۆل."
+msgstr ""
 
 #: app/templates/stats.html:17
 msgid "Total Exams"
-msgstr "کۆی تاقیکردنەوەکان"
+msgstr ""
 
 #: app/templates/stats.html:24 app/templates/student/dashboard.html:82
 msgid "Global Average"
-msgstr "ڕێژەی گشتی"
+msgstr ""
 
 #: app/templates/stats.html:31
 msgid "Total Students"
-msgstr "کۆی خوێندکاران"
+msgstr ""
 
 #: app/templates/stats.html:43
 msgid "Subject Performance"
-msgstr "ئاستی بابەت"
+msgstr ""
 
 #: app/templates/stats.html:54
 msgid "Pass to Fail Ratio"
-msgstr "ڕێژەی دەرچوون بۆ کەوتن"
+msgstr ""
 
 #: app/templates/stats.html:66
 msgid "Detailed Breakdown"
-msgstr "وردەکارییەکان"
+msgstr ""
 
 #: app/templates/stats.html:72 app/templates/student/dashboard.html:132
 msgid "Subject"
-msgstr "بابەت"
+msgstr ""
 
 #: app/templates/stats.html:73
 msgid "Average Score"
-msgstr "تێکڕای نمرە"
+msgstr ""
 
 #: app/templates/stats.html:84
 msgid "No exam data available yet."
-msgstr "هێشتا داتای تاقیکردنەوە بەردەست نییە."
+msgstr ""
 
 #: app/templates/student_login.html:20
 msgid "Enter your unique access code to continue."
-msgstr "کۆدی چوونەژوورەوەی تایبەتیت بنووسە بۆ بەردەوامبوون."
+msgstr ""
 
 #: app/templates/admin/edit_student.html:21 app/templates/student_login.html:33
 msgid "Access Code"
-msgstr "کۆدی چوونەژوورەوە"
+msgstr ""
 
 #: app/templates/student_login.html:62
 msgid "Register New Student"
-msgstr "تۆمارکردنی خوێندکاری نوێ"
+msgstr ""
 
 #: app/templates/student_login.html:65
 msgid "Login as Teacher"
-msgstr "چوونەژوورەوە وەک مامۆستا"
+msgstr ""
 
 #: app/templates/student_signup.html:12
 msgid "Student Registration"
-msgstr "تۆماری خوێندکار"
+msgstr ""
 
 #: app/templates/student_signup.html:13
 msgid "Create your account to access exams and study materials."
-msgstr "هەژمارەکەت دروستبکە بۆ چوونە ناو تاقیکردنەوەکان و سەرچاوەکانی خوێندن."
+msgstr ""
 
 #: app/templates/student_signup.html:45
 msgid "Already have an account?"
-msgstr "پێشتر هەژمارت هەیە؟"
+msgstr ""
 
 #: app/templates/student_signup.html:46
 msgid ""
 "Login\n"
 "                            here"
-msgstr "لێرە چوونەژوورەوە بکە"
+msgstr ""
 
 #: app/templates/admin/edit_about.html:14
 msgid "Site Content Manager"
-msgstr "بەڕێوەبەری ناوەڕۆکی ماڵپەڕ"
+msgstr ""
 
 #: app/templates/admin/edit_about.html:16
 msgid "View Live Page"
-msgstr "بینینی پەڕەی ڕاستەوخۆ"
+msgstr ""
 
 #: app/templates/admin/edit_about.html:25
 msgid "Pro Tip:"
-msgstr "ئامۆژگاری:"
+msgstr ""
 
 #: app/templates/admin/edit_about.html:25
 msgid ""
@@ -304,76 +303,76 @@ msgstr ""
 #: app/templates/admin/edit_teacher.html:56
 #: app/templates/student/settings.html:85
 msgid "Cancel"
-msgstr "هەڵوەشاندنەوە"
+msgstr ""
 
 #: app/templates/admin/edit_student.html:10
 msgid "Edit Student:"
-msgstr "دەستکاریکردنی خوێندکار:"
+msgstr ""
 
 #: app/templates/admin/edit_student.html:17
 #: app/templates/admin/import_preview.html:86
 msgid "Full Name"
-msgstr "ناوی تەواو"
+msgstr ""
 
 #: app/templates/admin/edit_teacher.html:11
 msgid "Edit Staff Profile"
-msgstr "دەستکاریکردنی پرۆفایلی کارمەند"
+msgstr ""
 
 #: app/templates/admin/edit_teacher.html:44
 msgid "Grant System Administrator Access"
-msgstr "پێدانی دەسەڵاتی بەڕێوەبەری سیستەم"
+msgstr ""
 
 #: app/templates/admin/edit_teacher.html:49
 msgid "Warning:"
-msgstr "ئاگاداری:"
+msgstr ""
 
 #: app/templates/admin/edit_teacher.html:49
 msgid ""
 "Admins have full control, including deleting\n"
 "                            users and content."
-msgstr "بەڕێوەبەرەکان دەسەڵاتی تەواویان هەیە، لەوانە سڕینەوەی بەکارهێنەران و ناوەڕۆک."
+msgstr ""
 
 #: app/templates/admin/import_preview.html:13
 msgid "Review Data Import"
-msgstr "پێداچوونەوەی داتای هاوردەکراو"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:14
 msgid "Please verify the data below before saving to the database."
-msgstr "تکایە دڵنیابەرەوە لەم داتایانەی خوارەوە پێش پاشەکەوتکردن."
+msgstr ""
 
 #: app/templates/admin/import_preview.html:18
 msgid "Rows Found"
-msgstr "ڕیز دۆزرایەوە"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:42
 msgid ""
 "Batch\n"
 "                            Settings:"
-msgstr "ڕێکخستنەکانی کۆمەڵە:"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:47
 msgid "Assign to Lecture:"
-msgstr "دیاریکردن بۆ وانە:"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:49
 msgid "(None - General Subject Exam)"
-msgstr "(هیچ - تاقیکردنەوەی گشتی بابەت)"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:60
 msgid "Mark all as Kurdish (RTL)"
-msgstr "هەمووی وەک کوردی (ڕاست بۆ چەپ) دیاریبکە"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:71
 msgid "Preview Mode Only"
-msgstr "تەنها دۆخی پێشاندانی پێشوەختە"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:72
 msgid "This data is held in memory. It will"
-msgstr "ئەم داتایانە لە بیرگەدا هەڵگیراون. هەرگیز"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:72
 msgid "not"
-msgstr "نا"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:72
 msgid ""
@@ -384,235 +383,235 @@ msgstr ""
 
 #: app/templates/admin/import_preview.html:87
 msgid "Generated Access Code"
-msgstr "کۆدی چوونەژوورەوەی دروستکراو"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:89
 #: app/templates/teacher/student_detail.html:60
 msgid "Question"
-msgstr "پرسیار"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:90
 msgid "Options (A / B / C / D)"
-msgstr "هەڵبژاردنەکان (A / B / C / D)"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:91
 msgid "Answer"
-msgstr "وەڵام"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:124
 msgid "Cancel & Discard"
-msgstr "هەڵوەشاندنەوە و فڕێدان"
+msgstr ""
 
 #: app/templates/admin/import_preview.html:127
 msgid "Confirm Import"
-msgstr "پشتڕاستکردنەوەی هاوردەکردن"
+msgstr ""
 
 #: app/templates/student/dashboard.html:20
 msgid "Member of Group:"
-msgstr "ئەندامی گروپ:"
+msgstr ""
 
 #: app/templates/student/dashboard.html:26
 msgid "Browse Subjects"
-msgstr "گەڕان بەناو بابەتەکاندا"
+msgstr ""
 
 #: app/templates/student/dashboard.html:35
 msgid "Quick Actions"
-msgstr "کردارە خێراکان"
+msgstr ""
 
 #: app/templates/student/dashboard.html:40
 msgid "My Settings"
-msgstr "ڕێکخستنەکانم"
+msgstr ""
 
 #: app/templates/student/dashboard.html:43
 msgid "Sign Out"
-msgstr "چوونە دەرەوە"
+msgstr ""
 
 #: app/templates/student/dashboard.html:61
 msgid "Action Required"
-msgstr "پێویست بە کردار دەکات"
+msgstr ""
 
 #: app/templates/student/dashboard.html:62
 msgid ""
 "Please add your email address to secure your account and receive\n"
 "                        notifications."
-msgstr "تکایە ناونیشانی ئیمەیڵەکەت زیاد بکە بۆ پاراستنی ئەکاونتەکەت و وەرگرتنی ئاگادارینامە."
+msgstr ""
 
 #: app/templates/student/dashboard.html:66
 msgid "Add Email"
-msgstr "زیادکردنی ئیمەیڵ"
+msgstr ""
 
 #: app/templates/student/dashboard.html:76
 msgid "Exams Completed"
-msgstr "تاقیکردنەوە تەواوکراوەکان"
+msgstr ""
 
 #: app/templates/student/dashboard.html:91
 msgid "Subject Mastery"
-msgstr "شارەزایی بابەت"
+msgstr ""
 
 #: app/templates/student/dashboard.html:92
 msgid "Average Performance per Course"
-msgstr "تێکڕای ئاست لە هەر خولێکدا"
+msgstr ""
 
 #: app/templates/student/dashboard.html:104
 msgid "Excellent"
-msgstr "زۆر باشە"
+msgstr ""
 
 #: app/templates/student/dashboard.html:106
 msgid "Passing"
-msgstr "دەرچوون"
+msgstr ""
 
 #: app/templates/student/dashboard.html:108
 msgid "Needs Review"
-msgstr "پێویستی بە پێداچوونەوەیە"
+msgstr ""
 
 #: app/templates/student/dashboard.html:117
 msgid "No exams taken yet. Start a subject to track your mastery!"
-msgstr "هێشتا هیچ تاقیکردنەوەیەکت نەکردووە. دەستپێبکە بە بابەتێک بۆ بینینی ئاستت!"
+msgstr ""
 
 #: app/templates/student/dashboard.html:126
 msgid "Recent Exam Activity"
-msgstr "دوایین چالاکییەکانی تاقیکردنەوە"
+msgstr ""
 
 #: app/templates/student/dashboard.html:133
 msgid "Date Submitted"
-msgstr "بەرواری ناردن"
+msgstr ""
 
 #: app/templates/student/dashboard.html:134
 msgid "Score"
-msgstr "نمرە"
+msgstr ""
 
 #: app/templates/student/dashboard.html:135
 msgid "Actions"
-msgstr "کردارەکان"
+msgstr ""
 
 #: app/templates/student/dashboard.html:162
 msgid "Review"
-msgstr "پێداچوونەوە"
+msgstr ""
 
 #: app/templates/student/dashboard.html:169
 msgid "Your exam history is currently empty."
-msgstr "مێژووی تاقیکردنەوەکانت لە ئێستادا بەتاڵە."
+msgstr ""
 
 #: app/templates/student/review_exam.html:11
 msgid "Exam Results:"
-msgstr "ئەنجامەکانی تاقیکردنەوە:"
+msgstr ""
 
 #: app/templates/student/review_exam.html:12
 msgid "Taken on"
-msgstr "لە بەرواری"
+msgstr ""
 
 #: app/templates/student/review_exam.html:19
 msgid "Final Score"
-msgstr "نمرەی کۆتایی"
+msgstr ""
 
 #: app/templates/student/review_exam.html:24
 msgid "Return to Dashboard"
-msgstr "گەڕانەوە بۆ داشبۆرد"
+msgstr ""
 
 #: app/templates/student/review_exam.html:95
 msgid "The correct answer was"
-msgstr "وەڵامی ڕاست بریتی بوو لە"
+msgstr ""
 
 #: app/templates/student/settings.html:10
 msgid "Account Settings"
-msgstr "ڕێکخستنەکانی هەژمار"
+msgstr ""
 
 #: app/templates/student/settings.html:17
 msgid "Action Required:"
-msgstr "پێویست بە کردار دەکات:"
+msgstr ""
 
 #: app/templates/student/settings.html:17
 msgid ""
 "Please add your email address to secure your\n"
 "                    account."
-msgstr "تکایە ناونیشانی ئیمەیڵەکەت زیاد بکە بۆ پاراستنی ئەکاونتەکەت."
+msgstr ""
 
 #: app/templates/student/settings.html:26
 msgid "Personal Information"
-msgstr "زانیاری کەسی"
+msgstr ""
 
 #: app/templates/student/settings.html:36
 msgid ""
 "We will use this for important notifications and\n"
 "                            account recovery."
-msgstr "ئەمە بەکاردەهێنین بۆ ئاگادارینامە گرنگەکان و گەڕاندنەوەی ئەکاونت."
+msgstr ""
 
 #: app/templates/student/settings.html:45
 msgid "Appearance"
-msgstr "ڕواڵەت"
+msgstr ""
 
 #: app/templates/student/settings.html:50
 msgid "Academic Glass"
-msgstr "ڕوانگەی ئەکادیمی"
+msgstr ""
 
 #: app/templates/student/settings.html:54
 msgid "Cyber Command"
-msgstr "فەرماندەیی ئەلیکترۆنی"
+msgstr ""
 
 #: app/templates/student/settings.html:63
 msgid "Security"
-msgstr "ئاسایش"
+msgstr ""
 
 #: app/templates/student/settings.html:65
 msgid "My Access Code"
-msgstr "کۆدی چوونەژوورەوەم"
+msgstr ""
 
 #: app/templates/student/settings.html:78
 msgid "If you change this, you will need to use the new code to login next time."
-msgstr "ئەگەر ئەمە بگۆڕیت، پێویستە لە جاری داهاتوودا کۆدە نوێیەکە بەکاربهێنیت بۆ چوونەژوورەوە."
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:15
 msgid "Access Code:"
-msgstr "کۆدی چوونەژوورەوە:"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:20
 msgid "Export Detailed Log"
-msgstr "هەناردەکردنی تۆماری ورد"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:23
 msgid "Back to Analytics"
-msgstr "گەڕانەوە بۆ شیکارییەکان"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:39
 msgid "Taken on:"
-msgstr "لە بەرواری:"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:43
 #: app/templates/teacher/student_detail.html:47
 msgid "Score:"
-msgstr "نمرە:"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:61
 msgid "Selection"
-msgstr "هەڵبژاردن"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:62
 msgid "Correct Ans"
-msgstr "وەڵامی ڕاست"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:63
 msgid "Result"
-msgstr "ئەنجام"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:75
 msgid "Correct"
-msgstr "ڕاستە"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:77
 msgid "Wrong"
-msgstr "هەڵەیە"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:83
 msgid ""
 "Answer log for this exam is\n"
 "                            unavailable."
-msgstr "تۆماری وەڵامەکان بۆ ئەم تاقیکردنەوەیە بەردەست نییە."
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:97
 msgid "No Exam History Found"
-msgstr "مێژووی تاقیکردنەوە نەدۆزرایەوە"
+msgstr ""
 
 #: app/templates/teacher/student_detail.html:98
 msgid "This student has not yet completed any exams."
-msgstr "ئەم خوێندکارە هێشتا هیچ تاقیکردنەوەیەکی ئەنجام نەداوە."
+msgstr ""
 

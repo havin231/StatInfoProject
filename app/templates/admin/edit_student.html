@@ -7,26 +7,27 @@
     <div class="col-md-6">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-transparent pt-4 border-bottom-0">
-                <h2 class="h5 fw-bold mb-0">Edit Student: <span class="text-primary">{{ student.full_name }}</span></h2>
+                <h2 class="h5 fw-bold mb-0">{{ _('Edit Student:') }} <span class="text-primary">{{ student.full_name
+                        }}</span></h2>
             </div>
             <div class="card-body p-4 pt-0">
                 <form method="POST" action="">
                     {{ form.hidden_tag() }}
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted opacity-75">Full Name</label>
+                        <label class="form-label small fw-bold text-muted opacity-75">{{ _('Full Name') }}</label>
                         {{ form.full_name(class="form-control") }}
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted opacity-75">Access Code</label>
+                        <label class="form-label small fw-bold text-muted opacity-75">{{ _('Access Code') }}</label>
                         {{ form.access_code(class="form-control font-monospace") }}
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted opacity-75">Email Address</label>
+                        <label class="form-label small fw-bold text-muted opacity-75">{{ _('Email Address') }}</label>
                         {{ form.email(class="form-control") }}
                     </div>
 
                     <div class="d-flex justify-content-between border-top pt-3">
-                        <a href="/admin/students" class="btn btn-outline-secondary">Cancel</a>
+                        <a href="/admin/students" class="btn btn-outline-secondary">{{ _('Cancel') }}</a>
                         {{ form.submit(class="btn btn-primary px-4") }}
                     </div>
                 </form>

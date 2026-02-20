@@ -14,31 +14,31 @@
         <!-- BATCH OPERATIONS CARD -->
         <div class="card shadow-sm border-0 card-accent mb-4">
             <div class="card-body">
-                <h3 class="h5 mb-3"><i class="fas fa-tasks me-2 text-primary"></i>Batch Operations</h3>
-                <p class="small text-muted mb-4">Manage large groups of students efficiently.</p>
+                <h3 class="h5 mb-3"><i class="fas fa-tasks me-2 text-primary"></i>{{ _('Batch Operations') }}</h3>
+                <p class="small text-muted mb-4">{{ _('Manage large groups of students efficiently.') }}</p>
 
                 <!-- Import Button -->
                 <button type="button" class="btn btn-outline-primary w-100 mb-2" data-bs-toggle="modal"
                     data-bs-target="#importModal">
-                    <i class="fas fa-file-import me-2"></i>Import Excel/CSV
+                    <i class="fas fa-file-import me-2"></i>{{ _('Import Excel/CSV') }}
                 </button>
 
                 <!-- Export Button -->
                 <a href="/admin/export/students" class="btn btn-outline-success w-100 mb-4">
-                    <i class="fas fa-download me-2"></i>Export Roster
+                    <i class="fas fa-download me-2"></i>{{ _('Export Roster') }}
                 </a>
 
                 <hr class="text-muted opacity-25">
 
                 <!-- NUCLEAR OPTION: DELETE ALL -->
                 <div class="alert alert-danger border-danger p-2 mb-2 small">
-                    <i class="fas fa-exclamation-triangle me-1"></i> <strong>Danger Zone</strong>
+                    <i class="fas fa-exclamation-triangle me-1"></i> <strong>{{ _('Danger Zone') }}</strong>
                 </div>
                 <form action="{{ url_for('main.delete_all_students') }}" method="POST"
-                    onsubmit="return confirm('⚠️ CRITICAL WARNING ⚠️\n\nAre you sure you want to delete ALL students?\n\nThis action will PERMANENTLY ERASE:\n- All student accounts\n- All exam results\n- All detailed answer logs\n\nThis cannot be undone. Click OK to wipe the database.');">
+                    onsubmit="return confirm('{{ _(\'⚠️ CRITICAL WARNING ⚠️\\n\\nAre you sure you want to delete ALL students?\\n\\nThis action will PERMANENTLY ERASE:\\n- All student accounts\\n- All exam results\\n- All detailed answer logs\\n\\nThis cannot be undone. Click OK to wipe the database.\') }}');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-danger w-100 fw-bold">
-                        <i class="fas fa-radiation me-2"></i>Delete ALL Students
+                        <i class="fas fa-radiation me-2"></i>{{ _('Delete ALL Students') }}
                     </button>
                 </form>
             </div>
@@ -47,27 +47,28 @@
         <!-- MANUAL ENTRY CARD -->
         <div class="card shadow-sm border-0">
             <div class="card-body">
-                <h3 class="h5 mb-3"><i class="fas fa-user-plus me-2 text-highlight"></i>Manual Registration</h3>
+                <h3 class="h5 mb-3"><i class="fas fa-user-plus me-2 text-highlight"></i>{{ _('Manual Registration') }}
+                </h3>
                 <form method="POST" action="">
                     {{ form.hidden_tag() }}
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase">Full Name</label>
+                        <label class="form-label small fw-bold text-muted text-uppercase">{{ _('Full Name') }}</label>
                         {{ form.full_name(class="form-control", placeholder="e.g., John Doe") }}
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase">Access Code</label>
+                        <label class="form-label small fw-bold text-muted text-uppercase">{{ _('Access Code') }}</label>
                         {{ form.access_code(class="form-control font-monospace fw-bold", style="letter-spacing: 1px;")
                         }}
-                        <div class="form-text small">Auto-generated secure token.</div>
+                        <div class="form-text small">{{ _('Auto-generated secure token.') }}</div>
                     </div>
 
 
 
                     <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-lime shadow-sm">
-                            <i class="fas fa-check-circle me-2"></i>Register Student
+                            <i class="fas fa-check-circle me-2"></i>{{ _('Register Student') }}
                         </button>
                     </div>
                 </form>
@@ -84,22 +85,22 @@
 
             <!-- Header for Screen View -->
             <div class="card-header bg-transparent d-flex justify-content-between align-items-center d-print-none py-3">
-                <h3 class="h5 mb-0 fw-bold">Active Roster <span
+                <h3 class="h5 mb-0 fw-bold">{{ _('Active Roster') }} <span
                         class="badge bg-body-secondary text-primary border ms-2">{{ students|length }}</span></h3>
                 <div class="d-flex gap-2">
                     <button onclick="window.print()" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-print me-2"></i>Print
+                        <i class="fas fa-print me-2"></i>{{ _('Print') }}
                     </button>
                     <a href="/teacher/dashboard" class="btn btn-outline-dark btn-sm">
-                        <i class="fas fa-arrow-left me-2"></i>Dashboard
+                        <i class="fas fa-arrow-left me-2"></i>{{ _('Dashboard') }}
                     </a>
                 </div>
             </div>
 
             <!-- Header for Printed Page -->
             <div class="d-none d-print-block text-center mb-4">
-                <h2 class="fw-bold">Student Access Roster</h2>
-                <p class="text-muted">Confidential Login Credentials</p>
+                <h2 class="fw-bold">{{ _('Student Access Roster') }}</h2>
+                <p class="text-muted">{{ _('Confidential Login Credentials') }}</p>
             </div>
 
             <!-- Student Table -->
@@ -107,10 +108,10 @@
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-body-secondary sticky-top">
                         <tr>
-                            <th class="ps-4">Full Name</th>
-                            <th>Email</th>
-                            <th>Access Code</th>
-                            <th class="d-print-none text-end pe-4">Manage</th>
+                            <th class="ps-4">{{ _('Full Name') }}</th>
+                            <th>{{ _('Email') }}</th>
+                            <th>{{ _('Access Code') }}</th>
+                            <th class="d-print-none text-end pe-4">{{ _('Manage') }}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -124,8 +125,8 @@
                                 <a href="mailto:{{ s.email }}" class="text-decoration-none small text-muted"><i
                                         class="fas fa-envelope me-1"></i>{{ s.email }}</a>
                                 {% else %}
-                                <span
-                                    class="badge bg-warning text-warning-emphasis border border-warning">Missing</span>
+                                <span class="badge bg-warning text-warning-emphasis border border-warning">{{
+                                    _('Missing') }}</span>
                                 {% endif %}
                             </td>
                             <td>
@@ -137,14 +138,14 @@
                                 <div class="btn-group shadow-sm">
                                     <!-- Edit Button (Task 1) -->
                                     <a href="/admin/edit/student/{{ s.id }}"
-                                        class="btn btn-sm btn-outline-secondary border" title="Edit Details">
+                                        class="btn btn-sm btn-outline-secondary border" title="{{ _('Edit Details') }}">
                                         <i class="fas fa-edit"></i>
                                     </a>
                                     <!-- Single Delete Button -->
                                     <a href="/admin/delete/student/{{ s.id }}"
                                         class="btn btn-sm btn-outline-danger border"
-                                        onclick="return confirm('Delete {{ s.full_name }}? This removes their exam history.')"
-                                        title="Delete Student">
+                                        onclick="return confirm('{{ _(\'Delete\') }} {{ s.full_name }}? {{ _(\'This removes their exam history.\') }}')"
+                                        title="{{ _('Delete Student') }}">
                                         <i class="fas fa-trash"></i>
                                     </a>
                                 </div>
@@ -154,8 +155,8 @@
                         <tr>
                             <td colspan="5" class="text-center py-5 text-muted">
                                 <i class="fas fa-users-slash d-block mb-3 fs-2 opacity-50"></i>
-                                No students registered.<br>
-                                Use the form or import tool to add them.
+                                {{ _('No students registered.') }}<br>
+                                {{ _('Use the form or import tool to add them.') }}
                             </td>
                         </tr>
                         {% endfor %}
@@ -172,7 +173,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg bg-card">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i class="fas fa-file-csv me-2"></i>Bulk Student Import</h5>
+                <h5 class="modal-title"><i class="fas fa-file-csv me-2"></i>{{ _('Bulk Student Import') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                     aria-label="Close"></button>
             </div>
@@ -181,9 +182,9 @@
                     {{ import_form.hidden_tag() }}
 
                     <div class="alert alert-info small mb-4">
-                        <i class="fas fa-info-circle me-2"></i><strong>Format Requirement:</strong><br>
-                        File must have a column: <strong>"Name"</strong>.<br>
-                        Access codes are generated automatically.
+                        <i class="fas fa-info-circle me-2"></i><strong>{{ _('Format Requirement:') }}</strong><br>
+                        {{ _('File must have a column:') }} <strong>"{{ _('Name') }}"</strong>.<br>
+                        {{ _('Access codes are generated automatically.') }}
                     </div>
 
                     <div class="mb-0">
@@ -191,9 +192,9 @@
                     </div>
                 </div>
                 <div class="modal-footer bg-transparent border-top">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
                     <button type="submit" class="btn btn-primary px-4">
-                        Preview Data <i class="fas fa-arrow-right ms-1"></i>
+                        {{ _('Preview Data') }} <i class="fas fa-arrow-right ms-1"></i>
                     </button>
                 </div>
             </form>

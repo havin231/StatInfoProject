@@ -9,20 +9,21 @@
 -->
 <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
     <div class="col-md-6 col-lg-5">
-        
+
         <!-- Welcome Header -->
         <div class="text-center mb-4">
             <h1 class="display-1 text-primary"><i class="fas fa-cogs"></i></h1>
-            <h2 class="h3 fw-bold">System Initialization</h2>
-            <p class="text-muted">Welcome to SchoolLMS. Please create the primary <strong>Headmaster</strong> account to begin.</p>
+            <h2 class="h3 fw-bold">{{ _('System Initialization') }}</h2>
+            <p class="text-muted">{{ _('Welcome to SchoolLMS. Please create the primary') }} <strong>{{ _('Headmaster')
+                    }}</strong> {{ _('account to begin.') }}</p>
         </div>
 
         <div class="card shadow-lg border-0 card-accent">
             <div class="card-body p-4 p-md-5">
-                
+
                 <form method="POST" action="">
                     {{ form.hidden_tag() }}
-                    
+
                     <!-- Username Field -->
                     <div class="mb-3">
                         {{ form.username.label(class="form-label small fw-bold text-muted") }}
@@ -56,7 +57,7 @@
             </div>
             <!-- Informational Footer -->
             <div class="card-footer bg-body-tertiary text-center py-3 border-0 small text-muted">
-                <i class="fas fa-lock me-1"></i> This is a one-time setup process.
+                <i class="fas fa-lock me-1"></i> {{ _('This is a one-time setup process.') }}
             </div>
         </div>
 

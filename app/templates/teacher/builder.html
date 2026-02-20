@@ -14,12 +14,13 @@
             <div>
                 <h1 class="h3 mb-1">{{ title }}</h1>
                 {% if subject %}
-                <p class="text-muted small mb-0">Subject Context: <span class="fw-bold text-highlight">{{ subject.name
+                <p class="text-muted small mb-0">{{ _('Subject Context:') }} <span class="fw-bold text-highlight">{{
+                        subject.name
                         }}</span></p>
                 {% endif %}
             </div>
             <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
-                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+                <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Dashboard') }}
             </a>
         </div>
 
@@ -42,15 +43,16 @@
 
                     <!-- Lecture Title -->
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase">Lecture Title</label>
+                        <label class="form-label fw-bold text-muted small text-uppercase">{{ _('Lecture Title')
+                            }}</label>
                         {{ form.title(class="form-control form-control-lg", placeholder="e.g., Introduction to
                         Informatic Systems") }}
                     </div>
 
                     <!-- English Content (Standard) -->
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-muted small text-uppercase">Lecture Content
-                            (English)</label>
+                        <label class="form-label fw-bold text-muted small text-uppercase">{{ _('Lecture Content
+                            (English)') }}</label>
                         {{ form.content_body(id="content_body", class="form-control") }}
                     </div>
 
@@ -58,13 +60,14 @@
                     <div class="mb-4 p-3 bg-body-tertiary rounded border border-dashed">
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <label class="form-label fw-bold text-muted small text-uppercase mb-0">Bilingual
-                                    Support</label>
-                                <p class="text-muted small mb-0">Optionally add a Kurdish translation for this lecture.
+                                <label class="form-label fw-bold text-muted small text-uppercase mb-0">{{ _('Bilingual
+                                    Support') }}</label>
+                                <p class="text-muted small mb-0">{{ _('Optionally add a Kurdish translation for this
+                                    lecture.') }}
                                 </p>
                             </div>
                             <button type="button" class="btn btn-sm btn-outline-primary" onclick="toggleKurdish()">
-                                <i class="fas fa-plus me-1"></i> Add / Edit Kurdish Section
+                                <i class="fas fa-plus me-1"></i> {{ _('Add / Edit Kurdish Section') }}
                             </button>
                         </div>
                         <div id="kurdish-section" class="mt-3" style="display: none;">
@@ -74,7 +77,8 @@
 
                     <!-- Footer Actions -->
                     <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                        <a href="/teacher/dashboard" class="btn btn-outline-secondary px-4">Discard Changes</a>
+                        <a href="/teacher/dashboard" class="btn btn-outline-secondary px-4">{{ _('Discard Changes')
+                            }}</a>
                         {{ form.submit(class="btn btn-primary px-5 shadow-sm") }}
                     </div>
                 </form>
@@ -82,7 +86,8 @@
                 <!-- RESOURCE MANAGER (Only visible when Editing an existing page) -->
                 {% if page %}
                 <div class="mt-5 pt-4 border-top">
-                    <h5 class="fw-bold text-primary mb-3"><i class="fas fa-link me-2"></i>Resource Manager</h5>
+                    <h5 class="fw-bold text-primary mb-3"><i class="fas fa-link me-2"></i>{{ _('Resource Manager') }}
+                    </h5>
 
                     <!-- List Existing Resources -->
                     {% if page.resources %}
@@ -92,22 +97,23 @@
                             <div>
                                 <strong>{{ res.title }}</strong>
                                 <a href="{{ res.link }}" target="_blank" class="small ms-2 text-muted"><i
-                                        class="fas fa-external-link-alt"></i> Test Link</a>
+                                        class="fas fa-external-link-alt"></i> {{ _('Test Link') }}</a>
                             </div>
                             <a href="/teacher/resource/delete/{{ res.id }}" class="btn btn-sm btn-outline-danger"
-                                onclick="return confirm('Remove this resource?')">
+                                onclick="return confirm('{{ _(\'Remove this resource?\') }}')">
                                 <i class="fas fa-trash"></i>
                             </a>
                         </div>
                         {% endfor %}
                     </div>
                     {% else %}
-                    <div class="alert alert-light border mb-4">No resources attached yet. Add one below.</div>
+                    <div class="alert alert-light border mb-4">{{ _('No resources attached yet. Add one below.') }}
+                    </div>
                     {% endif %}
 
                     <!-- Add New Resource Form -->
                     <div class="bg-body-tertiary p-3 rounded border">
-                        <h6 class="small fw-bold text-uppercase text-muted mb-2">Add New Link</h6>
+                        <h6 class="small fw-bold text-uppercase text-muted mb-2">{{ _('Add New Link') }}</h6>
                         <form method="POST" action="/teacher/resource/add/{{ page.id }}"
                             class="row g-2 align-items-end">
                             {{ resource_form.hidden_tag() }}
@@ -129,8 +135,8 @@
                 {% if not questions_json %}
                 <!-- Message for New Pages -->
                 <div class="mt-4 alert alert-info small">
-                    <i class="fas fa-info-circle me-2"></i> To add resource links (PDFs, Videos), please
-                    <strong>Save</strong> this lecture first. You can then add them in the Edit screen.
+                    <i class="fas fa-info-circle me-2"></i> {{ _('To add resource links (PDFs, Videos), please Save this
+                    lecture first. You can then add them in the Edit screen.') }}
                 </div>
                 {% endif %}
                 {% endif %}
@@ -150,19 +156,20 @@
 
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
                     <div>
-                        <h5 class="fw-bold mb-0 text-muted text-uppercase">Detailed Question Bank</h5>
-                        <small class="text-muted">Manage questions, assign lectures, and set languages.</small>
+                        <h5 class="fw-bold mb-0 text-muted text-uppercase">{{ _('Detailed Question Bank') }}</h5>
+                        <small class="text-muted">{{ _('Manage questions, assign lectures, and set languages.')
+                            }}</small>
                     </div>
                     <div class="d-flex gap-2">
                         <!-- Import Button -->
                         <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal"
                             data-bs-target="#importModal">
-                            <i class="fas fa-file-excel me-2"></i>Import Excel
+                            <i class="fas fa-file-excel me-2"></i>{{ _('Import Excel') }}
                         </button>
                         <!-- Global Save Button -->
                         <button type="button" class="btn btn-sm btn-primary px-3 shadow-sm" onclick="saveChanges()"
                             id="saveBtn">
-                            <i class="fas fa-save me-2"></i>Save All Changes
+                            <i class="fas fa-save me-2"></i>{{ _('Save All Changes') }}
                         </button>
                     </div>
                 </div>
@@ -174,11 +181,12 @@
                             <tr>
                                 <th class="ps-3" style="width: 40px;">#</th>
                                 <!-- TASK 4: Language Column -->
-                                <th style="width: 50px;" class="text-center" title="Is Kurdish? (RTL)">RTL</th>
+                                <th style="width: 50px;" class="text-center" title="{{ _('Is Kurdish? (RTL)') }}">RTL
+                                </th>
 
-                                <th style="min-width: 300px;">Question Text</th>
+                                <th style="min-width: 300px;">{{ _('Question Text') }}</th>
                                 <!-- TASK 4: Lecture Column -->
-                                <th style="min-width: 180px;">Assigned Lecture</th>
+                                <th style="min-width: 180px;">{{ _('Assigned Lecture') }}</th>
                                 <th style="min-width: 100px;">Opt A</th>
                                 <th style="min-width: 100px;">Opt B</th>
                                 <th style="min-width: 100px;">Opt C</th>
@@ -196,7 +204,7 @@
                 <div class="d-grid mt-3">
                     <button type="button" class="btn btn-outline-secondary border-dashed py-2 fw-bold"
                         onclick="addQuestion()">
-                        <i class="fas fa-plus me-2"></i>Add New Question Row
+                        <i class="fas fa-plus me-2"></i>{{ _('Add New Question Row') }}
                     </button>
                 </div>
 
@@ -211,29 +219,31 @@
                     {{ form.hidden_tag() }}
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold">Subject Name</label>
+                            <label class="form-label small fw-bold">{{ _('Subject Name') }}</label>
                             {{ form.name(class="form-control") }}
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label small fw-bold">URL Slug (Unique)</label>
+                            <label class="form-label small fw-bold">{{ _('URL Slug (Unique)') }}</label>
                             {{ form.slug(class="form-control font-monospace") }}
                         </div>
                         <div class="col-12">
-                            <label class="form-label small fw-bold">Subject Description</label>
+                            <label class="form-label small fw-bold">{{ _('Subject Description') }}</label>
                             {{ form.description(class="form-control", rows="3") }}
                         </div>
                         {% if current_user.is_admin %}
                         <div class="col-12 border-top pt-3 mt-3">
                             <label class="form-label small fw-bold text-danger"><i
-                                    class="fas fa-user-shield me-1"></i>Admin Control: Reassign Teacher</label>
+                                    class="fas fa-user-shield me-1"></i>{{ _('Admin Control: Reassign Teacher')
+                                }}</label>
                             {{ form.teacher_id(class="form-select border-danger bg-danger-subtle") }}
-                            <div class="form-text text-muted small">Only administrators can change the subject owner.
+                            <div class="form-text text-muted small">{{ _('Only administrators can change the subject
+                                owner.') }}
                             </div>
                         </div>
                         {% endif %}
                     </div>
                     <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                        <a href="/teacher/dashboard" class="btn btn-outline-secondary px-4">Cancel</a>
+                        <a href="/teacher/dashboard" class="btn btn-outline-secondary px-4">{{ _('Cancel') }}</a>
                         {{ form.submit(class="btn btn-primary px-4") }}
                     </div>
                 </form>
@@ -250,21 +260,21 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Bulk Question Import</h5>
+                <h5 class="modal-title">{{ _('Bulk Question Import') }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" action="/teacher/import/questions/{{ subject.id }}" enctype="multipart/form-data">
                 <div class="modal-body p-4">
                     {{ import_form.hidden_tag() }}
                     <div class="alert alert-info small mb-4">
-                        <strong>Required Columns:</strong><br>
-                        Question, Opt A, Opt B, Opt C, Opt D, Answer
+                        <strong>{{ _('Required Columns:') }}</strong><br>
+                        {{ _('Question, Opt A, Opt B, Opt C, Opt D, Answer') }}
                     </div>
                     {{ import_form.file(class="form-control") }}
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Preview Questions</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Preview Questions') }}</button>
                 </div>
             </form>
         </div>

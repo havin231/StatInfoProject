@@ -10,11 +10,12 @@
             <div class="card-header bg-primary text-white p-4">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="h4 mb-1"><i class="fas fa-table me-2"></i>Review Data Import</h2>
-                        <p class="mb-0 opacity-75">Please verify the data below before saving to the database.</p>
+                        <h2 class="h4 mb-1"><i class="fas fa-table me-2"></i>{{ _('Review Data Import') }}</h2>
+                        <p class="mb-0 opacity-75">{{ _('Please verify the data below before saving to the database.')
+                            }}</p>
                     </div>
                     <span class="badge bg-primary bg-opacity-10 text-primary border border-primary fs-6">{{ data|length
-                        }} Rows Found</span>
+                        }} {{ _('Rows Found') }}</span>
                 </div>
             </div>
 
@@ -37,14 +38,15 @@
                     -->
                     {% if import_type == 'question' %}
                     <div class="bg-body-tertiary p-3 border-bottom d-flex flex-wrap gap-3 align-items-center">
-                        <div class="fw-bold text-muted text-uppercase small"><i class="fas fa-sliders-h me-2"></i>Batch
-                            Settings:</div>
+                        <div class="fw-bold text-muted text-uppercase small"><i class="fas fa-sliders-h me-2"></i>{{
+                            _('Batch
+                            Settings:') }}</div>
 
                         <!-- 1. Bulk Lecture Assignment -->
                         <div class="input-group input-group-sm" style="max-width: 300px;">
-                            <span class="input-group-text bg-transparent">Assign to Lecture:</span>
+                            <span class="input-group-text bg-transparent">{{ _('Assign to Lecture:') }}</span>
                             <select name="bulk_lecture_id" class="form-select">
-                                <option value="">(None - General Subject Exam)</option>
+                                <option value="">{{ _('(None - General Subject Exam)') }}</option>
                                 {% for lec in lectures %}
                                 <option value="{{ lec.id }}">{{ lec.title }}</option>
                                 {% endfor %}
@@ -55,7 +57,8 @@
                         <div class="form-check form-switch ms-auto">
                             <input class="form-check-input" type="checkbox" role="switch" id="bulkLanguage"
                                 name="bulk_language">
-                            <label class="form-check-label fw-bold" for="bulkLanguage">Mark all as Kurdish (RTL)</label>
+                            <label class="form-check-label fw-bold" for="bulkLanguage">{{ _('Mark all as Kurdish (RTL)')
+                                }}</label>
                         </div>
                     </div>
                     {% endif %}
@@ -65,9 +68,10 @@
                         <div class="d-flex">
                             <i class="fas fa-exclamation-triangle fs-4 me-3 mt-1"></i>
                             <div>
-                                <strong>Preview Mode Only</strong><br>
-                                This data is held in memory. It will <strong>not</strong> be saved until you click
-                                "Confirm Import".
+                                <strong>{{ _('Preview Mode Only') }}</strong><br>
+                                {{ _('This data is held in memory. It will') }} <strong>{{ _('not') }}</strong> {{ _('be
+                                saved until you click
+                                "Confirm Import".') }}
                             </div>
                         </div>
                     </div>
@@ -79,12 +83,12 @@
                                 <tr>
                                     <th class="ps-4">#</th>
                                     {% if import_type == 'student' %}
-                                    <th>Full Name</th>
-                                    <th>Generated Access Code</th>
+                                    <th>{{ _('Full Name') }}</th>
+                                    <th>{{ _('Generated Access Code') }}</th>
                                     {% elif import_type == 'question' %}
-                                    <th style="width: 40%;">Question</th>
-                                    <th>Options (A / B / C / D)</th>
-                                    <th>Answer</th>
+                                    <th style="width: 40%;">{{ _('Question') }}</th>
+                                    <th>{{ _('Options (A / B / C / D)') }}</th>
+                                    <th>{{ _('Answer') }}</th>
                                     {% endif %}
                                 </tr>
                             </thead>
@@ -117,9 +121,10 @@
 
                 <!-- ACTION FOOTER -->
                 <div class="card-footer bg-transparent p-4 text-end border-top">
-                    <a href="javascript:history.back()" class="btn btn-outline-secondary me-2">Cancel & Discard</a>
+                    <a href="javascript:history.back()" class="btn btn-outline-secondary me-2">{{ _('Cancel & Discard')
+                        }}</a>
                     <button type="submit" class="btn btn-success px-4 fw-bold shadow-sm">
-                        <i class="fas fa-check-circle me-2"></i>Confirm Import
+                        <i class="fas fa-check-circle me-2"></i>{{ _('Confirm Import') }}
                     </button>
                 </div>
             </form>

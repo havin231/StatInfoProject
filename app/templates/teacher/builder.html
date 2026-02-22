@@ -284,35 +284,39 @@
 
 <script>
     // --- 1. DATA INITIALIZATION ---
-    let questionsData = {% if questions_json is defined %}{ { questions_json | tojson } } {% else %} []{% endif %};
-    let lectureMapping = {% if pages is defined %}{ { pages | tojson } } {% else %} []{% endif %};
+    let questionsData = JSON.parse('{% if questions_json is defined %}{{ questions_json | tojson | safe }}{% else %}[]{% endif %}');
+    let lectureMapping = JSON.parse('{% if pages is defined %}{{ pages | tojson | safe }}{% else %}[]{% endif %}');
 
     document.addEventListener("DOMContentLoaded", function () {
-        const tinyPlugins = 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table wordcount directionality';
-        const tinyToolbar = 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | ltr rtl | code | help';
+        const tinyPlugins = 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount';
+        const tinyToolbar = 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table image link | charmap emoticons pagebreak | searchreplace fullscreen preview wordcount ltr rtl';
+
+        const msWordSettings = {
+            plugins: tinyPlugins,
+            toolbar: tinyToolbar,
+            height: 600,
+            browser_spellcheck: true,
+            contextmenu: 'link image table',
+            menubar: 'file edit view insert format tools table help',
+            toolbar_mode: 'sliding',
+            image_advtab: true,
+            paste_data_images: true,
+            promotion: false,
+            valid_elements: '*[*]',
+            extended_valid_elements: 'script[src|async|defer|type|charset]',
+            content_style: 'body { max-width: 21cm; min-height: 29.7cm; margin: 1cm auto; padding: 2cm; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-family: Arial, sans-serif; font-size: 16px; box-sizing: border-box; } html { background: #f0f2f5; }',
+            paste_preprocess: function (plugin, args) {
+                args.content = args.content.replace(/<o:p>.*?<\/o:p>/g, '');
+            }
+        };
 
         // Init Standard TinyMCE
         if (document.getElementById('content_body')) {
-            tinymce.init({
-                selector: '#content_body',
-                height: 400,
-                plugins: tinyPlugins,
-                toolbar: tinyToolbar,
-                promotion: false,
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
-            });
+            tinymce.init(Object.assign({}, msWordSettings, { selector: '#content_body' }));
         }
         // Init Kurdish TinyMCE
         if (document.getElementById('content_body_kurdish')) {
-            tinymce.init({
-                selector: '#content_body_kurdish',
-                height: 400,
-                directionality: 'rtl',
-                plugins: tinyPlugins,
-                toolbar: tinyToolbar,
-                promotion: false,
-                content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
-            });
+            tinymce.init(Object.assign({}, msWordSettings, { selector: '#content_body_kurdish', directionality: 'rtl' }));
         }
 
         // Init Spreadsheet logic

@@ -170,6 +170,12 @@ CSS in exam.html handles flex-direction reversal and text alignment.
 Brand Name Consistency:
 The brand name "StatInfoProject" must be wrapped in a container (e.g., `<div>`) with `style="direction: ltr !important;"` in the navbar. This prevents Bootstrap's RTL flexbox from reversing the character order in Kurdish mode while allowing "StatInfo" (white) and "Project" (green) to be styled independently.
 
+Rich Text Editor (TinyMCE) Standards:
+We use TinyMCE configured with open-source settings to mimic MS Word.
+- Always include the full suite of open-source plugins (e.g. `anchor`, `pagebreak`, `wordcount`).
+- Use `content_style` to constrain the editor body to `max-width: 21cm` and `min-height: 29.7cm` (A4 proportions) on a grey `#f0f2f5` html background to simulate a physical page.
+- Enable `browser_spellcheck`, full `menubar`, and `contextmenu`.
+
 Dark Mode:
 
 Use var(--bg-body) and var(--text-main) CSS variables.

@@ -59,13 +59,37 @@
         tinymce.init({
             selector: '#content',
             height: 500,
-            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table help wordcount directionality',
-            toolbar: 'undo redo | blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | code | ltr rtl | help',
+            plugins: 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table image link | charmap emoticons pagebreak | searchreplace fullscreen preview wordcount ltr rtl',
+            browser_spellcheck: true,
+            contextmenu: 'link image table',
+            menubar: 'file edit view insert format tools table help',
+            toolbar_mode: 'sliding',
+            image_advtab: true,
+            paste_data_images: true,
             promotion: false,
             // CRITICAL: Allows all content, including custom HTML/CSS.
             valid_elements: '*[*]',
             extended_valid_elements: 'script[src|async|defer|type|charset]',
-            content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+            content_style: `
+                body {
+                    max-width: 21cm;
+                    min-height: 29.7cm;
+                    margin: 1cm auto;
+                    padding: 2cm;
+                    background: white;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                    font-family: Arial, sans-serif;
+                    font-size: 16px;
+                    box-sizing: border-box;
+                }
+                html {
+                    background: #f0f2f5; 
+                }
+            `,
+            paste_preprocess: function (plugin, args) {
+                args.content = args.content.replace(/<o:p>.*?<\/o:p>/g, '');
+            }
         });
     });
 </script>

@@ -168,7 +168,7 @@ Questions marked is_kurdish=True must have CSS class .rtl-question.
 CSS in exam.html handles flex-direction reversal and text alignment.
 
 Brand Name Consistency:
-The brand name "StatInfoProject" must be wrapped in a single container (e.g., `<span>`) in the navbar to prevent Bootstrap's RTL flexbox from reversing the order of the text components.
+The brand name "StatInfoProject" must be wrapped in a container (e.g., `<div>`) with `style="direction: ltr !important;"` in the navbar. This prevents Bootstrap's RTL flexbox from reversing the character order in Kurdish mode while allowing "StatInfo" (white) and "Project" (green) to be styled independently.
 
 Dark Mode:
 

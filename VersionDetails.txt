@@ -1,0 +1,20 @@
+# StatInfoProject Version History
+
+This file logs the details, changes, and improvements of every version of the project.
+Whenever a change or new feature is added, append a new version block following the format below.
+
+---
+
+## Version 0.1
+**Date:** 2026-03-30
+**Summary:** Initial documented version structure and file organization.
+
+### Changes & Improvements:
+- Categorized project files into Git-only, PythonAnywhere-only, and Local-only files.
+- Removed unused cache directories (`__pycache__`, `.pytest_cache`).
+- Updated system documentation (`SKILL.md`) with explicit maintenance rules for versioning and file organization.
+- Added a systematic `VersionDetails.txt` file to keep track of ongoing functional improvements.
+- Prepared an initial local version backup (`version_0.1`) under `~/Documents/statinfopro/`.
+- Updated GitHub authentication token in `SKILL.md`.
+
+---

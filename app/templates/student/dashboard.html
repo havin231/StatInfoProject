@@ -36,7 +36,7 @@
             </div>
             <div class="card-body pt-0">
                 <div class="d-grid gap-2">
-                    <a href="{{ url_for('main.student_settings') }}" class="btn btn-outline-dark text-start">
+                    <a href="{{ url_for('auth.student_settings') }}" class="btn btn-outline-dark text-start">
                         <i class="fas fa-cog me-2"></i>{{ _('My Settings') }}
                     </a>
                     <a href="/logout" class="btn btn-outline-danger text-start">
@@ -62,7 +62,7 @@
                     <p class="mb-0 small">{{ _('Please add your email address to secure your account and receive
                         notifications.') }}</p>
                 </div>
-                <a href="{{ url_for('main.student_settings') }}" class="btn btn-sm btn-warning ms-auto fw-bold">{{
+                <a href="{{ url_for('auth.student_settings') }}" class="btn btn-sm btn-warning ms-auto fw-bold">{{
                     _('Add Email') }}</a>
             </div>
         </div>

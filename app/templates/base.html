@@ -40,8 +40,12 @@
     <!-- 3. FontAwesome Icons (CDN) -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-    <!-- 4. Custom Design System (style.css) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- 4. Custom Design System (Modular CSS) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/utilities.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tinymce.css') }}">
 
     <!--
         5. MATHJAX (LATEX SUPPORT)
@@ -116,7 +120,7 @@
 
             <!-- Mobile Theme Toggle & Language Toggle (Visible only on < lg) -->
             <div class="d-flex d-lg-none mt-1">
-                <a href="{{ url_for('main.set_lang', lang='ku' if session.get('lang', 'en') == 'en' else 'en') }}"
+                <a href="{{ url_for('auth.set_lang', lang='ku' if session.get('lang', 'en') == 'en' else 'en') }}"
                     class="btn btn-link text-reset p-0 me-3" title="Toggle Language">
                     <i class="fas fa-globe fa-lg"></i>
                 </a>
@@ -148,7 +152,7 @@
 
                     <!-- Language Switcher -->
                     <li class="nav-item">
-                        <a href="{{ url_for('main.set_lang', lang='ku' if session.get('lang', 'en') == 'en' else 'en') }}"
+                        <a href="{{ url_for('auth.set_lang', lang='ku' if session.get('lang', 'en') == 'en' else 'en') }}"
                             class="btn btn-sm btn-outline" title="Toggle Language (English/Kurdish)">
                             <i class="fas fa-globe"></i>
                         </a>

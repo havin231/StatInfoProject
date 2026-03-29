@@ -1,9 +1,13 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'academic-minimalist-secure-key-2025'
 
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://StatInfoProject:stat123123@StatInfoProject.mysql.pythonanywhere-services.com/StatInfoProject$school_db'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///dev.db'
 
     # FIX: This recycles database connections to prevent timeouts
     SQLALCHEMY_ENGINE_OPTIONS = {

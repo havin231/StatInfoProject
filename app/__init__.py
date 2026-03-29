@@ -5,6 +5,8 @@ from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_wtf.csrf import CSRFProtect
 from flask_babel import Babel
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask import session
 from config import Config
 
@@ -19,11 +21,12 @@ db = SQLAlchemy()
 bcrypt = Bcrypt()
 csrf = CSRFProtect()
 babel = Babel()
+limiter = Limiter(key_func=get_remote_address, default_limits=[])
 
 login_manager = LoginManager()
 # The login_view tells Flask-Login where to redirect users if they try to access a protected page.
-# 'main.login' refers to the login route in the 'main' blueprint.
-login_manager.login_view = 'main.login'
+# 'auth.login' refers to the login route in the 'auth' blueprint.
+login_manager.login_view = 'auth.login'
 login_manager.login_message_category = 'info' # Bootstrap class for flash message
 
 def create_app(config_class=Config):
@@ -40,11 +43,13 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     csrf.init_app(app) # Enables global CSRF protection for forms
     babel.init_app(app, locale_selector=get_locale)
+    limiter.init_app(app)
 
     # --- REGISTER BLUEPRINTS ---
     # Imports are placed here to avoid circular import errors.
-    from app.routes import main
-    app.register_blueprint(main)
+    from app.routes import all_blueprints
+    for bp in all_blueprints:
+        app.register_blueprint(bp)
 
     # --- DATABASE SETUP ---
     # Automatically create database tables if they don't exist.

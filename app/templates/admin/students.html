@@ -34,7 +34,7 @@
                 <div class="alert alert-danger border-danger p-2 mb-2 small">
                     <i class="fas fa-exclamation-triangle me-1"></i> <strong>{{ _('Danger Zone') }}</strong>
                 </div>
-                <form action="{{ url_for('main.delete_all_students') }}" method="POST"
+                <form action="{{ url_for('admin.delete_all_students') }}" method="POST"
                     onsubmit="return confirm('{{ _('⚠️ CRITICAL WARNING ⚠️\\n\\nAre you sure you want to delete ALL students?\\n\\nThis action will PERMANENTLY ERASE:\\n- All student accounts\\n- All exam results\\n- All detailed answer logs\\n\\nThis cannot be undone. Click OK to wipe the database.') }}');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-danger w-100 fw-bold">

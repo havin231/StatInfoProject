@@ -1,0 +1,44 @@
+/* 
+   =========================================
+   SCHOOL LMS - UTILITIES & PRINT
+   =========================================
+*/
+
+/* Ensure Rich Text content respects theme colors */
+.rich-text-content {
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+.rich-text-content a {
+    color: var(--primary-color);
+}
+
+/* Hover effect for footer links */
+.hover-link:hover {
+    color: var(--primary-color) !important;
+    text-decoration: underline !important;
+}
+
+/* Print Optimization */
+@media print {
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .card {
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+    }
+
+    .navbar,
+    .btn,
+    .d-print-none {
+        display: none !important;
+    }
+
+    .text-highlight {
+        color: black !important;
+    }
+}

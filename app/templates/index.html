@@ -12,10 +12,25 @@
     <p class="lead text-main mx-auto mb-3" style="max-width: 600px;">
         {{ _('this website is still under construction.') }}<br>
     </p>
-    <h1 class="display-4 fw-bold mb-3">{{ _('Welcome to') }} <span class="text-highlight">StatInfoProject</span></h1>
-    <p class="lead text-muted mx-auto mb-4" style="max-width: 600px;">
-        {{ _('A place to learn') }}
-    </p>
+    {% if search_query %}
+        <h1 class="display-4 fw-bold mb-3">{{ _('Search Results for') }} <span class="text-highlight">'{{ search_query }}'</span></h1>
+    {% else %}
+        <h1 class="display-4 fw-bold mb-3">{{ _('Welcome to') }} <span class="text-highlight">StatInfoProject</span></h1>
+        <p class="lead text-muted mx-auto mb-4" style="max-width: 600px;">
+            {{ _('A place to learn') }}
+        </p>
+    {% endif %}
+
+    <!-- Global Search Bar -->
+    <form class="mx-auto mb-4" style="max-width: 600px;" method="GET" action="/">
+        <div class="input-group input-group-lg shadow-sm">
+            <input type="search" name="q" class="form-control" placeholder="{{ _('Search subjects and lessons...') }}" value="{{ search_query }}" required>
+            <button class="btn btn-primary px-4" type="submit"><i class="fas fa-search"></i></button>
+            {% if search_query %}
+            <a href="/" class="btn btn-outline-secondary px-3" title="Clear Search"><i class="fas fa-times pt-2"></i></a>
+            {% endif %}
+        </div>
+    </form>
 
     <!-- Show Login Buttons only to Guests -->
     {% if not current_user.is_authenticated and not session.get('student_id') %}
@@ -71,4 +86,31 @@
     {% endfor %}
 
 </div>
+
+{% if search_query %}
+    <h3 class="h4 fw-bold mb-4 mt-5 border-bottom pb-2">{{ _('Matching Lessons') }}</h3>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+        {% for page in pages %}
+        <div class="col">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h4 class="h6 fw-bold mb-1">{{ page.title }}</h4>
+                        <span class="badge bg-secondary-subtle text-secondary ms-2" style="font-size: 0.7rem;">{{ page.subject.name }}</span>
+                    </div>
+                    <p class="text-muted small flex-grow-1" style="font-size: 0.85rem;">{{ page.content_body | striptags | truncate(150) }}</p>
+                    <a href="/subject/{{ page.subject.slug }}/page/{{ page.id }}" class="btn btn-outline-primary mt-3 btn-sm w-100">
+                        <i class="fas fa-book-open me-2"></i>{{ _('View Lesson') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center text-muted py-4 w-100">
+            <p><i class="fas fa-search me-2"></i>{{ _('No individual lessons found matching your query.') }}</p>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 {% endblock %}

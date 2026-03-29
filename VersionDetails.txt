@@ -28,3 +28,15 @@ Whenever a change or new feature is added, append a new version block following 
 - Backed up to local `version_0.1.1` snapshot.
 
 ---
+
+## Version 0.2
+**Date:** 2026-03-30
+**Summary:** Added Global Search functionality.
+
+### Changes & Improvements:
+- **Search Subjects & Lessons**: Users can now use the search bar on the homepage to instantly find courses by name and description, or individual lessons by title and content.
+- **Dynamic Display**: Added responsive "Matching Lessons" and "Search Results" grids dynamically injected onto the homepage.
+- **SQLAlchemy Optimizations**: Updated `/` route logic to safely execute case-insensitive `ILIKE` searches via `or_` conditions.
+- Snapshotted as `version_0.2` system-wide.
+
+---

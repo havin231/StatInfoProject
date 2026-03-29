@@ -1,10 +1,10 @@
 from datetime import datetime
 from flask import Blueprint, render_template, url_for, flash, redirect, request, jsonify
 from flask_login import current_user
-from sqlalchemy import func
+from sqlalchemy import func, or_
 
 from app import db, bcrypt, limiter
-from app.models import User, Student, Subject, ExamResult, SiteInfo
+from app.models import User, Student, Subject, ExamResult, SiteInfo, Page
 from app.forms import SetupForm
 
 public = Blueprint('public', __name__)
@@ -94,10 +94,32 @@ def index():
     """
     HOMEPAGE
 
-    Lists all academic subjects currently offered.
+    Lists all academic subjects currently offered, with support for search.
     """
-    subject_list = Subject.query.filter_by(is_public=True).all()
-    return render_template('index.html', subjects=subject_list)
+    search_query = request.args.get('q', '').strip()
+    
+    if search_query:
+        subject_list = Subject.query.filter(
+            Subject.is_public == True,
+            or_(
+                Subject.name.ilike(f'%{search_query}%'),
+                Subject.description.ilike(f'%{search_query}%')
+            )
+        ).all()
+        
+        page_list = Page.query.join(Subject).filter(
+            Subject.is_public == True,
+            or_(
+                Page.title.ilike(f'%{search_query}%'),
+                Page.content_body.ilike(f'%{search_query}%'),
+                Page.content_body_kurdish.ilike(f'%{search_query}%')
+            )
+        ).all()
+    else:
+        subject_list = Subject.query.filter_by(is_public=True).all()
+        page_list = []
+
+    return render_template('index.html', subjects=subject_list, pages=page_list, search_query=search_query)
 
 
 @public.route('/about')

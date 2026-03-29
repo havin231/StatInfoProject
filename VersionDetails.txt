@@ -18,3 +18,13 @@ Whenever a change or new feature is added, append a new version block following 
 - Updated GitHub authentication token in `SKILL.md`.
 
 ---
+
+## Version 0.1.1
+**Date:** 2026-03-30
+**Summary:** Hotfix for Teacher Analytics.
+
+### Changes & Improvements:
+- **Bug Fix**: Resolved a `jinja2.exceptions.TemplateSyntaxError: unexpected '}'` crash on the `/teacher/analytics` dashboard caused by an unclosed `{{ dist_values | tojson }}` expression inside the chart script.
+- Backed up to local `version_0.1.1` snapshot.
+
+---

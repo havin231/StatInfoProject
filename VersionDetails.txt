@@ -40,3 +40,14 @@ Whenever a change or new feature is added, append a new version block following 
 - Snapshotted as `version_0.2` system-wide.
 
 ---
+
+## Version 0.2.1
+**Date:** 2026-03-30
+**Summary:** Hotfix for Lecture Creation Form.
+
+### Changes & Improvements:
+- **Bug Fix**: Resolved an issue where the "Publish Content" button would do nothing when creating a new lecture. This occurred because HTML5 validation was preventing form submission on hidden TinyMCE elements.
+- **Solution**: Added `novalidate` to the lecture creation `<form>` in `teacher/builder.html` and implemented a visual error block to display Backend (Flask-WTF) validation messages seamlessly.
+- Snapshotted as `version_0.2.1`.
+
+---

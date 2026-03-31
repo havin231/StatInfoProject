@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, abort
+from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
 from app import db, bcrypt
@@ -84,11 +85,11 @@ def toggle_visibility(subject_id):
     try:
         subject.is_public = not subject.is_public
         db.session.commit()
-        status = "visible" if subject.is_public else "hidden"
-        flash(f'Subject "{subject.name}" is now {status} on the public homepage.', 'success')
+        status = _("visible") if subject.is_public else _("hidden")
+        flash(_('Subject "%(name)s" is now %(status)s on the public homepage.', name=subject.name, status=status), 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error updating visibility: {str(e)}', 'danger')
+        flash(_('Error updating visibility: %(error)s', error=str(e)), 'danger')
 
     return redirect(url_for('teacher.teacher_dashboard'))
 
@@ -114,13 +115,13 @@ def add_teacher():
         # A. Uniqueness Check (Email)
         existing_email = User.query.filter_by(email=form.email.data).first()
         if existing_email:
-            flash(f'Error: The email address "{form.email.data}" is already in use.', 'danger')
+            flash(_('Error: The email address "%(email)s" is already in use.', email=form.email.data), 'danger')
             return redirect(url_for('teacher.teacher_dashboard'))
 
         # B. Uniqueness Check (Username)
         existing_name = User.query.filter_by(username=form.username.data).first()
         if existing_name:
-            flash(f'Error: The name "{form.username.data}" is already taken.', 'danger')
+            flash(_('Error: The name "%(username)s" is already taken.', username=form.username.data), 'danger')
             return redirect(url_for('teacher.teacher_dashboard'))
 
         # C. Security: Hash Password
@@ -140,11 +141,11 @@ def add_teacher():
             db.session.add(new_staff_member)
             db.session.commit()
 
-            role_label = "Administrator" if is_admin_user else "Teacher"
-            flash(f'Success: {role_label} account created for {form.username.data}.', 'success')
+            role_label = _("Administrator") if is_admin_user else _("Teacher")
+            flash(_('Success: %(role)s account created for %(username)s.', role=role_label, username=form.username.data), 'success')
         except Exception as db_err:
             db.session.rollback()
-            flash(f'Database Error during staff creation: {str(db_err)}', 'danger')
+            flash(_('Database Error during staff creation: %(error)s', error=str(db_err)), 'danger')
 
     return redirect(url_for('teacher.teacher_dashboard'))
 
@@ -168,12 +169,12 @@ def edit_teacher(teacher_id):
         # Check uniqueness for modified fields
         if target_staff.username != form.username.data:
             if User.query.filter_by(username=form.username.data).first():
-                flash('Error: The new username is already taken.', 'danger')
+                flash(_('Error: The new username is already taken.'), 'danger')
                 return redirect(url_for('teacher.edit_teacher', teacher_id=target_staff.id))
 
         if target_staff.email != form.email.data:
             if User.query.filter_by(email=form.email.data).first():
-                flash('Error: The new email is already in use.', 'danger')
+                flash(_('Error: The new email is already in use.'), 'danger')
                 return redirect(url_for('teacher.edit_teacher', teacher_id=target_staff.id))
 
         # Update Visible Info
@@ -190,10 +191,10 @@ def edit_teacher(teacher_id):
         if form.password.data:
             new_pw_hash = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
             target_staff.password_hash = new_pw_hash
-            flash('Password has been reset.', 'success')
+            flash(_('Password has been reset.'), 'success')
 
         db.session.commit()
-        flash('Staff profile updated.', 'success')
+        flash(_('Staff profile updated.'), 'success')
         return redirect(url_for('teacher.teacher_dashboard'))
 
     return render_template('admin/edit_teacher.html', form=form, teacher=target_staff)
@@ -216,7 +217,7 @@ def delete_teacher(teacher_id):
 
     # 1. Logic Check: Cannot delete self
     if target_staff.id == current_user.id:
-        flash('Security Violation: You cannot delete your own account.', 'danger')
+        flash(_('Security Violation: You cannot delete your own account.'), 'danger')
         return redirect(url_for('teacher.teacher_dashboard'))
 
     try:
@@ -249,11 +250,11 @@ def delete_teacher(teacher_id):
         # 3. Final Step: Remove the Staff Member
         db.session.delete(target_staff)
         db.session.commit()
-        flash(f'Account for {target_staff.username} and all associated course data have been purged.', 'success')
+        flash(_('Account for %(username)s and all associated course data have been purged.', username=target_staff.username), 'success')
 
     except Exception as cleanup_err:
         db.session.rollback()
-        flash(f'Integrity Error during deletion: {str(cleanup_err)}', 'danger')
+        flash(_('Integrity Error during deletion: %(error)s', error=str(cleanup_err)), 'danger')
 
     return redirect(url_for('teacher.teacher_dashboard'))
 

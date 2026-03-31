@@ -1,6 +1,7 @@
 import json
 import pandas as pd
 from flask import Blueprint, render_template, url_for, flash, redirect, request, abort, jsonify, Response
+from flask_babel import gettext as _
 from flask_login import login_required, current_user
 import csv
 import io
@@ -49,7 +50,7 @@ def import_students_step1():
 
             # Validate required columns
             if 'name' not in data_frame.columns:
-                flash('Import Error: Your file must contain a column named "Name".', 'danger')
+                flash(_('Import Error: Your file must contain a column named "Name".'), 'danger')
                 return redirect(url_for('admin.admin_students'))
 
             # Construct the preview list
@@ -69,10 +70,10 @@ def import_students_step1():
             )
 
         except Exception as e:
-            flash(f'An error occurred while reading the file: {str(e)}', 'danger')
+            flash(_('An error occurred while reading the file: %(error)s', error=str(e)), 'danger')
             return redirect(url_for('admin.admin_students'))
 
-    flash('File upload failed. Please ensure you selected a valid CSV or Excel file.', 'danger')
+    flash(_('File upload failed. Please ensure you selected a valid CSV or Excel file.'), 'danger')
     return redirect(url_for('admin.admin_students'))
 
 
@@ -119,7 +120,7 @@ def import_questions_step1(subject_id):
             missing_fields = [f for f in required_fields if f not in data_frame.columns]
 
             if missing_fields:
-                flash(f'Import Error: Missing columns: {", ".join(missing_fields)}', 'danger')
+                flash(_('Import Error: Missing columns: %(fields)s', fields=", ".join(missing_fields)), 'danger')
                 return redirect(url_for('content.builder_exam', subject=target_subject.id))
 
             # Prepare Preview
@@ -144,10 +145,10 @@ def import_questions_step1(subject_id):
             )
 
         except Exception as file_err:
-            flash(f'Processing Error: {str(file_err)}', 'danger')
+            flash(_('Processing Error: %(error)s', error=str(file_err)), 'danger')
             return redirect(url_for('content.builder_exam', subject=target_subject.id))
 
-    flash('Invalid request or file format.', 'danger')
+    flash(_('Invalid request or file format.'), 'danger')
     return redirect(url_for('content.builder_exam', subject=target_subject.id))
 
 
@@ -187,7 +188,7 @@ def process_import_confirmation():
                 save_count += 1
 
             db.session.commit()
-            flash(f'Batch Processed: {save_count} students added.', 'success')
+            flash(_('Batch Processed: %(count)s students added.', count=save_count), 'success')
             return redirect(url_for('admin.admin_students'))
 
         # 3. Handle Question Commit (Includes Batch Language and Lecture)
@@ -226,12 +227,12 @@ def process_import_confirmation():
                 q_save_count += 1
 
             db.session.commit()
-            flash(f'Batch Processed: {q_save_count} questions assigned to bank.', 'success')
+            flash(_('Batch Processed: %(count)s questions assigned to bank.', count=q_save_count), 'success')
             return redirect(url_for('content.builder_exam', subject=subject_record.id))
 
     except Exception as commit_error:
         db.session.rollback()
-        flash(f'Critical Commit Failure: {str(commit_error)}', 'danger')
+        flash(_('Critical Commit Failure: %(error)s', error=str(commit_error)), 'danger')
         return redirect(url_for('teacher.teacher_dashboard'))
 
     return redirect(url_for('teacher.teacher_dashboard'))
@@ -255,7 +256,7 @@ def add_subject():
     if form.validate_on_submit():
         # Verify slug uniqueness
         if Subject.query.filter_by(slug=form.slug.data).first():
-            flash('Error: The URL Slug must be unique across all subjects.', 'danger')
+            flash(_('Error: The URL Slug must be unique across all subjects.'), 'danger')
         else:
             new_subj = Subject(
                 name=form.name.data,
@@ -265,7 +266,7 @@ def add_subject():
             )
             db.session.add(new_subj)
             db.session.commit()
-            flash(f'Subject "{form.name.data}" created successfully.', 'success')
+            flash(_('Subject "%(name)s" created successfully.', name=form.name.data), 'success')
 
     return redirect(url_for('teacher.teacher_dashboard'))
 
@@ -296,7 +297,7 @@ def edit_subject(subject_id):
              subj_record.teacher_id = form.teacher_id.data
 
         db.session.commit()
-        flash('Subject information updated.', 'success')
+        flash(_('Subject information updated.'), 'success')
         return redirect(url_for('teacher.teacher_dashboard'))
 
     return render_template('teacher/builder.html', form=form, title="Edit Subject Details", subject=subj_record)
@@ -340,11 +341,11 @@ def delete_subject(subject_id):
         # D. Purge Subject
         db.session.delete(subj_record)
         db.session.commit()
-        flash(f'Subject "{subj_record.name}" and all internal content has been deleted.', 'success')
+        flash(_('Subject "%(name)s" and all internal content has been deleted.', name=subj_record.name), 'success')
 
     except Exception as e:
         db.session.rollback()
-        flash(f'Deletion failed: {str(e)}', 'danger')
+        flash(_('Deletion failed: %(error)s', error=str(e)), 'danger')
 
     return redirect(url_for('teacher.teacher_dashboard'))
 
@@ -374,7 +375,7 @@ def builder_info():
         )
         db.session.add(new_page_record)
         db.session.commit()
-        flash('Lecture content published.', 'success')
+        flash(_('Lecture content published.'), 'success')
         return redirect(url_for('teacher.teacher_dashboard'))
 
     return render_template('teacher/builder.html', form=form, title="Create New Lecture", subject=subj_record)
@@ -400,7 +401,7 @@ def edit_page(page_id):
         target_page.content_body = form.content_body.data
         target_page.content_body_kurdish = form.content_body_kurdish.data
         db.session.commit()
-        flash('Changes saved.', 'success')
+        flash(_('Changes saved.'), 'success')
         return redirect(url_for('student.subject_detail', slug=target_page.subject.slug))
 
     return render_template(
@@ -426,7 +427,7 @@ def delete_page(page_id):
     db.session.delete(target_page)
     db.session.commit()
 
-    flash('Lecture deleted.', 'success')
+    flash(_('Lecture deleted.'), 'success')
     return redirect(url_for('student.subject_detail', slug=subject_slug_ref))
 
 
@@ -448,9 +449,9 @@ def add_resource(page_id):
         )
         db.session.add(new_res)
         db.session.commit()
-        flash('Learning resource attached.', 'success')
+        flash(_('Learning resource attached.'), 'success')
     else:
-        flash('Attachment Error: Title and Link are required.', 'danger')
+        flash(_('Attachment Error: Title and Link are required.'), 'danger')
 
     return redirect(url_for('content.edit_page', page_id=target_page.id))
 
@@ -467,7 +468,7 @@ def delete_resource(resource_id):
 
     db.session.delete(target_res)
     db.session.commit()
-    flash('Resource removed.', 'success')
+    flash(_('Resource removed.'), 'success')
     return redirect(url_for('content.edit_page', page_id=parent_page_id))
 
 
@@ -646,7 +647,7 @@ def edit_question(question_id):
             target_q.page_id = form.page_id.data
 
         db.session.commit()
-        flash('Question updated.', 'success')
+        flash(_('Question updated.'), 'success')
         return redirect(url_for('student.subject_detail', slug=target_q.subject.slug))
 
     return render_template('teacher/builder.html', form=form, title="Modify Question", subject=target_q.subject)
@@ -665,9 +666,9 @@ def delete_question(question_id):
         StudentAnswer.query.filter_by(question_id=target_q.id).delete()
         db.session.delete(target_q)
         db.session.commit()
-        flash('Question removed from bank.', 'success')
+        flash(_('Question removed from bank.'), 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error during question deletion: {str(e)}', 'danger')
+        flash(_('Error during question deletion: %(error)s', error=str(e)), 'danger')
 
     return redirect(url_for('student.subject_detail', slug=subject_slug_ref))

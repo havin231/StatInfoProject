@@ -1,5 +1,6 @@
 import pandas as pd
 from flask import Blueprint, render_template, url_for, flash, redirect, request, abort
+from flask_babel import gettext as _
 from flask_login import login_required, current_user
 from sqlalchemy import desc
 
@@ -44,11 +45,11 @@ def toolbase():
                 try:
                     db.session.add(new_tool)
                     db.session.commit()
-                    flash('New tool added successfully.', 'success')
+                    flash(_('New tool added successfully.'), 'success')
                     return redirect(url_for('tools.toolbase'))
                 except Exception as e:
                     db.session.rollback()
-                    flash(f'Error adding tool: {str(e)}', 'danger')
+                    flash(_('Error adding tool: %(error)s', error=str(e)), 'danger')
 
         # B. BULK IMPORT
         if import_form.validate_on_submit() and 'file' in request.files:
@@ -67,7 +68,7 @@ def toolbase():
                 
                 # Validate Headers (Name, Link) - Description is optional
                 if 'name' not in df.columns or 'link' not in df.columns:
-                    flash('Import Error: CSV must have "Name" and "Link" columns.', 'danger')
+                    flash(_('Import Error: CSV must have \"Name\" and \"Link\" columns.'), 'danger')
                     return redirect(url_for('tools.toolbase'))
                 
                 # Iterate and Add
@@ -87,12 +88,12 @@ def toolbase():
                          count += 1
                 
                 db.session.commit()
-                flash(f'Success! Imported {count} tools from file.', 'success')
+                flash(_('Success! Imported %(count)s tools from file.', count=count), 'success')
                 return redirect(url_for('tools.toolbase'))
 
             except Exception as e:
                 db.session.rollback()
-                flash(f'Import Failed: {str(e)}', 'danger')
+                flash(_('Import Failed: %(error)s', error=str(e)), 'danger')
             
     all_tools = Tool.query.order_by(desc(Tool.created_at)).all()
     return render_template('toolbase.html', form=form, import_form=import_form, tools=all_tools, is_admin=is_admin)
@@ -107,10 +108,10 @@ def delete_tool(tool_id):
     try:
         db.session.delete(tool)
         db.session.commit()
-        flash('Tool deleted.', 'success')
+        flash(_('Tool deleted.'), 'success')
     except:
         db.session.rollback()
-        flash('Error deleting tool.', 'danger')
+        flash(_('Error deleting tool.'), 'danger')
         
     return redirect(url_for('tools.toolbase'))
 
@@ -127,9 +128,9 @@ def delete_all_tools():
     try:
         num_deleted = db.session.query(Tool).delete()
         db.session.commit()
-        flash(f'All tools deleted! ({num_deleted} removed)', 'warning')
+        flash(_('All tools deleted! (%(count)s removed)', count=num_deleted), 'warning')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error deleting all tools: {str(e)}', 'danger')
+        flash(_('Error deleting all tools: %(error)s', error=str(e)), 'danger')
         
     return redirect(url_for('tools.toolbase'))

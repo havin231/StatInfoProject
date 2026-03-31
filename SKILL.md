@@ -20,7 +20,7 @@
 ### File Categories
 - **Git only (GitHub Repository)**:
   - Application logic: `app/`, `config.py`, `run.py`, `requirements.txt`
-  - Localization files: `babel.cfg`, `messages.pot`, `translate.py`
+  - Localization files: `babel.cfg`, `messages.pot`, `app/translations/ku/LC_MESSAGES/messages.po`
   - Git files: `.gitignore`, `.env.example`
   - Documentation and Logs: `SKILL.md`, `VersionDetails.txt`
   - DB Scripts: `convert_sql_to_backup.py`, `update_db.py`, `regrade_all.py`, `fix_quotes.py`, `add_subject_is_public.py`, `drop_group_id.py`
@@ -50,6 +50,7 @@
     │   │   ├── Dark_CyberCommand.svg
     │   │   └── Dark_AcademicGlass.svg (Default Favicon)
     │   └── uploads/          # (Unused - We use text links for external resources)
+    ├── translations/         # Babel Translations (.po, .mo files)
     └── templates/
         ├── base.html         # Master Layout (MathJax, Navbar, Flash, Favicon)
         ├── login.html        # Staff Login

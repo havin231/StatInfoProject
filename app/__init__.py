@@ -11,6 +11,20 @@ from flask import session
 from config import Config
 
 def get_locale():
+    # If the user is logged in natively (teacher/admin) or as student (stored in session somehow),
+    # we can check request.
+    from flask_login import current_user
+    # Try to get from logged-in teacher/admin
+    if current_user and current_user.is_authenticated and hasattr(current_user, 'preferred_lang'):
+        return current_user.preferred_lang
+    # Try to get from student logic
+    # The student login system might just set 'student_id' in session
+    student_id = session.get('student_id')
+    if student_id:
+        from app.models import Student
+        student = db.session.get(Student, student_id)
+        if student and student.preferred_lang:
+            return student.preferred_lang
     return session.get('lang', 'en')
 
 # --- EXTENSION INITIALIZATION ---
@@ -65,7 +79,15 @@ def create_app(config_class=Config):
                 conn.commit()
             app.logger.info("Migration: 'is_public' column added to subject table.")
         except Exception:
-            # Column already exists — this is expected after first run.
+            pass
+
+        try:
+            with db.engine.connect() as conn:
+                conn.execute(text("ALTER TABLE user ADD COLUMN preferred_lang VARCHAR(10) DEFAULT 'en'"))
+                conn.execute(text("ALTER TABLE student ADD COLUMN preferred_lang VARCHAR(10) DEFAULT 'en'"))
+                conn.commit()
+            app.logger.info("Migration: 'preferred_lang' column added to user and student tables.")
+        except Exception:
             pass
 
     return app

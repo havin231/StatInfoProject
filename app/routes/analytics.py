@@ -2,8 +2,8 @@ import csv
 import io
 import zipfile
 from datetime import datetime
-
 from flask import Blueprint, render_template, url_for, flash, redirect, request, abort, Response
+from flask_babel import gettext as _
 from flask_login import login_required, current_user
 from sqlalchemy import desc
 
@@ -347,7 +347,7 @@ def restore_system():
     if form.validate_on_submit():
         file = form.backup_file.data
         if not file:
-            flash('No file provided.', 'danger')
+            flash(_('No file provided.'), 'danger')
             return redirect(request.url)
 
         try:
@@ -360,7 +360,7 @@ def restore_system():
                 # Validation
                 required_files = ['1_users.csv', '2_subjects.csv', '3_students.csv']
                 if not all(f in file_list for f in required_files):
-                    flash('Invalid Backup Format. Missing core CSV files.', 'danger')
+                    flash(_('Invalid Backup Format. Missing core CSV files.'), 'danger')
                     return redirect(request.url)
 
                 # 2. SAFE WIPE (Delete rows in reverse dependency order)
@@ -378,7 +378,7 @@ def restore_system():
                     db.session.commit()
                 except Exception as wipe_err:
                     db.session.rollback()
-                    flash(f'Pre-Restore Wipe Failed: {wipe_err}', 'danger')
+                    flash(_('Pre-Restore Wipe Failed: %(error)s', error=str(wipe_err)), 'danger')
                     return redirect(request.url)
 
                 # 3. REHYDRATE GENERATOR (Memory Efficient)
@@ -610,12 +610,12 @@ def restore_system():
                     ))
                 
                 db.session.commit()
-                flash('SYSTEM RESTORE COMPLETED. Database re-hydrated successfully.', 'success')
+                flash(_('SYSTEM RESTORE COMPLETED. Database re-hydrated successfully.'), 'success')
                 return redirect(url_for('teacher.teacher_dashboard'))
 
         except Exception as e:
             db.session.rollback()
-            flash(f'CRITICAL RESTORE FAILURE: {str(e)}', 'danger')
+            flash(_('CRITICAL RESTORE FAILURE: %(error)s', error=str(e)), 'danger')
             return redirect(request.url)
 
     return render_template('admin/restore_center.html', form=form)
@@ -640,7 +640,7 @@ def edit_about():
         info_record.title = edit_form.title.data
         info_record.content = edit_form.content.data
         db.session.commit()
-        flash('Public Information Page Updated.', 'success')
+        flash(_('Public Information Page Updated.'), 'success')
         return redirect(url_for('teacher.teacher_dashboard'))
 
     return render_template('admin/edit_about.html', form=edit_form)

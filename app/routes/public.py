@@ -1,5 +1,6 @@
 from datetime import datetime
-from flask import Blueprint, render_template, url_for, flash, redirect, request, jsonify
+from flask import Blueprint, render_template, url_for, flash, redirect, request, jsonify, session
+from flask_babel import gettext as _
 from flask_login import current_user
 from sqlalchemy import func, or_
 
@@ -47,7 +48,7 @@ def setup():
     existing_admin = User.query.filter_by(is_admin=True).first()
 
     if existing_admin:
-        flash('System is already initialized. Access to setup is restricted.', 'warning')
+        flash(_('System is already initialized. Access to setup is restricted.'), 'warning')
         return redirect(url_for('auth.login'))
 
     # 2. Setup Form
@@ -59,7 +60,7 @@ def setup():
         # Verify email uniqueness
         check_email = User.query.filter_by(email=form.email.data).first()
         if check_email:
-            flash('Error: This email is already registered in our systems.', 'danger')
+            flash(_('Error: This email is already registered in our systems.'), 'danger')
             return render_template('setup.html', form=form)
 
         # Secure password hashing using Bcrypt
@@ -76,11 +77,11 @@ def setup():
         try:
             db.session.add(master_admin)
             db.session.commit()
-            flash('Admin Account Created! Please login to begin managing the school.', 'success')
+            flash(_('Admin Account Created! Please login to begin managing the school.'), 'success')
             return redirect(url_for('auth.login'))
         except Exception as database_error:
             db.session.rollback()
-            flash(f'Critical Database Error: {str(database_error)}', 'danger')
+            flash(_('Critical Database Error: %(error)s', error=str(database_error)), 'danger')
 
     return render_template('setup.html', form=form)
 
@@ -172,3 +173,38 @@ def public_stats():
         pass_count=passing_grade_count,
         fail_count=failing_grade_count
     )
+
+@public.route('/set-lang/<lang>')
+def set_lang(lang):
+    """
+    Sets the user's preferred language.
+    Stored in session, and if logged in, in user profile.
+    """
+    if lang not in ['en', 'ku', 'ckb']:
+        flash(_('Invalid language selected.'), 'danger')
+        return redirect(request.referrer or url_for('public.index'))
+    
+    session['lang'] = lang
+
+    # Try to update specific users if logged in
+    from flask_login import current_user
+    if current_user and current_user.is_authenticated and hasattr(current_user, 'preferred_lang'):
+        try:
+            current_user.preferred_lang = lang
+            db.session.commit()
+        except:
+            db.session.rollback()
+    else:
+        # Check student
+        student_id = session.get('student_id')
+        if student_id:
+            student = db.session.get(Student, student_id)
+            if student:
+                try:
+                    student.preferred_lang = lang
+                    db.session.commit()
+                except:
+                    db.session.rollback()
+    
+    flash(_('Language changed successfully.'), 'success')
+    return redirect(request.referrer or url_for('public.index'))

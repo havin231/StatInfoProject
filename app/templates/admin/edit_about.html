@@ -59,6 +59,7 @@
         tinymce.init({
             selector: '#content',
             height: 500,
+            directionality: '{{ "rtl" if get_locale().language == "ku" else "ltr" }}',
             plugins: 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount',
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table image link | charmap emoticons pagebreak | searchreplace fullscreen preview wordcount ltr rtl',
             browser_spellcheck: true,

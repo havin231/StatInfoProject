@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, abort
+from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
 from app import db
@@ -37,9 +38,9 @@ def admin_students():
     if form_manual.validate_on_submit():
         # Uniqueness Check
         if Student.query.filter_by(access_code=form_manual.access_code.data).first():
-            flash('Error: This Access Code is already in use.', 'danger')
+            flash(_('Error: This Access Code is already in use.'), 'danger')
         elif form_manual.email.data and Student.query.filter_by(email=form_manual.email.data).first():
-            flash('Error: This Email is already in use.', 'danger')
+            flash(_('Error: This Email is already in use.'), 'danger')
         else:
             new_student = Student(
                 full_name=form_manual.full_name.data,
@@ -48,7 +49,7 @@ def admin_students():
             )
             db.session.add(new_student)
             db.session.commit()
-            flash(f'Student "{form_manual.full_name.data}" registered successfully.', 'success')
+            flash(_('Student "%(name)s" registered successfully.', name=form_manual.full_name.data), 'success')
             return redirect(url_for('admin.admin_students'))
 
     # Fetch all students for the table (Sorted by Newest First)
@@ -83,14 +84,14 @@ def edit_student(student_id):
         if student_record.access_code != form.access_code.data:
             code_check = Student.query.filter_by(access_code=form.access_code.data).first()
             if code_check:
-                flash('Critical Error: The new access code is already assigned to someone else.', 'danger')
+                flash(_('Critical Error: The new access code is already assigned to someone else.'), 'danger')
                 return render_template('admin/edit_student.html', form=form, student=student_record)
 
         # Check if email was changed and uniqueness
         if form.email.data and student_record.email != form.email.data:
             email_check = Student.query.filter_by(email=form.email.data).first()
             if email_check:
-                flash('Critical Error: The new email is already assigned to someone else.', 'danger')
+                flash(_('Critical Error: The new email is already assigned to someone else.'), 'danger')
                 return render_template('admin/edit_student.html', form=form, student=student_record)
 
         # Update Record
@@ -100,11 +101,11 @@ def edit_student(student_id):
 
         try:
             db.session.commit()
-            flash('Student profile updated. All grades and history remain linked.', 'success')
+            flash(_('Student profile updated. All grades and history remain linked.'), 'success')
             return redirect(url_for('admin.admin_students'))
         except Exception as e:
             db.session.rollback()
-            flash(f'Database Error: {str(e)}', 'danger')
+            flash(_('Database Error: %(error)s', error=str(e)), 'danger')
 
     return render_template('admin/edit_student.html', form=form, student=student_record)
 
@@ -131,10 +132,10 @@ def delete_student(student_id):
         db.session.delete(target_student)
 
         db.session.commit()
-        flash(f'Student "{target_student.full_name}" and all their records have been removed.', 'success')
+        flash(_('Student "%(name)s" and all their records have been removed.', name=target_student.full_name), 'success')
     except Exception as fatal_err:
         db.session.rollback()
-        flash(f'Failed to delete student: {str(fatal_err)}', 'danger')
+        flash(_('Failed to delete student: %(error)s', error=str(fatal_err)), 'danger')
 
     return redirect(url_for('admin.admin_students'))
 
@@ -163,11 +164,11 @@ def delete_all_students():
         count_students = db.session.query(Student).delete()
 
         db.session.commit()
-        flash(f'Database Wipe Successful: {count_students} students, {count_results} exams, and {count_answers} choices deleted.', 'success')
+        flash(_('Database Wipe Successful: %(students)s students, %(results)s exams, and %(answers)s choices deleted.', students=count_students, results=count_results, answers=count_answers), 'success')
 
     except Exception as critical_wipe_error:
         db.session.rollback()
-        flash(f'CRITICAL SYSTEM ERROR during batch wipe: {str(critical_wipe_error)}', 'danger')
+        flash(_('CRITICAL SYSTEM ERROR during batch wipe: %(error)s', error=str(critical_wipe_error)), 'danger')
 
     return redirect(url_for('admin.admin_students'))
 
@@ -216,10 +217,10 @@ def add_command():
         try:
             db.session.add(new_cmd)
             db.session.commit()
-            flash('Maintenance script documented successfully.', 'success')
+            flash(_('Maintenance script documented successfully.'), 'success')
         except Exception as e:
             db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
+            flash(_('Error: %(error)s', error=str(e)), 'danger')
 
     return redirect(url_for('admin.admin_command_center'))
 
@@ -236,9 +237,9 @@ def delete_command(cmd_id):
     try:
         db.session.delete(target_cmd)
         db.session.commit()
-        flash('Documentation entry removed.', 'success')
+        flash(_('Documentation entry removed.'), 'success')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(_('Error: %(error)s', error=str(e)), 'danger')
 
     return redirect(url_for('admin.admin_command_center'))

@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, request, session
+from flask_babel import gettext as _
 from flask_login import login_user, current_user, logout_user
 
 from app import db, bcrypt, limiter
@@ -32,10 +33,10 @@ def login():
 
         if user_record and bcrypt.check_password_hash(user_record.password_hash, form.password.data):
             login_user(user_record, remember=form.remember.data)
-            flash('Logged in successfully.', 'success')
+            flash(_('Logged in successfully.'), 'success')
             return redirect(url_for('teacher.teacher_dashboard'))
         else:
-            flash('Authentication failed. Check credentials.', 'danger')
+            flash(_('Authentication failed. Check credentials.'), 'danger')
 
     return render_template('login.html', title='Staff Access', form=form)
 
@@ -56,7 +57,7 @@ def student_login():
         if student_record:
             # Persistent session identification
             session['student_id'] = student_record.id
-            flash(f'Welcome, {student_record.full_name}.', 'success')
+            flash(_('Welcome, %(name)s.', name=student_record.full_name), 'success')
 
             # REDIRECT LOGIC: Support for the 'next' parameter
             target_page = request.args.get('next')
@@ -65,7 +66,7 @@ def student_login():
 
             return redirect(url_for('student.student_dashboard'))
         else:
-            flash('The Access Code provided is invalid.', 'danger')
+            flash(_('The Access Code provided is invalid.'), 'danger')
 
     return render_template('student_login.html')
 
@@ -79,7 +80,7 @@ def logout():
     """
     logout_user()
     session.pop('student_id', None)
-    flash('Session ended.', 'info')
+    flash(_('Session ended.'), 'info')
     return redirect(url_for('public.index'))
 
 # ==============================================================================
@@ -99,7 +100,7 @@ def student_signup():
     if form.validate_on_submit():
         # Check email uniqueness
         if Student.query.filter_by(email=form.email.data).first():
-            flash('Error: This email is already registered.', 'danger')
+            flash(_('Error: This email is already registered.'), 'danger')
             return render_template('student_signup.html', form=form)
             
         # Generate unique access code
@@ -119,12 +120,12 @@ def student_signup():
             
             # Auto-login
             session['student_id'] = new_student.id
-            flash(f'Account created! Your Access Code is: {new_code}. Please save it!', 'success')
+            flash(_('Account created! Your Access Code is: %(code)s. Please save it!', code=new_code), 'success')
             return redirect(url_for('student.student_dashboard'))
             
         except Exception as e:
             db.session.rollback()
-            flash(f'Error creating account: {e}', 'danger')
+            flash(_('Error creating account: %(error)s', error=str(e)), 'danger')
             
     return render_template('student_signup.html', form=form)
 
@@ -148,13 +149,13 @@ def student_settings():
         # Check email uniqueness if changed
         if form.email.data != student.email:
             if Student.query.filter_by(email=form.email.data).first():
-                flash('Error: Email already in use by another student.', 'danger')
+                flash(_('Error: Email already in use by another student.'), 'danger')
                 return render_template('student/settings.html', form=form, student=student)
         
         # Check access code uniqueness if changed
         if form.access_code.data != student.access_code:
             if Student.query.filter_by(access_code=form.access_code.data).first():
-                flash('Error: Access code already taken.', 'danger')
+                flash(_('Error: Access code already taken.'), 'danger')
                 return render_template('student/settings.html', form=form, student=student)
                 
         student.email = form.email.data
@@ -162,18 +163,10 @@ def student_settings():
         
         try:
             db.session.commit()
-            flash('Settings updated successfully.', 'success')
+            flash(_('Settings updated successfully.'), 'success')
             return redirect(url_for('student.student_dashboard'))
         except Exception as e:
             db.session.rollback()
-            flash(f'Error updating settings: {e}', 'danger')
+            flash(_('Error updating settings: %(error)s', error=str(e)), 'danger')
             
     return render_template('student/settings.html', form=form, student=student)
-
-
-# --- LANGUAGE SETTINGS ---
-@auth.route('/set_lang/<lang>')
-def set_lang(lang):
-    if lang in ['en', 'ku']:
-        session['lang'] = lang
-    return redirect(request.referrer or url_for('public.index'))

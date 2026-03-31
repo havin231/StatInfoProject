@@ -26,6 +26,9 @@ class User(db.Model, UserMixin):
     # Permission Flag: If True, user can manage other users and global settings
     is_admin = db.Column(db.Boolean, default=False)
 
+    # Preferred Language for UI (e.g., 'en', 'ku')
+    preferred_lang = db.Column(db.String(10), default='en')
+
     # Relationship: A teacher teaches many Subjects
     subjects = db.relationship('Subject', backref='teacher', lazy=True)
 
@@ -49,6 +52,9 @@ class Student(db.Model):
 
     # NEW: Email (Optional for old students, Required for new)
     email = db.Column(db.String(120), unique=True, nullable=True)
+
+    # Preferred Language for UI
+    preferred_lang = db.Column(db.String(10), default='en')
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

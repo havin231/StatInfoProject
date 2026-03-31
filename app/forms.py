@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo
+from flask_babel import lazy_gettext as _l
 
 # ==========================================
 # 1. AUTHENTICATION & SETUP
@@ -11,20 +12,20 @@ class LoginForm(FlaskForm):
     """
     Form for staff/admin login.
     """
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me')
-    submit = SubmitField('Login')
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    password = PasswordField(_l('Password'), validators=[DataRequired()])
+    remember = BooleanField(_l('Remember Me'))
+    submit = SubmitField(_l('Login'))
 
 class SetupForm(FlaskForm):
     """
     Form for the initial system setup (creating the first Headmaster).
     """
-    username = StringField('Headmaster Name', validators=[DataRequired()])
-    email = StringField('Email Address', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Create System Admin')
+    username = StringField(_l('Headmaster Name'), validators=[DataRequired()])
+    email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
+    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField(_l('Confirm Password'), validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField(_l('Create System Admin'))
 
 # ==========================================
 # 2. ADMIN & USER MANAGEMENT
@@ -34,55 +35,55 @@ class TeacherSignupForm(FlaskForm):
     """
     Form for Admins to create new staff accounts.
     """
-    username = StringField('Teacher Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
-    is_admin = BooleanField('Grant Admin Access')
-    submit = SubmitField('Create Account')
+    username = StringField(_l('Teacher Name'), validators=[DataRequired()])
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
+    is_admin = BooleanField(_l('Grant Admin Access'))
+    submit = SubmitField(_l('Create Account'))
 
 class TeacherEditForm(FlaskForm):
     """
     Form for editing existing staff.
     """
-    username = StringField('Teacher Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Reset Password (Optional)', validators=[Optional(), Length(min=6)])
-    is_admin = BooleanField('Grant Admin Access')
-    submit = SubmitField('Update Account')
+    username = StringField(_l('Teacher Name'), validators=[DataRequired()])
+    email = StringField(_l('Email'), validators=[DataRequired(), Email()])
+    password = PasswordField(_l('Reset Password (Optional)'), validators=[Optional(), Length(min=6)])
+    is_admin = BooleanField(_l('Grant Admin Access'))
+    submit = SubmitField(_l('Update Account'))
 
 class StudentForm(FlaskForm):
     """
     Form for registering new students.
     """
-    full_name = StringField('Full Name', validators=[DataRequired()])
-    email = StringField('Email Address', validators=[Optional(), Email()])
-    access_code = StringField('Access Code (Unique)', validators=[DataRequired()])
-    submit = SubmitField('Add Student')
+    full_name = StringField(_l('Full Name'), validators=[DataRequired()])
+    email = StringField(_l('Email Address'), validators=[Optional(), Email()])
+    access_code = StringField(_l('Access Code (Unique)'), validators=[DataRequired()])
+    submit = SubmitField(_l('Add Student'))
 
 class StudentSignupForm(FlaskForm):
     """
     Form for students to sign up themselves.
     """
-    full_name = StringField('Full Name', validators=[DataRequired()])
-    email = StringField('Email Address', validators=[DataRequired(), Email()])
-    submit = SubmitField('Register Account')
+    full_name = StringField(_l('Full Name'), validators=[DataRequired()])
+    email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
+    submit = SubmitField(_l('Register Account'))
 
 class StudentSettingsForm(FlaskForm):
     """
     Form for students to update their profile (email and access code).
     """
-    email = StringField('Email Address', validators=[DataRequired(), Email()])
-    access_code = StringField('Change Access Code', validators=[DataRequired(), Length(min=6)])
-    submit = SubmitField('Save Changes')
+    email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
+    access_code = StringField(_l('Change Access Code'), validators=[DataRequired(), Length(min=6)])
+    submit = SubmitField(_l('Save Changes'))
 
 class StudentEditForm(FlaskForm):
     """
     Form for editing existing student details (Task 1).
     """
-    full_name = StringField('Full Name', validators=[DataRequired()])
-    email = StringField('Email Address', validators=[Optional(), Email()])
-    access_code = StringField('Access Code', validators=[DataRequired()])
-    submit = SubmitField('Update Student Details')
+    full_name = StringField(_l('Full Name'), validators=[DataRequired()])
+    email = StringField(_l('Email Address'), validators=[Optional(), Email()])
+    access_code = StringField(_l('Access Code'), validators=[DataRequired()])
+    submit = SubmitField(_l('Update Student Details'))
 
 # ==========================================
 # 3. SITE CONTENT (CMS)
@@ -92,9 +93,9 @@ class InfoPageForm(FlaskForm):
     """
     Form for editing static pages like 'About Us'.
     """
-    title = StringField('Page Title', default="About Us", validators=[DataRequired()])
-    content = TextAreaField('Page Content', validators=[DataRequired()])
-    submit = SubmitField('Save Page')
+    title = StringField(_l('Page Title'), default="About Us", validators=[DataRequired()])
+    content = TextAreaField(_l('Page Content'), validators=[DataRequired()])
+    submit = SubmitField(_l('Save Page'))
 
 # ==========================================
 # 4. ACADEMIC CONTENT
@@ -104,40 +105,40 @@ class SubjectForm(FlaskForm):
     """
     Form for creating/editing Subjects.
     """
-    name = StringField('Subject Name', validators=[DataRequired()])
-    slug = StringField('Unique Slug (e.g. math-101)', validators=[DataRequired()])
-    description = TextAreaField('Description', validators=[DataRequired()])
-    teacher_id = SelectField('Assign Teacher', coerce=int)
-    submit = SubmitField('Create Subject')
+    name = StringField(_l('Subject Name'), validators=[DataRequired()])
+    slug = StringField(_l('Unique Slug (e.g. math-101)'), validators=[DataRequired()])
+    description = TextAreaField(_l('Description'), validators=[DataRequired()])
+    teacher_id = SelectField(_l('Assign Teacher'), coerce=int)
+    submit = SubmitField(_l('Create Subject'))
 
 class PageForm(FlaskForm):
     """
     Form for creating study materials (Lectures/Chapters).
     """
-    subject_id = SelectField('Select Subject', coerce=int, validators=[DataRequired()])
-    title = StringField('Page Title', validators=[DataRequired()])
-    content_body = TextAreaField('Content (English)', validators=[DataRequired()])
-    content_body_kurdish = TextAreaField('Content (Kurdish)', validators=[Optional()])
-    submit = SubmitField('Publish Content')
+    subject_id = SelectField(_l('Select Subject'), coerce=int, validators=[DataRequired()])
+    title = StringField(_l('Page Title'), validators=[DataRequired()])
+    content_body = TextAreaField(_l('Content (English)'), validators=[DataRequired()])
+    content_body_kurdish = TextAreaField(_l('Content (Kurdish)'), validators=[Optional()])
+    submit = SubmitField(_l('Publish Content'))
 
 class QuestionForm(FlaskForm):
     """
     Form for adding/editing a single question.
     """
-    subject_id = SelectField('Subject', coerce=int, validators=[DataRequired()])
-    page_id = SelectField('Link to Specific Lecture (Optional)', coerce=int)
+    subject_id = SelectField(_l('Subject'), coerce=int, validators=[DataRequired()])
+    page_id = SelectField(_l('Link to Specific Lecture (Optional)'), coerce=int)
 
-    question_text = TextAreaField('Question', validators=[DataRequired()])
-    option_a = StringField('Option A', validators=[DataRequired()])
-    option_b = StringField('Option B', validators=[DataRequired()])
-    option_c = StringField('Option C', validators=[DataRequired()])
-    option_d = StringField('Option D', validators=[DataRequired()])
-    correct_answer = SelectField('Correct Answer', choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')], validators=[DataRequired()])
+    question_text = TextAreaField(_l('Question'), validators=[DataRequired()])
+    option_a = StringField(_l('Option A'), validators=[DataRequired()])
+    option_b = StringField(_l('Option B'), validators=[DataRequired()])
+    option_c = StringField(_l('Option C'), validators=[DataRequired()])
+    option_d = StringField(_l('Option D'), validators=[DataRequired()])
+    correct_answer = SelectField(_l('Correct Answer'), choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')], validators=[DataRequired()])
 
     # Language Flag
-    is_kurdish = BooleanField('Is Kurdish? (Right-to-Left)')
+    is_kurdish = BooleanField(_l('Is Kurdish? (Right-to-Left)'))
 
-    submit = SubmitField('Save Question')
+    submit = SubmitField(_l('Save Question'))
 
 # ==========================================
 # 5. BULK IMPORT & RESOURCES
@@ -147,19 +148,19 @@ class BulkImportForm(FlaskForm):
     """
     Form for uploading CSV or Excel files.
     """
-    file = FileField('Upload File (CSV or Excel)', validators=[
+    file = FileField(_l('Upload File (CSV or Excel)'), validators=[
         DataRequired(),
-        FileAllowed(['csv', 'xlsx', 'xls'], 'Tables only!')
+        FileAllowed(['csv', 'xlsx', 'xls'], _l('Tables only!'))
     ])
-    submit = SubmitField('Preview Data')
+    submit = SubmitField(_l('Preview Data'))
 
 class ResourceForm(FlaskForm):
     """
     Form for adding a single resource link to a page.
     """
-    title = StringField('Resource Title (e.g. Watch Video)', validators=[DataRequired()])
-    link = StringField('URL (Link)', validators=[DataRequired()])
-    submit = SubmitField('Add Resource')
+    title = StringField(_l('Resource Title (e.g. Watch Video)'), validators=[DataRequired()])
+    link = StringField(_l('URL (Link)'), validators=[DataRequired()])
+    submit = SubmitField(_l('Add Resource'))
 
 # ==========================================
 # 6. SYSTEM MANAGEMENT
@@ -169,28 +170,28 @@ class CommandForm(FlaskForm):
     """
     NEW: Form for adding system commands to the admin cheat-sheet.
     """
-    title = StringField('Command Title (e.g. Reset DB)', validators=[DataRequired()])
-    command_text = TextAreaField('Command Code', validators=[DataRequired()])
-    description = TextAreaField('Description / When to use', validators=[DataRequired()])
-    submit = SubmitField('Save Command')
+    title = StringField(_l('Command Title (e.g. Reset DB)'), validators=[DataRequired()])
+    command_text = TextAreaField(_l('Command Code'), validators=[DataRequired()])
+    description = TextAreaField(_l('Description / When to use'), validators=[DataRequired()])
+    submit = SubmitField(_l('Save Command'))
 
 class RestoreBackupForm(FlaskForm):
     """
     NEW: Form for the Full System Restore feature.
     Accepts only .zip files containing the raw CSV dumps.
     """
-    backup_file = FileField('Select Backup File (.zip)', validators=[
+    backup_file = FileField(_l('Select Backup File (.zip)'), validators=[
         DataRequired(),
-        FileAllowed(['zip'], 'ZIP Archives Only!')
+        FileAllowed(['zip'], _l('ZIP Archives Only!'))
     ])
-    confirm_wipe = BooleanField('I understand this will DELETE ALL CURRENT DATA', validators=[DataRequired()])
-    submit = SubmitField('PERFORM FULL RESTORE')
+    confirm_wipe = BooleanField(_l('I understand this will DELETE ALL CURRENT DATA'), validators=[DataRequired()])
+    submit = SubmitField(_l('PERFORM FULL RESTORE'))
 
 class ToolForm(FlaskForm):
     """
     Form for adding external tool links.
     """
-    title = StringField('Tool Name', validators=[DataRequired()])
-    link = StringField('Tool URL (https://...)', validators=[DataRequired()])
-    description = TextAreaField('Description', validators=[Optional()])
-    submit = SubmitField('Add Tool')
+    title = StringField(_l('Tool Name'), validators=[DataRequired()])
+    link = StringField(_l('Tool URL (https://...)'), validators=[DataRequired()])
+    description = TextAreaField(_l('Description'), validators=[Optional()])
+    submit = SubmitField(_l('Add Tool'))

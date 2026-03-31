@@ -51,3 +51,16 @@ Whenever a change or new feature is added, append a new version block following 
 - Snapshotted as `version_0.2.1`.
 
 ---
+
+## Version 0.3
+**Date:** 2026-04-01
+**Summary:** Implemented Comprehensive Kurdish Sorani (ckb/ku) Localization Setup.
+
+### Changes & Improvements:
+- **Database Schema**: Added `preferred_lang` column to `User` and `Student` models to persist user language choice.
+- **Backend Refactoring**: Adapted routing files (`admin.py`, `analytics.py`, `teacher.py`, etc.), flash messages, WTForms, and controllers to utilize `gettext` (`_`) and `lazy_gettext` components dynamically.
+- **Frontend Refactoring**: Refactored `base.html` for RTL (Right-to-Left) rendering and implemented Jinja translation placeholders. 
+- **PyBabel Translation Engine**: Generated `babel.cfg`, extracted strings to `messages.pot`, and initialized the Kurdish directory (`ku`) containing `messages.po` templates and `.mo` libraries.
+- Snapshotted as `version_0.3`.
+
+---

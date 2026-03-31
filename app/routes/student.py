@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, request, session, abort
+from flask_babel import gettext as _
 from sqlalchemy import desc
 
 from app import db
@@ -112,7 +113,7 @@ def student_review_exam(result_id):
     # 3. Security: Anti-Snooping Check
     # Prevents students from guessing IDs to see other people's results.
     if attempt_record.student_id != session['student_id']:
-        flash('Access Denied: You do not have permission to view this record.', 'danger')
+        flash(_('Access Denied: You do not have permission to view this record.'), 'danger')
         return redirect(url_for('student.student_dashboard'))
 
     return render_template('student/review_exam.html', result=attempt_record)
@@ -298,10 +299,10 @@ def submit_exam(slug):
             ))
 
         db.session.commit()
-        flash(f'Examination Submitted. Final Grade: {final_percentage}%', 'success')
+        flash(_('Examination Submitted. Final Grade: %(grade)s%%', grade=final_percentage), 'success')
 
     except Exception as db_err:
         db.session.rollback()
-        flash(f'Critical system error during submission: {str(db_err)}', 'danger')
+        flash(_('Critical system error during submission: %(error)s', error=str(db_err)), 'danger')
 
     return redirect(url_for('student.student_dashboard'))

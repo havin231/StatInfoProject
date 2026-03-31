@@ -76,3 +76,16 @@ Whenever a change or new feature is added, append a new version block following 
 - Snapshotted as `version_0.3.1`.
 
 ---
+
+## Version 0.3.2
+**Date:** 2026-04-01
+**Summary:** Fixed global language toggle.
+
+### Changes & Improvements:
+- **Bug Fix**: `select_locale()` now prioritizes the user session over DB `preferred_lang` to ensure the UI updates instantly without requiring a new session.
+- **Backend Refactoring**: Stabilized `set_lang()` functionality to limit strictly to English (`en`) and Kurdish (`ku`).
+- **Configuration Update**: Properly documented `BABEL_DEFAULT_LOCALE` and `BABEL_TRANSLATION_DIRECTORIES` in `config.py`.
+- **Babel Fix**: Re-extracted Jinja2 templates via `pybabel` (into `messages.po`), and successfully compiled `.mo` binaries for Kurdish localization, enabling true bilingual frontend behavior.
+- Snapshotted as `version_0.3.2`.
+
+---

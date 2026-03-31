@@ -11,21 +11,50 @@ from flask import session
 from config import Config
 
 def select_locale():
-    # If the user is logged in natively (teacher/admin) or as student (stored in session somehow),
-    # we can check request.
+    """
+    Locale selector for Flask-Babel.
+    Priority: 1. Session  2. DB (Teacher/Admin)  3. DB (Student)  4. Default 'en'
+    
+    IMPORTANT: Session ALWAYS takes priority so the language toggle works immediately.
+    The DB value is only used as a fallback for users who haven't toggled yet
+    (e.g., fresh login from a new browser).
+    """
+    from flask import current_app
     from flask_login import current_user
-    # Try to get from logged-in teacher/admin
-    if current_user and current_user.is_authenticated and hasattr(current_user, 'preferred_lang'):
-        return current_user.preferred_lang
-    # Try to get from student logic
-    # The student login system might just set 'student_id' in session
+
+    VALID_LOCALES = {'en', 'ku'}
+
+    # 1. SESSION FIRST — single source of truth for the toggle
+    lang = session.get('lang')
+    if lang and lang in VALID_LOCALES:
+        current_app.logger.debug(f"select_locale() returning from session: {lang}")
+        return lang
+
+    # 2. DB SECOND — Teacher/Admin preferred_lang (fallback only)
+    try:
+        if current_user and current_user.is_authenticated and hasattr(current_user, 'preferred_lang'):
+            db_lang = current_user.preferred_lang
+            if db_lang and db_lang in VALID_LOCALES:
+                current_app.logger.debug(f"select_locale() returning from user DB: {db_lang}")
+                return db_lang
+    except Exception:
+        pass
+
+    # 3. DB THIRD — Student preferred_lang (fallback only)
     student_id = session.get('student_id')
     if student_id:
-        from app.models import Student
-        student = db.session.get(Student, student_id)
-        if student and student.preferred_lang:
-            return student.preferred_lang
-    return session.get('lang', 'en')
+        try:
+            from app.models import Student
+            student = db.session.get(Student, student_id)
+            if student and student.preferred_lang and student.preferred_lang in VALID_LOCALES:
+                current_app.logger.debug(f"select_locale() returning from student DB: {student.preferred_lang}")
+                return student.preferred_lang
+        except Exception:
+            pass
+
+    # 4. DEFAULT
+    current_app.logger.debug("select_locale() returning default: en")
+    return 'en'
 
 # --- EXTENSION INITIALIZATION ---
 # We create the extension instances here, but they are not attached to the app yet.

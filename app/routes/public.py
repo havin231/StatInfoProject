@@ -178,33 +178,43 @@ def public_stats():
 def set_lang(lang):
     """
     Sets the user's preferred language.
-    Stored in session, and if logged in, in user profile.
+    Stored in session FIRST (always), then persisted to DB for cross-device use.
     """
-    if lang not in ['en', 'ku', 'ckb']:
+    from flask import current_app
+
+    ALLOWED_LANGS = ['en', 'ku']
+
+    if lang not in ALLOWED_LANGS:
         flash(_('Invalid language selected.'), 'danger')
         return redirect(request.referrer or url_for('public.index'))
     
+    # 1. SESSION FIRST — this is the single source of truth for select_locale()
     session['lang'] = lang
+    current_app.logger.info(f"set_lang: session['lang'] set to '{lang}'")
 
-    # Try to update specific users if logged in
-    from flask_login import current_user
+    # 2. Persist to DB for cross-device/cross-session recall
     if current_user and current_user.is_authenticated and hasattr(current_user, 'preferred_lang'):
         try:
             current_user.preferred_lang = lang
             db.session.commit()
-        except:
+            current_app.logger.info(f"set_lang: User {current_user.id} preferred_lang updated to '{lang}'")
+        except Exception as e:
             db.session.rollback()
+            current_app.logger.error(f"set_lang: Failed to update user preferred_lang: {e}")
     else:
-        # Check student
+        # Check student session
         student_id = session.get('student_id')
         if student_id:
-            student = db.session.get(Student, student_id)
-            if student:
-                try:
+            try:
+                student = db.session.get(Student, student_id)
+                if student:
                     student.preferred_lang = lang
                     db.session.commit()
-                except:
-                    db.session.rollback()
+                    current_app.logger.info(f"set_lang: Student {student_id} preferred_lang updated to '{lang}'")
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.error(f"set_lang: Failed to update student preferred_lang: {e}")
     
     flash(_('Language changed successfully.'), 'success')
     return redirect(request.referrer or url_for('public.index'))
+

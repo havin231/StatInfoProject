@@ -18,3 +18,8 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     UPLOAD_FOLDER = os.path.join(BASE_DIR, 'app', 'static', 'uploads')
+
+    # --- BABEL / i18n CONFIGURATION ---
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_TRANSLATION_DIRECTORIES = os.path.join(BASE_DIR, 'app', 'translations')
+    LANGUAGES = ['en', 'ku']

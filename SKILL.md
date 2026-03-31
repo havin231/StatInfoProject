@@ -180,6 +180,12 @@ Logic:
 Constraint: Export function now includes `2_subjects.csv` (with `is_public`), and PK/FK columns to ensure lossless restoration.
 Backup Compatibility: Only Backups created AFTER Jan 2026 (v2.1) are supported. Old backups are backwards compatible with the `is_public` field.
 
+G. The Translation Toggle Fix (v2.x)
+
+- `select_locale()` in `__init__.py`: Session ALWAYS takes priority over DB `preferred_lang`. If `session['lang']` is set, return it immediately without querying the DB.
+- The canonical Kurdish locale identifier is `ku`. This string must be consistent across `select_locale()`, `set_lang()` route, and all Jinja2 comparisons in `base.html`.
+- Always run `pybabel compile -d app/translations` after editing `.po` files.
+
 5. UI/UX STANDARDS
 
 Bilingual Support:

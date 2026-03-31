@@ -19,16 +19,37 @@ def select_locale():
     The DB value is only used as a fallback for users who haven't toggled yet
     (e.g., fresh login from a new browser).
     """
-    from flask import current_app
+    from flask import current_app, has_request_context
     from flask_login import current_user
 
     VALID_LOCALES = {'en', 'ku'}
 
-    # 1. SESSION FIRST — single source of truth for the toggle
-    lang = session.get('lang')
-    if lang and lang in VALID_LOCALES:
-        current_app.logger.debug(f"select_locale() returning from session: {lang}")
-        return lang
+    current_app.logger.debug(f"select_locale() called, has_request_context: {has_request_context()}")
+
+    # Check if we're in request context before accessing session
+    if has_request_context():
+        # 1. SESSION FIRST — single source of truth for the toggle
+        lang = session.get('lang')
+        current_app.logger.debug(f"select_locale() session.get('lang'): {lang}")
+        if lang and lang in VALID_LOCALES:
+            current_app.logger.debug(f"select_locale() returning from session: {lang}")
+            return lang
+        else:
+            current_app.logger.debug(f"select_locale() session lang invalid or missing: {lang}")
+
+        # 3. DB THIRD — Student preferred_lang (fallback only)
+        student_id = session.get('student_id')
+        if student_id:
+            try:
+                from app.models import Student
+                student = db.session.get(Student, student_id)
+                if student and student.preferred_lang and student.preferred_lang in VALID_LOCALES:
+                    current_app.logger.debug(f"select_locale() returning from student DB: {student.preferred_lang}")
+                    return student.preferred_lang
+            except Exception:
+                pass
+    else:
+        current_app.logger.debug("select_locale() no request context, skipping session checks")
 
     # 2. DB SECOND — Teacher/Admin preferred_lang (fallback only)
     try:
@@ -39,18 +60,6 @@ def select_locale():
                 return db_lang
     except Exception:
         pass
-
-    # 3. DB THIRD — Student preferred_lang (fallback only)
-    student_id = session.get('student_id')
-    if student_id:
-        try:
-            from app.models import Student
-            student = db.session.get(Student, student_id)
-            if student and student.preferred_lang and student.preferred_lang in VALID_LOCALES:
-                current_app.logger.debug(f"select_locale() returning from student DB: {student.preferred_lang}")
-                return student.preferred_lang
-        except Exception:
-            pass
 
     # 4. DEFAULT
     current_app.logger.debug("select_locale() returning default: en")

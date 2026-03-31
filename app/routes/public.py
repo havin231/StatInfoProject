@@ -174,6 +174,35 @@ def public_stats():
         fail_count=failing_grade_count
     )
 
+@public.route('/test-lang')
+def test_lang():
+    """
+    Test route to verify translations are working correctly.
+    This helps debug language switching issues.
+    """
+    from flask import current_app
+    from flask_babel import get_locale
+    
+    current_app.logger.info(f"test_lang: Current locale from get_locale(): {get_locale()}")
+    current_app.logger.info(f"test_lang: Session contents: {dict(session)}")
+    current_app.logger.info(f"test_lang: Session lang: {session.get('lang')}")
+    
+    # Test some translations
+    test_translations = {
+        'welcome': _('Welcome'),
+        'toggle_language': _('Toggle Language'),
+        'home': _('Home'),
+        'about_us': _('About Us')
+    }
+    
+    return {
+        'current_locale': str(get_locale()),
+        'session_lang': session.get('lang'),
+        'translations': test_translations,
+        'is_rtl': get_locale().language == 'ku'
+    }
+
+
 @public.route('/set-lang/<lang>')
 def set_lang(lang):
     """
@@ -181,16 +210,22 @@ def set_lang(lang):
     Stored in session FIRST (always), then persisted to DB for cross-device use.
     """
     from flask import current_app
+    from flask_babel import refresh
 
     ALLOWED_LANGS = ['en', 'ku']
 
+    current_app.logger.info(f"set_lang called with lang='{lang}'")
+    current_app.logger.info(f"Current session before change: {dict(session)}")
+
     if lang not in ALLOWED_LANGS:
         flash(_('Invalid language selected.'), 'danger')
+        current_app.logger.error(f"Invalid language '{lang}' attempted")
         return redirect(request.referrer or url_for('public.index'))
     
     # 1. SESSION FIRST — this is the single source of truth for select_locale()
     session['lang'] = lang
     current_app.logger.info(f"set_lang: session['lang'] set to '{lang}'")
+    current_app.logger.info(f"Session after change: {dict(session)}")
 
     # 2. Persist to DB for cross-device/cross-session recall
     if current_user and current_user.is_authenticated and hasattr(current_user, 'preferred_lang'):
@@ -215,6 +250,14 @@ def set_lang(lang):
                 db.session.rollback()
                 current_app.logger.error(f"set_lang: Failed to update student preferred_lang: {e}")
     
+    # 3. FORCE REFRESH BABEL CACHE - This is the key fix!
+    try:
+        refresh()
+        current_app.logger.info("set_lang: Babel cache refreshed successfully")
+    except Exception as e:
+        current_app.logger.warning(f"set_lang: Failed to refresh Babel cache: {e}")
+    
     flash(_('Language changed successfully.'), 'success')
+    current_app.logger.info(f"Language successfully changed to '{lang}', redirecting to: {request.referrer or url_for('public.index')}")
     return redirect(request.referrer or url_for('public.index'))
 

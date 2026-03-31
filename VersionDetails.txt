@@ -89,3 +89,21 @@ Whenever a change or new feature is added, append a new version block following 
 - Snapshotted as `version_0.3.2`.
 
 ---
+
+## Version 0.3.3
+**Date:** 2026-04-01
+**Summary:** Fixed Kurdish Translation Toggle Cache Issue.
+
+### Changes & Improvements:
+- **Bug Fix**: Resolved critical issue where language toggle was not switching translations to Kurdish despite session being updated correctly.
+- **Root Cause**: Flask-Babel was caching the locale upon first access, preventing dynamic language switching during the same request cycle.
+- **Solution Implementation**: 
+  - Added `has_request_context()` checking in `select_locale()` to prevent RuntimeError when accessing session outside request context.
+  - Enhanced debugging with detailed logging in `select_locale()` and `set_lang()` routes to trace language switching flow.
+  - Added `flask_babel.refresh()` call in `/set-lang/<lang>` route to force cache refresh after session update.
+  - Created `/test-lang` debug endpoint for real-time translation verification.
+- **Backend Refactoring**: Improved session handling and locale selection logic with proper fallback mechanisms.
+- **Testing**: Comprehensive test suite verified language switching works correctly in both directions with proper RTL support.
+- Snapshotted as `version_0.3.3`.
+
+---

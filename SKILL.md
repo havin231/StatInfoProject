@@ -32,16 +32,27 @@
   - Local `.env` (local dev secrets)
   - Virtual environments: `.venv_safe/`, `.venv_test/`
 
-/ptoject_04 (Project Root)
+StatInfoProject_PlayGround (Project Root)
 ├── SKILL.md                  # This knowledge base
 ├── config.py                 # Production Config (MySQL connection + Pool Recycling)
 ├── requirements.txt          # Deps: Pandas, OpenPyXL, PyMySQL, Flask-Login
 ├── run.py                    # WSGI Entry Point
+├── Elite-Prompter-Agent.md   # AI Prompt Engineering Guide
 └── app/
     ├── __init__.py           # App Factory, Blueprints, Extensions (DB, Bcrypt, CSRF)
     ├── models.py             # Database Schema (Source of Truth)
     ├── forms.py              # WTForms definitions
-    ├── routes.py             # CORE LOGIC (1200+ lines: Auth, Import, Export, Views)
+    ├── routes/               # Blueprint Architecture (Modular Routing)
+    │   ├── __init__.py        # Blueprint registry
+    │   ├── admin.py          # Admin management routes
+    │   ├── analytics.py      # Analytics and reporting
+    │   ├── auth.py           # Authentication (login/logout)
+    │   ├── content.py        # Content management (subjects, pages, questions)
+    │   ├── helpers.py        # Utility functions
+    │   ├── public.py         # Public routes (homepage, about, stats)
+    │   ├── student.py        # Student dashboard and exams
+    │   ├── teacher.py        # Teacher dashboard and tools
+    │   └── toolbase.py       # External tools management
     ├── static/
     │   ├── style.css         # CSS Variables for Themes (Glass/Cyber)
     │   ├── Logo/             # Branding Assets
@@ -82,9 +93,9 @@ Constraint: InnoDB Engine (Enforces Foreign Keys).
 
 Models & Fields
 
-User: id, username, email, password_hash, is_admin (Bool).
+User: id, username, email, password_hash, is_admin (Bool), preferred_lang (String, default='en').
 
-Student: id, full_name, access_code (Unique Index), group_id.
+Student: id, full_name, access_code (Unique Index), email (String, nullable), preferred_lang (String, default='en'), created_at, updated_at.
 
 Subject: id, name, slug, description, teacher_id, is_public (Bool, default=True).
 
@@ -108,9 +119,11 @@ StudentAnswer: id, student_id, question_id, exam_id, selected_option, is_correct
 
 Constraint: Must link to exam_id (Parent Attempt).
 
-SiteInfo: id, key, title, content.
+SiteInfo: id, key, title, content, last_updated.
 
 SystemCommand: id, title, command_text, description.
+
+Tool: id, title, link, description, created_at.
 
 4. CRITICAL LOGIC PATTERNS
 A. The "Bottom-Up" Deletion Protocol (Anti-Crash)
@@ -183,8 +196,11 @@ Backup Compatibility: Only Backups created AFTER Jan 2026 (v2.1) are supported. 
 G. The Translation Toggle Fix (v2.x)
 
 - `select_locale()` in `__init__.py`: Session ALWAYS takes priority over DB `preferred_lang`. If `session['lang']` is set, return it immediately without querying the DB.
+- **CRITICAL**: Flask-Babel caches locale on first access. Must call `flask_babel.refresh()` in `/set_lang/<lang>` route after session update to force cache refresh.
+- Added `has_request_context()` checking in `select_locale()` to prevent RuntimeError when accessing session outside request context.
 - The canonical Kurdish locale identifier is `ku`. This string must be consistent across `select_locale()`, `set_lang()` route, and all Jinja2 comparisons in `base.html`.
 - Always run `pybabel compile -d app/translations` after editing `.po` files.
+- Debug endpoint `/test-lang` provides real-time translation verification and locale debugging information.
 
 5. UI/UX STANDARDS
 
@@ -256,6 +272,18 @@ Access SQL: mysql -u StatInfoProject -h StatInfoProject.mysql.pythonanywhere-ser
 Custom Scripts
 
 Fix Grading Error: python regrade_all.py (Scans all answers against current Question Answer Key and updates scores).
+
+Convert SQL to Backup: python convert_sql_to_backup.py (Converts database to CSV backup format).
+
+Update Database Schema: python update_db.py (Handles database migrations).
+
+Fix Quote Encoding: python fix_quotes.py (Fixes Kurdish character encoding issues).
+
+Add Subject Public Flag: python add_subject_is_public.py (Adds is_public column to subjects).
+
+Drop Group ID: python drop_group_id.py (Removes deprecated group_id column).
+
+Compile Translations: pybabel compile -d app/translations (Compiles .po files to .mo for Kurdish translations).
 
 7. ERROR DICTIONARY
 

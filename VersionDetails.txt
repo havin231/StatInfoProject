@@ -64,3 +64,15 @@ Whenever a change or new feature is added, append a new version block following 
 - Snapshotted as `version_0.3`.
 
 ---
+
+## Version 0.3.1
+**Date:** 2026-04-01
+**Summary:** Resolved Jinja2 UndefinedError for get_locale.
+
+### Changes & Improvements:
+- **Bug Fix**: Addressed a critical regression where templates extending `base.html` crashed due to an undefined `get_locale` function in the Jinja2 context.
+- **Backend Refactoring**: Renamed the local `get_locale` function in `app/__init__.py` to `select_locale` to prevent identifier collision. Imported `flask_babel.get_locale` and injected it explicitly into the template engine via an `@app.context_processor`.
+- **Logic Validation**: Ensured the right-to-left layout and locale switching logic strictly interprets the language object dynamically.
+- Snapshotted as `version_0.3.1`.
+
+---

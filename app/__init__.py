@@ -4,13 +4,13 @@ from sqlalchemy import text
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_wtf.csrf import CSRFProtect
-from flask_babel import Babel
+from flask_babel import Babel, get_locale as babel_get_locale
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask import session
 from config import Config
 
-def get_locale():
+def select_locale():
     # If the user is logged in natively (teacher/admin) or as student (stored in session somehow),
     # we can check request.
     from flask_login import current_user
@@ -51,12 +51,16 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
 
+    @app.context_processor
+    def inject_locale():
+        return dict(get_locale=babel_get_locale)
+
     # --- INITIALIZE EXTENSIONS ---
     db.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app) # Enables global CSRF protection for forms
-    babel.init_app(app, locale_selector=get_locale)
+    babel.init_app(app, locale_selector=select_locale)
     limiter.init_app(app)
 
     # --- REGISTER BLUEPRINTS ---

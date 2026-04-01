@@ -107,3 +107,49 @@ Whenever a change or new feature is added, append a new version block following 
 - Snapshotted as `version_0.3.3`.
 
 ---
+
+## Version 0.3.4
+**Date:** 2026-04-01
+**Summary:** Mobile Responsive Video Enhancement for TinyMCE Content.
+
+### Changes & Improvements:
+- **Feature**: Implemented Option C (Hybrid Approach) for mobile video responsiveness.
+- **TinyMCE Enhancement**: Added video embed buttons to toolbar with auto-detection for YouTube/Vimeo URLs.
+- **Mobile CSS**: Added comprehensive responsive video styles with 16:9 aspect ratio and mobile optimization.
+- **Resource Display**: Enhanced resource cards to detect and properly handle video resources with preview functionality.
+- **Video Preview Modal**: Added mobile-friendly video preview modal for testing embedded videos.
+- **Auto-Embed Processing**: TinyMCE now automatically converts YouTube/Vimeo URLs to responsive embeds.
+- **RTL Support**: Ensured video containers work correctly in both LTR and RTL layouts.
+- **Bootstrap Integration**: Videos use Bootstrap 5 responsive breakpoints and proper mobile scaling.
+- **Performance**: Added lazy loading for videos to improve mobile page load times.
+- **Documentation**: Updated SKILL.md with video responsive standards and guidelines.
+
+### Files Modified:
+- `app/static/style.css` - Added mobile video responsive styles
+- `app/templates/teacher/builder.html` - Enhanced TinyMCE with video support and preview modal
+- `app/templates/page.html` - Updated resource display with video detection and responsive embedding
+- `SKILL.md` - Added video responsive standards and documentation
+- `VersionDetails.txt` - Added v0.3.4 release notes
+
+### Mobile Video Fix (v0.3.4.3):
+**Date:** 2026-04-01
+**Issue**: YouTube video links still being cut off - investigating root cause with debugging.
+
+**Debugging Changes**: 
+- Added HTML comments for debugging video ID extraction
+- Enhanced video ID extraction logic to handle more YouTube URL formats
+- Added fallback for URL parsing with better error handling
+- Added explicit iframe dimensions (width: 100%, height: 100%)
+- Added alert message when video ID extraction fails
+- Improved iframe attributes with proper allow permissions
+
+**Files Modified**:
+- `app/templates/page.html` - Added debugging and improved YouTube URL parsing
+- `app/static/style.css` - Enhanced video-resource-card constraints
+
+**Next Steps**:
+- Check browser console for debugging output
+- Verify video ID is being extracted correctly
+- Test with actual YouTube URL formats
+
+---

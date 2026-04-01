@@ -218,6 +218,9 @@ We use TinyMCE configured with open-source settings to mimic MS Word.
 - Always include the full suite of open-source plugins (e.g. `anchor`, `pagebreak`, `wordcount`).
 - Use `content_style` to constrain the editor body to `max-width: 21cm` and `min-height: 29.7cm` (A4 proportions) on a grey `#f0f2f5` html background to simulate a physical page.
 - Enable `browser_spellcheck`, full `menubar`, and `contextmenu`.
+- **Video Support**: Added mobile-responsive video embedding with auto-detection for YouTube/Vimeo URLs.
+- **Mobile Optimization**: Videos automatically wrapped in responsive containers with 16:9 aspect ratio and proper mobile scaling.
+- **Toolbar Enhancement**: Added "Video" and "Responsive Video" buttons to TinyMCE toolbar for easy video embedding.
 
 Dark Mode:
 
@@ -232,6 +235,8 @@ Mobile Responsive:
 mjx-container { overflow-x: auto } (MathJax scroll).
 
 img { max-width: 100% !important; height: auto } (Prevent image blowout).
+
+**Video Responsive**: All embedded videos automatically use responsive containers with 16:9 aspect ratio. Videos scale properly on mobile devices with Bootstrap 5 breakpoints. Support for YouTube, Vimeo, and direct embeds with mobile-optimized loading.
 
 6. MAINTENANCE COMMANDS CHEAT SHEET
 

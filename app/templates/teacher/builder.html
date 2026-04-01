@@ -104,16 +104,45 @@
                     {% if page.resources %}
                     <div class="list-group mb-4">
                         {% for res in page.resources %}
+                        {% set is_video = 'youtube.com' in res.link or 'youtu.be' in res.link or 'vimeo.com' in res.link %}
+                        
                         <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{{ res.title }}</strong>
-                                <a href="{{ res.link }}" target="_blank" class="small ms-2 text-muted"><i
-                                        class="fas fa-external-link-alt"></i> {{ _('Test Link') }}</a>
+                            <div class="flex-grow-1">
+                                <div class="d-flex align-items-center mb-2">
+                                    <strong>{{ res.title }}</strong>
+                                    {% if is_video %}
+                                        <span class="badge bg-primary text-white ms-2">
+                                            <i class="fas fa-video me-1"></i>{{ _('Video') }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-muted small">
+                                    {% if is_video %}
+                                        {% if 'youtube.com' in res.link or 'youtu.be' in res.link %}
+                                            <i class="fab fa-youtube me-1"></i>{{ _('YouTube') }}
+                                        {% elif 'vimeo.com' in res.link %}
+                                            <i class="fab fa-vimeo me-1"></i>{{ _('Vimeo') }}
+                                        {% endif %}
+                                    {% else %}
+                                        <i class="fas fa-link me-1"></i>{{ _('Link') }}
+                                    {% endif %}
+                                </div>
+                                <a href="{{ res.link }}" target="_blank" class="small text-muted">
+                                    <i class="fas fa-external-link-alt"></i> {{ _('Test') }}
+                                </a>
                             </div>
-                            <a href="/teacher/resource/delete/{{ res.id }}" class="btn btn-sm btn-outline-danger"
-                                onclick="return confirm('{{ _(\"Remove this resource?\") }}')">
-                                <i class="fas fa-trash"></i>
-                            </a>
+                            <div class="d-flex gap-2">
+                                {% if is_video %}
+                                <button type="button" class="btn btn-sm btn-outline-info" 
+                                        onclick="previewVideo('{{ res.link }}', '{{ res.title }}')">
+                                    <i class="fas fa-eye"></i> {{ _('Preview') }}
+                                </button>
+                                {% endif %}
+                                <a href="/teacher/resource/delete/{{ res.id }}" class="btn btn-sm btn-outline-danger"
+                                    onclick="return confirm('Remove this resource?')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
                         </div>
                         {% endfor %}
                     </div>
@@ -178,8 +207,7 @@
                             <i class="fas fa-file-excel me-2"></i>{{ _('Import Excel') }}
                         </button>
                         <!-- Global Save Button -->
-                        <button type="button" class="btn btn-sm btn-primary px-3 shadow-sm" onclick="saveChanges()"
-                            id="saveBtn">
+                        <button type="button" class="btn btn-sm btn-primary px-3 shadow-sm" onclick="saveChanges()" id="saveBtn">
                             <i class="fas fa-save me-2"></i>{{ _('Save All Changes') }}
                         </button>
                     </div>
@@ -265,6 +293,29 @@
     </div>
 </div>
 
+<!-- VIDEO PREVIEW MODAL -->
+<div class="modal fade" id="videoPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">{{ _('Video Preview') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="videoPreviewContainer" class="video-container">
+                    <!-- Video will be inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer bg-body-tertiary">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
+                <a id="videoPreviewLink" href="#" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt me-2"></i>{{ _('Open in New Tab') }}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- IMPORT MODAL (Common to Scenario 2) -->
 {% if subject and import_form %}
 <div class="modal fade" id="importModal" tabindex="-1">
@@ -299,15 +350,15 @@
     let lectureMapping = JSON.parse('{% if pages is defined %}{{ pages | tojson | safe }}{% else %}[]{% endif %}');
 
     document.addEventListener("DOMContentLoaded", function () {
-        const tinyPlugins = 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount';
-        const tinyToolbar = 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table image link | charmap emoticons pagebreak | searchreplace fullscreen preview wordcount ltr rtl';
+        const tinyPlugins = 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount media';
+        const tinyToolbar = 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table image link media | charmap emoticons pagebreak | searchreplace fullscreen preview wordcount ltr rtl';
 
         const msWordSettings = {
             plugins: tinyPlugins,
             toolbar: tinyToolbar,
             height: 600,
             browser_spellcheck: true,
-            contextmenu: 'link image table',
+            contextmenu: 'link image table media',
             menubar: 'file edit view insert format tools table help',
             toolbar_mode: 'sliding',
             image_advtab: true,
@@ -315,11 +366,105 @@
             promotion: false,
             valid_elements: '*[*]',
             extended_valid_elements: 'script[src|async|defer|type|charset]',
-            content_style: 'body { max-width: 21cm; min-height: 29.7cm; margin: 1cm auto; padding: 2cm; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-family: Arial, sans-serif; font-size: 16px; box-sizing: border-box; } html { background: #f0f2f5; }',
+            content_style: 'body { max-width: 21cm; min-height: 29.7cm; margin: 1cm auto; padding: 2cm; background: white; box-shadow: 0 4px 8px rgba(0,0,0,0.1); font-family: Arial, sans-serif; font-size: 16px; box-sizing: border-box; } html { background: #f0f2f5; } .video-container { position: relative; width: 100%; max-width: 100%; height: 0; background: #000; border-radius: 8px; margin: 1rem 0; overflow: hidden; } .video-container::before { content: ""; display: block; padding-bottom: 56.25%; width: 100%; height: 0; } .video-container iframe, .video-container video, .video-container embed { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 8px; } @media (max-width: 768px) { .video-container { margin: 0.25rem 0; border-radius: 8px; max-width: 100vw; } .video-container iframe, .video-container video, .video-container embed { border-radius: 8px; } .rich-text-content iframe, .rich-text-content video, .rich-text-content embed { max-width: 100vw !important; max-height: 56.25vw !important; width: 100% !important; height: auto !important; }',
             paste_preprocess: function (plugin, args) {
-                args.content = args.content.replace(/<o:p>.*?<\/o:p>/g, '');
+                // Convert video URLs to embedded format for mobile responsiveness
+                let content = args.content;
+                
+                // YouTube URL to embed
+                content = content.replace(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|v\/|watch\?v=)|youtu\.be\/)([a-zA-Z0-9_-]+)/g, function(match, id) {
+                    const videoId = id.split(/[&?]/)[0];
+                    return '<div class="video-container"><iframe src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe></div>';
+                });
+                
+                // Vimeo URL to embed  
+                content = content.replace(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:.*#)?(\d+)/g, '<div class="video-container"><iframe src="https://player.vimeo.com/video/$1" frameborder="0" allowfullscreen></iframe></div>');
+                
+                args.content = content.replace(/<o:p>.*?<\/o:p>/g, '');
+                return args.content;
+            },
+            setup: function(editor) {
+                // Add video embed button
+                editor.ui.registry.addButton('videoembed', {
+                    text: 'Video',
+                    tooltip: 'Embed Video',
+                    icon: 'media',
+                    onAction: function() {
+                        const videoUrl = prompt('Enter video URL (YouTube, Vimeo, etc.):');
+                        if (videoUrl) {
+                            let embedCode = '';
+                            
+                            // Auto-detect and convert YouTube URLs
+                            const youtubeMatch = videoUrl.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|v\/|watch\?v=)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+                            if (youtubeMatch) {
+                                const videoId = youtubeMatch[1].split(/[&?]/)[0];
+                                embedCode = '<div class="video-container"><iframe src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe></div>';
+                            }
+                            // Auto-detect Vimeo URLs
+                            else if (videoUrl.includes('vimeo.com')) {
+                                const vimeoMatch = videoUrl.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:.*#)?(\d+)/);
+                                if (vimeoMatch) {
+                                    embedCode = '<div class="video-container"><iframe src="https://player.vimeo.com/video/' + vimeoMatch[1] + '" frameborder="0" allowfullscreen></iframe></div>';
+                                }
+                            }
+                            // Fallback: just wrap in responsive container
+                            else {
+                                embedCode = '<div class="video-container">' + videoUrl + '</div>';
+                            }
+                            
+                            editor.insertContent(embedCode);
+                        }
+                    }
+                });
+                
+                // Add button to toolbar
+                editor.ui.registry.addButton('responsivevideo', {
+                    text: 'Responsive Video',
+                    tooltip: 'Add Mobile-Friendly Video',
+                    icon: 'media',
+                    onAction: function() {
+                        editor.insertContent('<div class="video-container"><iframe src="" frameborder="0" allowfullscreen></iframe></div><p>Replace src with your video URL</p>');
+                    }
+                });
             }
         };
+
+        // Video Preview Function
+        function previewVideo(videoUrl, videoTitle) {
+            let embedCode = '';
+            
+            // Auto-detect and convert YouTube URLs
+            const youtubeMatch = videoUrl.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:embed\/|v\/|watch\?v=)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+            if (youtubeMatch) {
+                const videoId = youtubeMatch[1].split(/[&?]/)[0];
+                embedCode = '<div class="video-container"><iframe src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen loading="lazy"></iframe></div>';
+            }
+            // Auto-detect Vimeo URLs
+            else if (videoUrl.includes('vimeo.com')) {
+                const vimeoMatch = videoUrl.match(/(?:https?:\/\/)?(?:www\.)?vimeo\.com\/(?:.*#)?(\d+)/);
+                if (vimeoMatch) {
+                    embedCode = '<div class="video-container"><iframe src="https://player.vimeo.com/video/' + vimeoMatch[1] + '" frameborder="0" allowfullscreen loading="lazy"></iframe></div>';
+                }
+            }
+            // Fallback: just wrap in responsive container
+            else {
+                embedCode = '<div class="video-container">' + videoUrl + '</div>';
+            }
+            
+            // Update modal content
+            document.getElementById('videoPreviewContainer').innerHTML = embedCode;
+            document.getElementById('videoPreviewLink').href = videoUrl;
+            
+            // Update modal title
+            const modalTitle = document.querySelector('#videoPreviewModal .modal-title');
+            if (modalTitle) {
+                modalTitle.textContent = videoTitle + ' - {{ _("Video Preview") }}';
+            }
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('videoPreviewModal'));
+            modal.show();
+        }
 
         // Init Standard TinyMCE
         if (document.getElementById('content_body')) {

@@ -7,7 +7,7 @@ import csv
 import io
 
 from app import db
-from app.models import User, Subject, Page, Question, Resource, StudentAnswer
+from app.models import User, Subject, Page, Question, Resource, StudentAnswer, SystemCommand
 from app.forms import SubjectForm, PageForm, QuestionForm, BulkImportForm, ResourceForm
 from app.routes.helpers import generate_access_code
 from app.models import Student

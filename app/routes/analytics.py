@@ -12,7 +12,7 @@ from app.models import (
     User, Student, Subject, Page, Question, ExamResult,
     StudentAnswer, SiteInfo, Resource, SystemCommand, Tool
 )
-from app.forms import InfoPageForm, RestoreBackupForm
+from app.forms import InfoPageForm, RestoreBackupForm, WipeCleanForm
 
 analytics = Blueprint('analytics', __name__)
 
@@ -619,6 +619,47 @@ def restore_system():
             return redirect(request.url)
 
     return render_template('admin/restore_center.html', form=form)
+
+
+@analytics.route('/admin/system/wipe_clean', methods=['POST'])
+@login_required
+def wipe_clean():
+    """
+    WIPE ALL DATA - Factory Reset.
+    Deletes all data from the database, effectively resetting the system
+    to a clean state. Redirects to the setup page to create a new admin.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    form = WipeCleanForm()
+
+    if form.validate_on_submit():
+        try:
+            # Delete all data in reverse dependency order
+            db.session.query(StudentAnswer).delete()
+            db.session.query(ExamResult).delete()
+            db.session.query(Question).delete()
+            db.session.query(Resource).delete()
+            db.session.query(Page).delete()
+            db.session.query(Student).delete()
+            db.session.query(Subject).delete()
+            db.session.query(SiteInfo).delete()
+            db.session.query(SystemCommand).delete()
+            db.session.query(Tool).delete()
+            db.session.query(User).delete()
+            db.session.commit()
+
+            flash(_('System wiped clean. Please create a new administrator account.'), 'warning')
+            return redirect(url_for('public.setup'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(_('CRITICAL WIPE FAILURE: %(error)s', error=str(e)), 'danger')
+            return redirect(url_for('analytics.restore_system'))
+
+    flash(_('Invalid form submission.'), 'danger')
+    return redirect(url_for('analytics.restore_system'))
 
 
 @analytics.route('/admin/edit/about', methods=['GET', 'POST'])

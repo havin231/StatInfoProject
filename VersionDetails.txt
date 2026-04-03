@@ -182,3 +182,32 @@ Whenever a change or new feature is added, append a new version block following 
 - Git commit and push
 
 ---
+
+## Version 0.4.1
+**Date:** 2026-04-03
+**Summary:** Added Factory Reset (Wipe Clean) Feature to Disaster Recovery Center.
+
+### Changes & Improvements:
+- **Factory Reset Button**: Added a "WIPE EVERYTHING & GO TO SETUP" button to the Disaster Recovery Center (`/admin/system/restore`).
+- **New Form**: Added `WipeCleanForm` in `app/forms.py` with confirmation checkbox for safety.
+- **New Route**: Added `wipe_clean()` route (`/admin/system/wipe_clean`) in `app/routes/analytics.py` that:
+  - Deletes all data in proper bottom-up order (StudentAnswers → ExamResults → Questions → Resources → Pages → Students → Subjects → SiteInfo → SystemCommand → Tool → Users)
+  - Redirects to `/setup` page after successful wipe for fresh admin creation
+- **Template Update**: Updated `app/templates/admin/restore_center.html` with:
+  - "FACTORY RESET" warning section with yellow/orange styling
+  - Confirmation checkbox with required validation
+  - Double confirmation (checkbox + JavaScript confirm dialog)
+  - Warning button styling (`btn-warning`) to distinguish from restore function
+- **Safety Measures**: Multiple confirmation steps to prevent accidental data loss.
+
+### Files Modified:
+- `app/forms.py` - Added `WipeCleanForm` class
+- `app/routes/analytics.py` - Added `WipeCleanForm` import and `wipe_clean()` route
+- `app/templates/admin/restore_center.html` - Added Factory Reset UI section
+- `VersionDetails.txt` - Added v0.4.1 release notes
+
+### Next Steps:
+- Snapshot as `version_0.4.1`
+- Git commit and push
+
+---

@@ -187,6 +187,14 @@ class RestoreBackupForm(FlaskForm):
     confirm_wipe = BooleanField(_l('I understand this will DELETE ALL CURRENT DATA'), validators=[DataRequired()])
     submit = SubmitField(_l('PERFORM FULL RESTORE'))
 
+class WipeCleanForm(FlaskForm):
+    """
+    Form for wiping all data and creating a clean site.
+    """
+    confirm_wipe = BooleanField(_l('I understand this will DELETE ALL DATA permanently'), validators=[DataRequired()])
+    submit = SubmitField(_l('WIPE EVERYTHING & START FRESH'))
+
+
 class ToolForm(FlaskForm):
     """
     Form for adding external tool links.

@@ -62,6 +62,36 @@
                 </form>
 
             </div>
+            <hr class="my-4">
+
+            <!-- WIPE CLEAN SECTION -->
+            <div class="alert alert-dark border-warning">
+                <h5 class="alert-heading fw-bold text-warning"><i class="fas fa-trash-alt me-2"></i>{{ _('FACTORY RESET') }}</h5>
+                <p class="mb-2">
+                    {{ _('Start completely fresh by wiping ALL data.') }}
+                    {{ _('This will delete everything including users, subjects, students, and all records.') }}
+                    <strong>{{ _('This action cannot be undone.') }}</strong>
+                </p>
+            </div>
+
+            <form method="POST" action="{{ url_for('analytics.wipe_clean') }}">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-4 form-check bg-warning-subtle p-3 rounded border border-warning">
+                    <input type="checkbox" name="confirm_wipe" class="form-check-input ms-0 me-2" id="confirm_wipe_clean" required>
+                    <label class="form-check-label fw-bold text-warning" for="confirm_wipe_clean">
+                        {{ _('I understand this will PERMANENTLY DELETE ALL DATA and cannot be undone.') }}
+                    </label>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-warning btn-lg fw-bold"
+                        onclick="return confirm('{{ _('FINAL WARNING: This will DELETE EVERYTHING. Are you absolutely sure?') }}')">
+                        <i class="fas fa-broom me-2"></i>{{ _('WIPE EVERYTHING & GO TO SETUP') }}
+                    </button>
+                </div>
+            </form>
+
             <div class="card-footer bg-body-tertiary small text-muted">
                 <strong>{{ _('Protocol:') }}</strong> {{ _('Wipe-and-Replace Strategy.') }}<br>
                 <strong>{{ _('Security:') }}</strong> {{ _('All operations are logged.') }}

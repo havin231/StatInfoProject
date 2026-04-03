@@ -153,3 +153,32 @@ Whenever a change or new feature is added, append a new version block following 
 - Test with actual YouTube URL formats
 
 ---
+
+## Version 0.4
+**Date:** 2026-04-03
+**Summary:** Implemented Bulk Import for System Commands.
+
+### Changes & Improvements:
+- **Bulk Import Feature**: Added two-step bulk import workflow (preview → confirm) for System Commands in the Command Center.
+- **New Route**: Added `import_commands_step1()` in `app/routes/admin.py` to parse CSV/Excel files with required columns: Title, Command, and optional Description.
+- **Import Confirmation**: Extended `process_import_confirmation()` in `app/routes/content.py` to handle `import_type='command'` and create SystemCommand records.
+- **Template Updates**:
+  - `app/templates/admin/import_preview.html`: Added command-specific table headers and row rendering with monospace styling for commands.
+  - `app/templates/admin/commands.html`: Added collapsible "Bulk Import Commands" section with file upload form and CSV format instructions.
+- **Documentation**: Updated `SKILL.md` to document SystemCommand bulk import capability.
+- **Admin-only Access**: All bulk import functionality is restricted to admin users only.
+- **Standards Compliance**: Follows existing bulk import patterns (memory-only processing, utf-8-sig encoding support) as documented in SKILL.md.
+
+### Files Modified:
+- `app/routes/admin.py` - Added `import_commands_step1()` route and pandas import
+- `app/routes/content.py` - Added command import handling in `process_import_confirmation()`
+- `app/templates/admin/import_preview.html` - Added command preview table structure
+- `app/templates/admin/commands.html` - Added bulk import UI section
+- `SKILL.md` - Updated SystemCommand documentation
+- `VersionDetails.txt` - Added v0.4 release notes
+
+### Next Steps:
+- Snapshotted as `version_0.4`
+- Git commit and push
+
+---

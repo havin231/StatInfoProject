@@ -230,6 +230,24 @@ def process_import_confirmation():
             flash(_('Batch Processed: %(count)s questions assigned to bank.', count=q_save_count), 'success')
             return redirect(url_for('content.builder_exam', subject=subject_record.id))
 
+        # 4. Handle System Command Commit
+        elif import_category == 'command':
+            if not current_user.is_admin:
+                abort(403)
+
+            cmd_save_count = 0
+            for cmd_row in parsed_data:
+                db.session.add(SystemCommand(
+                    title=cmd_row['title'],
+                    command_text=cmd_row['command_text'],
+                    description=cmd_row.get('description', '')
+                ))
+                cmd_save_count += 1
+
+            db.session.commit()
+            flash(_('Batch Processed: %(count)s system commands documented.', count=cmd_save_count), 'success')
+            return redirect(url_for('admin.admin_command_center'))
+
     except Exception as commit_error:
         db.session.rollback()
         flash(_('Critical Commit Failure: %(error)s', error=str(commit_error)), 'danger')

@@ -123,6 +123,8 @@ SiteInfo: id, key, title, content, last_updated.
 
 SystemCommand: id, title, command_text, description.
 
+Bulk Import Supported: Yes (via `/admin/system/commands/import`). CSV columns: Title, Command, Description (optional).
+
 Tool: id, title, link, description, created_at.
 
 4. CRITICAL LOGIC PATTERNS

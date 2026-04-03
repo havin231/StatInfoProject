@@ -89,6 +89,10 @@
                                     <th style="width: 40%;">{{ _('Question') }}</th>
                                     <th>{{ _('Options (A / B / C / D)') }}</th>
                                     <th>{{ _('Answer') }}</th>
+                                    {% elif import_type == 'command' %}
+                                    <th>{{ _('Title') }}</th>
+                                    <th>{{ _('Command') }}</th>
+                                    <th>{{ _('Description') }}</th>
                                     {% endif %}
                                 </tr>
                             </thead>
@@ -111,6 +115,11 @@
                                         D: {{ row.option_d }}
                                     </td>
                                     <td class="fw-bold text-success text-center">{{ row.correct_answer }}</td>
+
+                                    {% elif import_type == 'command' %}
+                                    <td class="fw-bold">{{ row.title }}</td>
+                                    <td><code class="text-primary font-monospace">{{ row.command_text | truncate(80) }}</code></td>
+                                    <td class="text-muted small">{{ row.description | truncate(100) }}</td>
                                     {% endif %}
                                 </tr>
                                 {% endfor %}

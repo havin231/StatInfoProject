@@ -10,11 +10,9 @@
         <p class="text-muted small">{{ _('Executive overview of academic performance.') }}</p>
     </div>
     <div class="d-flex gap-2">
-        {% if current_user.is_admin %}
         <a href="/teacher/export/grades" class="btn btn-primary btn-sm">
             <i class="fas fa-download me-2"></i>{{ _('Export Grades (CSV)') }}
         </a>
-        {% endif %}
         <a href="/teacher/dashboard" class="btn btn-outline btn-sm">
             <i class="fas fa-arrow-left me-2"></i>{{ _('Dashboard') }}
         </a>
@@ -93,7 +91,7 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="2" class="text-center py-4 text-muted">{{ _('No students found.') }}</td>
+                            <td colspan="3" class="text-center py-4 text-muted">{{ _('No students found.') }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -159,8 +157,8 @@
             <tbody>
                 {% for act in recent_activity %}
                 <tr>
-                    <td class="ps-3 fw-bold">{{ act.student_name }}</td>
-                    <td>{{ act.subject_name }}</td>
+                    <td class="ps-3 fw-bold">{{ act.student.full_name }}</td>
+                    <td>{{ act.subject.name }}</td>
                     <td>
                         {% if act.score >= 50 %}
                         <span class="badge bg-success-subtle text-success">{{ act.score }}%</span>

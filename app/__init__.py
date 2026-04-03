@@ -7,7 +7,6 @@ from flask_wtf.csrf import CSRFProtect
 from flask_babel import Babel, get_locale as babel_get_locale
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_mail import Mail
 from flask import session
 from config import Config
 
@@ -75,7 +74,6 @@ bcrypt = Bcrypt()
 csrf = CSRFProtect()
 babel = Babel()
 limiter = Limiter(key_func=get_remote_address, default_limits=[])
-mail = Mail()
 
 login_manager = LoginManager()
 # The login_view tells Flask-Login where to redirect users if they try to access a protected page.
@@ -102,7 +100,6 @@ def create_app(config_class=Config):
     csrf.init_app(app) # Enables global CSRF protection for forms
     babel.init_app(app, locale_selector=select_locale)
     limiter.init_app(app)
-    mail.init_app(app)
 
     # --- REGISTER BLUEPRINTS ---
     # Imports are placed here to avoid circular import errors.

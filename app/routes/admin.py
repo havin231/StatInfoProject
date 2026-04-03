@@ -1,14 +1,13 @@
-from flask import Blueprint, render_template, url_for, flash, redirect, abort, request, current_app
+from flask import Blueprint, render_template, url_for, flash, redirect, abort, request
 from flask_babel import gettext as _
 from flask_login import login_required, current_user
-from jinja2 import Template
 
 import pandas as pd
 
 from app import db
-from app.models import Student, ExamResult, StudentAnswer, SystemCommand, User, Subject, SiteInfo
-from app.forms import StudentForm, StudentEditForm, BulkImportForm, CommandForm, SubjectForm
-from app.routes.helpers import generate_access_code, send_welcome_email
+from app.models import Student, ExamResult, StudentAnswer, SystemCommand
+from app.forms import StudentForm, StudentEditForm, BulkImportForm, CommandForm
+from app.routes.helpers import generate_access_code
 
 admin = Blueprint('admin', __name__)
 
@@ -48,8 +47,7 @@ def admin_students():
             new_student = Student(
                 full_name=form_manual.full_name.data,
                 access_code=form_manual.access_code.data,
-                email=form_manual.email.data,
-                bypass_id_req=form_manual.bypass_id_req.data
+                email=form_manual.email.data
             )
             db.session.add(new_student)
             db.session.commit()
@@ -102,7 +100,6 @@ def edit_student(student_id):
         student_record.full_name = form.full_name.data
         student_record.email = form.email.data
         student_record.access_code = form.access_code.data
-        student_record.bypass_id_req = form.bypass_id_req.data
 
         try:
             db.session.commit()
@@ -176,43 +173,6 @@ def delete_all_students():
         flash(_('CRITICAL SYSTEM ERROR during batch wipe: %(error)s', error=str(critical_wipe_error)), 'danger')
 
     return redirect(url_for('admin.admin_students'))
-
-
-@admin.route('/admin/transfer_subject', methods=['POST'])
-@login_required
-def transfer_subject():
-    """
-    PHASE 2: SUBJECT OWNERSHIP TRANSFER
-    Allows an admin to reassign a subject to a different teacher.
-    """
-    if not current_user.is_admin:
-        abort(403)
-
-    subject_id = request.form.get('subject_id', type=int)
-    new_teacher_id = request.form.get('new_teacher_id', type=int)
-
-    if not subject_id or not new_teacher_id:
-        flash(_('Error: Subject or Teacher not selected.'), 'danger')
-        return redirect(url_for('teacher.teacher_dashboard'))
-
-    subject = Subject.query.get_or_404(subject_id)
-    new_teacher = User.query.get_or_404(new_teacher_id)
-
-    if new_teacher.is_admin:
-        flash(_('Error: Cannot transfer subject to an administrator.'), 'danger')
-        return redirect(url_for('teacher.teacher_dashboard'))
-
-    try:
-        old_teacher_name = subject.teacher.username
-        subject.teacher_id = new_teacher.id
-        db.session.commit()
-        flash(_('Subject "%(subject)s" transferred from %(old)s to %(new)s.', 
-                subject=subject.name, old=old_teacher_name, new=new_teacher.username), 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(_('Error transferring subject: %(error)s', error=str(e)), 'danger')
-
-    return redirect(url_for('teacher.teacher_dashboard'))
 
 
 # ==============================================================================

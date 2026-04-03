@@ -183,44 +183,6 @@ Whenever a change or new feature is added, append a new version block following 
 
 ---
 
-## Version 0.4.2
-**Date:** 2026-04-03
-**Summary:** Implemented Senior Architect security, administrative, and bilingual enhancements.
-
-### Changes & Improvements:
-- **Security & Auth**:
-    - Enforced 8+ character passwords with uppercase and numbers for all staff accounts.
-    - Updated Access Code generator to 8 characters (cryptographically secure).
-    - Restricted all data exports (CSV) to Administrators only.
-- **Administrative Ops**:
-    - Subject Ownership Transfer: Added route for Admins to reassign subjects between teachers.
-    - Teacher Consent: Added privacy toggle for teachers to control public name display.
-    - ID Bypass: Added flag to make student documentation optional.
-- **Data Privacy**:
-    - Teacher-side Anonymization: Student names are masked (e.g., "Student-123") in teacher analytics.
-- **Communication & Lifecycle**:
-    - Nuclear Deletion: Added student-initiated bottom-up account deletion.
-    - Editable Emails: Integrated dynamic HTML email templates into SiteInfo CMS with placeholder support ({username}, {site_url}).
-    - Immediate Onboarding: New teachers automatically receive a welcome email upon creation.
-- **Localization**:
-    - Deep Kurdish Integration: Added title_kurdish and content_kurdish to SiteInfo.
-    - Bilingual "About Us": Route now serves content based on user locale.
-- **Migration**:
-    - Created `update_v2_2.py` for automated schema and template updates.
-
-### Files Modified:
-- `app/models.py` - Updated User, Student, SiteInfo models.
-- `app/forms.py` - Updated validation and added CMS/Privacy fields.
-- `app/routes/admin.py` - Added transfer logic and ID bypass support.
-- `app/routes/teacher.py` - Added consent toggle, anonymization logic, and onboarding alerts.
-- `app/routes/analytics.py` - Implemented export lockdown and teacher-side masking.
-- `app/routes/helpers.py` - Enhanced code generator and added Mail handler.
-- `app/routes/public.py` - Bilingual CMS content delivery.
-- `app/templates/` - Updated analytics, dashboard, and subject views.
-- `update_v2_2.py` - New migration script.
-
----
-
 ## Version 0.4.1
 **Date:** 2026-04-03
 **Summary:** Added Factory Reset (Wipe Clean) Feature to Disaster Recovery Center.

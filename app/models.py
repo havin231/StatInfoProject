@@ -29,9 +29,6 @@ class User(db.Model, UserMixin):
     # Preferred Language for UI (e.g., 'en', 'ku')
     preferred_lang = db.Column(db.String(10), default='en')
 
-    # NEW: Teacher Consent for name display
-    consent_to_display_name = db.Column(db.Boolean, default=True)
-
     # Relationship: A teacher teaches many Subjects
     subjects = db.relationship('Subject', backref='teacher', lazy=True)
 
@@ -55,9 +52,6 @@ class Student(db.Model):
 
     # NEW: Email (Optional for old students, Required for new)
     email = db.Column(db.String(120), unique=True, nullable=True)
-
-    # NEW: ID Bypass Flag
-    bypass_id_req = db.Column(db.Boolean, default=False)
 
     # Preferred Language for UI
     preferred_lang = db.Column(db.String(10), default='en')
@@ -228,15 +222,7 @@ class SiteInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(50), unique=True, nullable=False) # Unique identifier
     title = db.Column(db.String(100), default="About Us")
-    title_kurdish = db.Column(db.String(100), nullable=True)
     content = db.Column(db.Text, nullable=True) # HTML content
-    content_kurdish = db.Column(db.Text, nullable=True) # Kurdish HTML content
-
-    # NEW: Automated Email Templates
-    welcome_email_subject = db.Column(db.String(200), nullable=True)
-    welcome_email_body = db.Column(db.Text, nullable=True)
-    teacher_alert_body = db.Column(db.Text, nullable=True)
-
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 # ==========================================

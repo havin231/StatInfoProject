@@ -93,10 +93,7 @@
                     </a>
                 </div>
                 {% else %}
-                {% if subject.teacher.consent_to_display_name or current_user.is_admin %}
-                <p class="text-muted small mb-0">{{ _('Instructor:') }} <strong>{{ subject.teacher.username }}</strong></p>
-                {% endif %}
-                <p class="text-muted small mb-0">{{ subject.pages|length }} {{ _('Lectures') }} | {{ subject.questions|length }} {{ _('Questions') }}</p>
+                <p class="text-muted small">{{ _('No exams available yet.') }}</p>
                 <button class="btn btn-secondary disabled w-100">{{ _('Exam Closed') }}</button>
                 {% endif %}
             </div>

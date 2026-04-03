@@ -29,61 +29,16 @@
                 <form method="POST" action="">
                     {{ form.hidden_tag() }}
 
-                    <ul class="nav nav-tabs mb-4" id="contentTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="english-tab" data-bs-toggle="tab" data-bs-target="#english" type="button" role="tab">{{ _('English Content') }}</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="kurdish-tab" data-bs-toggle="tab" data-bs-target="#kurdish" type="button" role="tab">{{ _('Kurdish Content') }}</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="emails-tab" data-bs-toggle="tab" data-bs-target="#emails" type="button" role="tab">{{ _('Email Templates') }}</button>
-                        </li>
-                    </ul>
+                    <!-- Title Field -->
+                    <div class="mb-3">
+                        {{ form.title.label(class="form-label fw-bold text-muted small text-uppercase") }}
+                        {{ form.title(class="form-control form-control-lg") }}
+                    </div>
 
-                    <div class="tab-content" id="contentTabsContent">
-                        <!-- English Tab -->
-                        <div class="tab-pane fade show active" id="english" role="tabpanel">
-                            <div class="mb-3">
-                                {{ form.title.label(class="form-label fw-bold text-muted small text-uppercase") }}
-                                {{ form.title(class="form-control form-control-lg") }}
-                            </div>
-                            <div class="mb-4">
-                                {{ form.content.label(class="form-label fw-bold text-muted small text-uppercase") }}
-                                {{ form.content(class="form-control editor-en", rows="10") }}
-                            </div>
-                        </div>
-
-                        <!-- Kurdish Tab -->
-                        <div class="tab-pane fade" id="kurdish" role="tabpanel">
-                            <div class="mb-3">
-                                {{ form.title_kurdish.label(class="form-label fw-bold text-muted small text-uppercase") }}
-                                {{ form.title_kurdish(class="form-control form-control-lg", dir="rtl") }}
-                            </div>
-                            <div class="mb-4">
-                                {{ form.content_kurdish.label(class="form-label fw-bold text-muted small text-uppercase") }}
-                                {{ form.content_kurdish(class="form-control editor-ku", rows="10") }}
-                            </div>
-                        </div>
-
-                        <!-- Emails Tab -->
-                        <div class="tab-pane fade" id="emails" role="tabpanel">
-                            <div class="alert alert-warning small mb-4">
-                                <i class="fas fa-info-circle me-2"></i>{{ _('Use {username}, {email}, and {site_url} as placeholders in your templates.') }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.welcome_email_subject.label(class="form-label fw-bold text-muted small text-uppercase") }}
-                                {{ form.welcome_email_subject(class="form-control") }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.welcome_email_body.label(class="form-label fw-bold text-muted small text-uppercase") }}
-                                {{ form.welcome_email_body(class="form-control editor-email", rows="8") }}
-                            </div>
-                            <div class="mb-3">
-                                {{ form.teacher_alert_body.label(class="form-label fw-bold text-muted small text-uppercase") }}
-                                {{ form.teacher_alert_body(class="form-control editor-email", rows="8") }}
-                            </div>
-                        </div>
+                    <!-- Content Editor -->
+                    <div class="mb-4">
+                        {{ form.content.label(class="form-label fw-bold text-muted small text-uppercase") }}
+                        {{ form.content(class="form-control", rows="10") }}
                     </div>
 
                     <!-- Action Buttons -->
@@ -101,8 +56,10 @@
 <script>
     // --- TINYMCE INITIALIZATION ---
     document.addEventListener("DOMContentLoaded", function () {
-        const commonConfig = {
+        tinymce.init({
+            selector: '#content',
             height: 500,
+            directionality: '{{ "rtl" if get_locale().language == "ku" else "ltr" }}',
             plugins: 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount',
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table image link | charmap emoticons pagebreak | searchreplace fullscreen preview wordcount ltr rtl',
             browser_spellcheck: true,
@@ -112,6 +69,7 @@
             image_advtab: true,
             paste_data_images: true,
             promotion: false,
+            // CRITICAL: Allows all content, including custom HTML/CSS.
             valid_elements: '*[*]',
             extended_valid_elements: 'script[src|async|defer|type|charset]',
             content_style: `
@@ -133,25 +91,6 @@
             paste_preprocess: function (plugin, args) {
                 args.content = args.content.replace(/<o:p>.*?<\/o:p>/g, '');
             }
-        };
-
-        tinymce.init({
-            ...commonConfig,
-            selector: '.editor-en',
-            directionality: 'ltr'
-        });
-
-        tinymce.init({
-            ...commonConfig,
-            selector: '.editor-ku',
-            directionality: 'rtl'
-        });
-
-        tinymce.init({
-            ...commonConfig,
-            selector: '.editor-email',
-            height: 300,
-            directionality: 'ltr'
         });
     });
 </script>

@@ -1,7 +1,5 @@
-from flask import current_app, render_template
+from flask import current_app
 from flask_mail import Message
-from app import mail, db
-from app.models import SiteInfo
 from jinja2 import Template
 import secrets
 import string
@@ -11,6 +9,9 @@ def send_welcome_email(user):
     PHASE 1 & 4: Sends a welcome email to a new teacher/admin.
     Uses dynamic templates stored in SiteInfo.
     """
+    from app.models import SiteInfo
+    from app import db
+    
     site_info = SiteInfo.query.filter_by(key='about').first()
     if not site_info or not site_info.welcome_email_body:
         # Fallback if no template is defined
@@ -39,7 +40,7 @@ def send_welcome_email(user):
                     recipients=[user.email],
                     html=body if '<html>' in body.lower() else None,
                     body=body if '<html>' not in body.lower() else None)
-        mail.send(msg)
+        current_app.extensions['mail'].send(msg)
         return True
     except Exception as e:
         current_app.logger.error(f"Failed to send welcome email: {e}")

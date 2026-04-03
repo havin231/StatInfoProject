@@ -1902,3 +1902,40 @@ msgstr "هیچ مێژوویەکی تاقیکردنەوە نەدۆزرایەوە"
 #: app/templates/teacher/student_detail.html:98
 msgid "This student has not yet completed any exams."
 msgstr "ئەم قوتابییە هێشتا هیچ تاقیکردنەوەیەکی تەواو نەکردووە."
+
+# Factory Reset Translations
+#: app/templates/admin/restore_center.html:69
+msgid "FACTORY RESET"
+msgstr "ڕێکخستنەوەی کارگە"
+
+#: app/templates/admin/restore_center.html:71
+msgid "Start completely fresh by wiping ALL data."
+msgstr "دەست بکە بە تەواوی نوێ بە سڕینەوەی هەموو داتا."
+
+#: app/templates/admin/restore_center.html:72
+msgid "This will delete everything including users, subjects, students, and all records."
+msgstr "ئەمە هەموو شتێک دەسڕێتەوە لەنێویشدا بەکارهێنەران، بابەتەکان، قوتابیان، و هەموو تۆمارەکان."
+
+#: app/templates/admin/restore_center.html:73
+msgid "This action cannot be undone."
+msgstr "ئەم کردارە ناتوانرێت بگەڕێنرێتەوە."
+
+#: app/templates/admin/restore_center.html:83
+msgid "I understand this will PERMANENTLY DELETE ALL DATA and cannot be undone."
+msgstr "تێدەگەم کە ئەمە بە هەمیشەیی هەموو داتا دەسڕێتەوە و ناتوانرێت بگەڕێنرێتەوە."
+
+#: app/templates/admin/restore_center.html:90
+msgid "WIPE EVERYTHING & GO TO SETUP"
+msgstr "سڕینەوەی هەموو شتێک & چوون بۆ ڕێکخستن"
+
+#: app/templates/admin/restore_center.html:89
+msgid "FINAL WARNING: This will DELETE EVERYTHING. Are you absolutely sure?"
+msgstr "ئاگاداری کۆتایی: ئەمە هەموو شتێک دەسڕێتەوە. تۆ تەنها دڵنیایت؟"
+
+#: app/forms.py:194
+msgid "I understand this will DELETE ALL DATA permanently"
+msgstr "تێدەگەم کە ئەمە بە هەمیشەیی هەموو داتا دەسڕێتەوە"
+
+#: app/forms.py:195
+msgid "WIPE EVERYTHING & START FRESH"
+msgstr "سڕینەوەی هەموو شتێک & دەستپێکردنەوەی نوێ"

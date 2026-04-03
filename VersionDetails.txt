@@ -204,7 +204,17 @@ Whenever a change or new feature is added, append a new version block following 
 - `app/forms.py` - Added `WipeCleanForm` class
 - `app/routes/analytics.py` - Added `WipeCleanForm` import and `wipe_clean()` route
 - `app/templates/admin/restore_center.html` - Added Factory Reset UI section
+- `app/translations/ku/LC_MESSAGES/messages.po` - Added Kurdish translations for Factory Reset
 - `VersionDetails.txt` - Added v0.4.1 release notes
+
+### Kurdish Translations Added:
+- FACTORY RESET → ڕێکخستنەوەی کارگە
+- Start completely fresh by wiping ALL data → دەست بکە بە تەواوی نوێ بە سڕینەوەی هەموو داتا
+- This will delete everything including users, subjects, students, and all records → ئەمە هەموو شتێک دەسڕێتەوە لەنێویشدا بەکارهێنەران، بابەتەکان، قوتابیان، و هەموو تۆمارەکان
+- This action cannot be undone → ئەم کردارە ناتوانرێت بگەڕێنرێتەوە
+- I understand this will PERMANENTLY DELETE ALL DATA and cannot be undone → تێدەگەم کە ئەمە بە هەمیشەیی هەموو داتا دەسڕێتەوە و ناتوانرێت بگەڕێنرێتەوە
+- WIPE EVERYTHING & GO TO SETUP → سڕینەوەی هەموو شتێک & چوون بۆ ڕێکخستن
+- FINAL WARNING: This will DELETE EVERYTHING. Are you absolutely sure? → ئاگاداری کۆتایی: ئەمە هەموو شتێک دەسڕێتەوە. تۆ تەنها دڵنیایت؟
 
 ### Next Steps:
 - Snapshot as `version_0.4.1`

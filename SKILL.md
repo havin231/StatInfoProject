@@ -93,9 +93,9 @@ Constraint: InnoDB Engine (Enforces Foreign Keys).
 
 Models & Fields
 
-User: id, username, email, password_hash, is_admin (Bool), preferred_lang (String, default='en').
+User: id, username, email, password_hash, is_admin (Bool), preferred_lang (String, default='en'), consent_to_display_name (Bool, default=True).
 
-Student: id, full_name, access_code (Unique Index), email (String, nullable), preferred_lang (String, default='en'), created_at, updated_at.
+Student: id, full_name, access_code (Unique Index), email (String, nullable), preferred_lang (String, default='en'), bypass_id_req (Bool, default=False), created_at, updated_at.
 
 Subject: id, name, slug, description, teacher_id, is_public (Bool, default=True).
 
@@ -119,7 +119,7 @@ StudentAnswer: id, student_id, question_id, exam_id, selected_option, is_correct
 
 Constraint: Must link to exam_id (Parent Attempt).
 
-SiteInfo: id, key, title, content, last_updated.
+SiteInfo: id, key, title, title_kurdish, content, content_kurdish, welcome_email_subject, welcome_email_body, teacher_alert_body, last_updated.
 
 SystemCommand: id, title, command_text, description.
 

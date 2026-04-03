@@ -36,9 +36,11 @@
                     <a href="/teacher/analytics" class="btn btn-lime">
                         <i class="fas fa-chart-pie me-2"></i>{{ _('View Analytics') }}
                     </a>
+                    {% if current_user.is_admin %}
                     <a href="/teacher/export/grades" class="btn btn-outline btn-sm">
                         <i class="fas fa-file-csv me-2"></i>{{ _('Export Grades') }}
                     </a>
+                    {% endif %}
                     {% endif %}
                 </div>
             </div>
@@ -78,9 +80,22 @@
                 <h1 class="h3 mb-1">{{ _('My Classroom') }}</h1>
                 <p class="text-muted small mb-0">{{ subjects|length }} {{ _('Subjects Assigned') }}</p>
             </div>
-            <!-- Stats Badge (Hidden on very small screens) -->
-            <div class="d-none d-md-block text-muted small">
-                {{ _('Total Exams Taken:') }} <span class="fw-bold text-highlight">{{ total_results }}</span>
+            <!-- Teacher Display Name Consent & Stats -->
+            <div class="text-end">
+                <div class="d-none d-md-block text-muted small mb-1">
+                    {{ _('Total Exams Taken:') }} <span class="fw-bold text-highlight">{{ total_results }}</span>
+                </div>
+                {% if not current_user.is_admin %}
+                <div class="form-check form-switch small d-inline-block">
+                    <form method="POST" action="{{ url_for('teacher.toggle_name_consent') }}" id="consentForm">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input class="form-check-input" type="checkbox" role="switch" id="nameConsent" 
+                               {% if current_user.consent_to_display_name %}checked{% endif %}
+                               onchange="document.getElementById('consentForm').submit()">
+                        <label class="form-check-label text-muted" for="nameConsent">{{ _('Display my name on subjects') }}</label>
+                    </form>
+                </div>
+                {% endif %}
             </div>
         </div>
 

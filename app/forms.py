@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo
+from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo, Regexp
 from flask_babel import lazy_gettext as _l
 
 # ==========================================
@@ -23,7 +23,11 @@ class SetupForm(FlaskForm):
     """
     username = StringField(_l('Headmaster Name'), validators=[DataRequired()])
     email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
+    password = PasswordField(_l('Password'), validators=[
+        DataRequired(), 
+        Length(min=8),
+        Regexp(r'^(?=.*[A-Z])(?=.*\d).+$', message=_l('Password must contain at least one uppercase letter and one number.'))
+    ])
     confirm_password = PasswordField(_l('Confirm Password'), validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField(_l('Create System Admin'))
 
@@ -37,7 +41,11 @@ class TeacherSignupForm(FlaskForm):
     """
     username = StringField(_l('Teacher Name'), validators=[DataRequired()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
+    password = PasswordField(_l('Password'), validators=[
+        DataRequired(), 
+        Length(min=8),
+        Regexp(r'^(?=.*[A-Z])(?=.*\d).+$', message=_l('Password must contain at least one uppercase letter and one number.'))
+    ])
     is_admin = BooleanField(_l('Grant Admin Access'))
     submit = SubmitField(_l('Create Account'))
 
@@ -47,8 +55,13 @@ class TeacherEditForm(FlaskForm):
     """
     username = StringField(_l('Teacher Name'), validators=[DataRequired()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Reset Password (Optional)'), validators=[Optional(), Length(min=6)])
+    password = PasswordField(_l('Reset Password (Optional)'), validators=[
+        Optional(), 
+        Length(min=8),
+        Regexp(r'^(?=.*[A-Z])(?=.*\d).+$', message=_l('Password must contain at least one uppercase letter and one number.'))
+    ])
     is_admin = BooleanField(_l('Grant Admin Access'))
+    consent_to_display_name = BooleanField(_l('Consent to display name publicly'))
     submit = SubmitField(_l('Update Account'))
 
 class StudentForm(FlaskForm):
@@ -58,6 +71,7 @@ class StudentForm(FlaskForm):
     full_name = StringField(_l('Full Name'), validators=[DataRequired()])
     email = StringField(_l('Email Address'), validators=[Optional(), Email()])
     access_code = StringField(_l('Access Code (Unique)'), validators=[DataRequired()])
+    bypass_id_req = BooleanField(_l('Bypass ID documentation requirement'))
     submit = SubmitField(_l('Add Student'))
 
 class StudentSignupForm(FlaskForm):
@@ -94,7 +108,15 @@ class InfoPageForm(FlaskForm):
     Form for editing static pages like 'About Us'.
     """
     title = StringField(_l('Page Title'), default="About Us", validators=[DataRequired()])
-    content = TextAreaField(_l('Page Content'), validators=[DataRequired()])
+    title_kurdish = StringField(_l('Page Title (Kurdish)'), validators=[Optional()])
+    content = TextAreaField(_l('Page Content (English)'), validators=[DataRequired()])
+    content_kurdish = TextAreaField(_l('Page Content (Kurdish)'), validators=[Optional()])
+    
+    # Email Template Fields
+    welcome_email_subject = StringField(_l('Welcome Email Subject'), validators=[Optional()])
+    welcome_email_body = TextAreaField(_l('Welcome Email Body (HTML)'), validators=[Optional()])
+    teacher_alert_body = TextAreaField(_l('Teacher Alert Body (HTML)'), validators=[Optional()])
+    
     submit = SubmitField(_l('Save Page'))
 
 # ==========================================

@@ -3,8 +3,9 @@ from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
 from app import db, bcrypt
-from app.models import User, Subject, Page, Question, ExamResult, StudentAnswer
-from app.forms import SubjectForm, TeacherSignupForm, TeacherEditForm
+from app.routes.helpers import generate_access_code
+from app.models import User, Subject, Page, Question, ExamResult, StudentAnswer, Student
+from app.forms import SubjectForm, TeacherSignupForm, TeacherEditForm, StudentForm
 
 teacher = Blueprint('teacher', __name__)
 
@@ -141,6 +142,9 @@ def add_teacher():
             db.session.add(new_staff_member)
             db.session.commit()
 
+            # PHASE 1: Immediate Onboarding Alert
+            send_welcome_email(new_staff_member)
+
             role_label = _("Administrator") if is_admin_user else _("Teacher")
             flash(_('Success: %(role)s account created for %(username)s.', role=role_label, username=form.username.data), 'success')
         except Exception as db_err:
@@ -199,6 +203,85 @@ def edit_teacher(teacher_id):
 
     return render_template('admin/edit_teacher.html', form=form, teacher=target_staff)
 
+
+@teacher.route('/teacher/analytics')
+@login_required
+def teacher_analytics():
+    """
+    PHASE 3: TEACHER-SIDE ANONYMIZATION
+    Anonymizes student names for teachers, but shows full names to admins.
+    """
+    if current_user.is_admin:
+        results = ExamResult.query.all()
+    else:
+        results = ExamResult.query.join(Subject).filter(Subject.teacher_id == current_user.id).all()
+    
+    # Process results for anonymization
+    processed_results = []
+    for res in results:
+        display_name = res.student.full_name if current_user.is_admin else f"Student-{res.student.id}"
+        processed_results.append({
+            'id': res.id,
+            'student_name': display_name,
+            'subject': res.subject.name,
+            'score': res.score,
+            'date': res.date_submitted
+        })
+    
+    return render_template('teacher/analytics.html', results=processed_results)
+
+@teacher.route('/student/delete_my_account', methods=['POST'])
+@login_required
+def delete_my_account():
+    """
+    PHASE 4: NUCLEAR ACCOUNT DELETION (Student-Initiated)
+    Protocol: Bottom-Up Deletion.
+    """
+    # This route is for students, but since there is no student blueprint yet 
+    # and student session is handled differently, we check for student_id in session
+    from flask import session
+    from flask_login import logout_user
+    
+    student_id = session.get('student_id')
+    if not student_id:
+        abort(403)
+        
+    target_student = Student.query.get_or_404(student_id)
+    
+    try:
+        # 1. Delete from student_answer
+        StudentAnswer.query.filter_by(student_id=target_student.id).delete()
+        # 2. Delete from exam_result
+        ExamResult.query.filter_by(student_id=target_student.id).delete()
+        # 3. Delete from student
+        db.session.delete(target_student)
+        
+        db.session.commit()
+        logout_user()
+        session.clear()
+        flash(_('Your account and all associated data have been permanently deleted.'), 'success')
+        return redirect(url_for('public.index'))
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error during account deletion: %(error)s', error=str(e)), 'danger')
+        return redirect(url_for('public.index'))
+
+@teacher.route('/teacher/toggle_name_consent', methods=['POST'])
+@login_required
+def toggle_name_consent():
+    """
+    PHASE 2: TEACHER CONSENT
+    Allows a teacher to toggle whether their name is displayed on subjects.
+    """
+    try:
+        current_user.consent_to_display_name = not current_user.consent_to_display_name
+        db.session.commit()
+        status = _("visible") if current_user.consent_to_display_name else _("hidden")
+        flash(_('Your name is now %(status)s on your subjects.', status=status), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error updating consent: %(error)s', error=str(e)), 'danger')
+    return redirect(url_for('teacher.teacher_dashboard'))
 
 @teacher.route('/admin/delete/teacher/<int:teacher_id>')
 @login_required

@@ -75,6 +75,24 @@ def teacher_analytics():
         elif r.score >= 50: dist_buckets['Pass'] += 1
         else: dist_buckets['Fail'] += 1
 
+    # PHASE 3: Student Data with Anonymization
+    student_metric_data = []
+    unique_student_ids = set(result.student_id for result in set_results)
+    students_active = Student.query.filter(Student.id.in_(unique_student_ids)).all()
+    
+    for active_student in students_active:
+        personal_scores = [r.score for r in set_results if r.student_id == active_student.id]
+        personal_average = round(sum(personal_scores)/len(personal_scores), 1) if personal_scores else 0
+        
+        display_name = active_student.full_name if current_user.is_admin else f"Student-{active_student.id}"
+        
+        student_obj = {
+            'id': active_student.id,
+            'name': display_name,
+            'avg_score': personal_average
+        }
+        student_metric_data.append(student_obj)
+
     # Time Trend Chart
     sorted_history = sorted(set_results, key=lambda x: x.date_submitted)
     timeline_map = {}
@@ -96,14 +114,22 @@ def teacher_analytics():
     r_labels = list(radar_map.keys())
     r_values = [round(sum(radar_map[k])/len(radar_map[k]), 1) for k in r_labels]
 
-    # Recent activity log
-    activity_feed = sorted(set_results, key=lambda x: x.date_submitted, reverse=True)[:10]
+    # PHASE 3: Recent activity log with Anonymization
+    activity_feed = []
+    raw_activity = sorted(set_results, key=lambda x: x.date_submitted, reverse=True)[:10]
+    for act in raw_activity:
+        display_name = act.student.full_name if current_user.is_admin else f"Student-{act.student.id}"
+        activity_feed.append({
+            'student_name': display_name,
+            'subject_name': act.subject.name,
+            'score': act.score,
+            'date_submitted': act.date_submitted
+        })
 
     return render_template(
         'teacher/analytics.html',
         question_data=question_stats_list,
         student_data=student_metric_data,
-        at_risk_students=at_risk_student_list,
         dist_values=list(dist_buckets.values()),
         trend_dates=t_labels,
         trend_scores=t_values,
@@ -152,8 +178,14 @@ def student_detail_view(student_id):
 @analytics.route('/teacher/export/grades')
 @login_required
 def export_grades():
-    """Global CSV score export."""
-    results_to_export = ExamResult.query.all() if current_user.is_admin else ExamResult.query.join(Subject).filter(Subject.teacher_id == current_user.id).all()
+    """
+    PHASE 3: EXPORT LOCKDOWN
+    Global CSV score export. Restricted to Admins.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    results_to_export = ExamResult.query.all()
 
     output_stream = io.StringIO()
     output_stream.write('\ufeff') # BOM
@@ -178,7 +210,13 @@ def export_grades():
 @analytics.route('/teacher/export/student/answers/<int:student_id>')
 @login_required
 def export_student_answers(student_id):
-    """Detailed CSV choice log export."""
+    """
+    PHASE 3: EXPORT LOCKDOWN
+    Detailed CSV choice log export. Restricted to Admins.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
     target_student = Student.query.get_or_404(student_id)
     results_to_export = ExamResult.query.filter_by(student_id=target_student.id).order_by(desc(ExamResult.date_submitted)).all()
 
@@ -679,9 +717,17 @@ def edit_about():
         if not info_record.id:
             db.session.add(info_record)
         info_record.title = edit_form.title.data
+        info_record.title_kurdish = edit_form.title_kurdish.data
         info_record.content = edit_form.content.data
+        info_record.content_kurdish = edit_form.content_kurdish.data
+        
+        # Email Templates
+        info_record.welcome_email_subject = edit_form.welcome_email_subject.data
+        info_record.welcome_email_body = edit_form.welcome_email_body.data
+        info_record.teacher_alert_body = edit_form.teacher_alert_body.data
+        
         db.session.commit()
-        flash(_('Public Information Page Updated.'), 'success')
+        flash(_('Public Information Page and Email Templates Updated.'), 'success')
         return redirect(url_for('teacher.teacher_dashboard'))
 
     return render_template('admin/edit_about.html', form=edit_form)

@@ -128,10 +128,24 @@ def about():
     """
     ABOUT US PAGE
 
-    Content is dynamically fetched from the SiteInfo model.
+    PHASE 5: DEEP KURDISH INTEGRATION
+    Content is dynamically fetched from the SiteInfo model based on locale.
     """
+    from flask_babel import get_locale
     site_content = SiteInfo.query.filter_by(key='about').first()
-    return render_template('about.html', info=site_content)
+    
+    # Logic to select correct language content
+    locale = str(get_locale())
+    if site_content and locale == 'ku':
+        # Create a proxy object or just pass specific fields if content_kurdish exists
+        display_info = {
+            'title': site_content.title_kurdish or site_content.title,
+            'content': site_content.content_kurdish or site_content.content
+        }
+    else:
+        display_info = site_content
+
+    return render_template('about.html', info=display_info)
 
 
 @public.route('/public/stats')

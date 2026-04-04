@@ -141,6 +141,56 @@ def add_teacher():
             db.session.add(new_staff_member)
             db.session.commit()
 
+            # Send notification email to new teacher
+            from flask_mail import Message
+            from app import mail
+            from app.models import SiteInfo
+            
+            email_message = request.form.get('email_message', '').strip()
+            
+            if email_message and new_staff_member.email:
+                # Use custom message from admin
+                email_body = email_message
+                email_body = email_body.replace('{{name}}', new_staff_member.username)
+                email_body = email_body.replace('{{email}}', new_staff_member.email)
+                email_body = email_body.replace('{{password}}', form.password.data)
+                email_body = email_body.replace('{{role}}', role_label)
+            else:
+                # Use default template
+                default_template = f"""Welcome to StatInfoPro!
+
+Dear {new_staff_member.username},
+
+An administrator has created an account for you on the StatInfoPro platform.
+
+Your login credentials:
+Email: {new_staff_member.email}
+Password: {form.password.data}
+Role: {role_label}
+
+Please log in at your earliest convenience and consider changing your password after your first login.
+
+Best regards,
+StatInfoPro Team
+"""
+                email_body = SiteInfo.get_email_template('teacher_welcome', default_template)
+                email_body = email_body.replace('{{name}}', new_staff_member.username)
+                email_body = email_body.replace('{{email}}', new_staff_member.email)
+                email_body = email_body.replace('{{password}}', form.password.data)
+                email_body = email_body.replace('{{role}}', role_label)
+            
+            try:
+                msg = Message(
+                    subject='Your StatInfoPro Account Has Been Created',
+                    recipients=[new_staff_member.email],
+                    body=email_body
+                )
+                mail.send(msg)
+                flash(_('Welcome email sent to %(email)s.', email=new_staff_member.email), 'info')
+            except Exception as email_err:
+                # Log error but don't block account creation
+                print(f"Failed to send welcome email to teacher: {email_err}")
+
             role_label = _("Administrator") if is_admin_user else _("Teacher")
             flash(_('Success: %(role)s account created for %(username)s.', role=role_label, username=form.username.data), 'success')
         except Exception as db_err:
@@ -286,3 +336,20 @@ def view_teacher(teacher_id):
         view_as_admin=True,
         teacher_name=teacher_record.username
     )
+
+
+@teacher.route('/teacher/toggle_name_display', methods=['POST'])
+@login_required
+def toggle_name_display():
+    """
+    Toggle whether the teacher's name is displayed on their subject pages.
+    """
+    current_user.show_name_on_subject = not current_user.show_name_on_subject
+    try:
+        db.session.commit()
+        status = _('shown') if current_user.show_name_on_subject else _('hidden')
+        flash(_('Your name will now be %(status)s on subject pages.', status=status), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error updating preference: %(error)s', error=str(e)), 'danger')
+    return redirect(url_for('teacher.teacher_dashboard'))

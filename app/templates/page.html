@@ -26,8 +26,6 @@
                     <i class="fas fa-stopwatch me-2"></i>{{ _('Take Lecture Quiz') }}
                 </a>
                 {% endif %}
-
-                <!-- KURDISH TOGGLE MOVED TO FLOATING BUTTON -->
             </div>
         </div>
 
@@ -40,17 +38,16 @@
                     {{ page.title }}
                 </h1>
 
-                <!-- ENGLISH CONTENT (Default View) -->
-                <!-- 'overflow-hidden' prevents wide images/tables from breaking layout -->
-                <div id="content-en" class="rich-text-content overflow-hidden">
-                    {{ page.content_body | safe }}
-                </div>
-
-                <!-- KURDISH CONTENT (Hidden by default) -->
-                {% if page.content_body_kurdish %}
-                <div id="content-ku" class="rich-text-content d-none overflow-hidden"
-                    style="direction: rtl; text-align: right;">
+                <!-- CONTENT BASED ON GLOBAL LANGUAGE -->
+                {% if get_locale().language == 'ku' and page.content_body_kurdish %}
+                <!-- KURDISH CONTENT -->
+                <div class="rich-text-content overflow-hidden" style="direction: rtl; text-align: right;">
                     {{ page.content_body_kurdish | safe }}
+                </div>
+                {% else %}
+                <!-- ENGLISH CONTENT (Default) -->
+                <div class="rich-text-content overflow-hidden">
+                    {{ page.content_body | safe }}
                 </div>
                 {% endif %}
 
@@ -138,57 +135,6 @@
 
     </div>
 </div>
-
-<!--
-    FLOATING LANGUAGE TOGGLE
--->
-{% if page.content_body_kurdish %}
-<div class="position-fixed top-0 start-0 m-3 mt-5 pt-4" style="z-index: 1050;">
-    <!-- Mobile: Circle Button (Fills the icon) -->
-    <button onclick="toggleLanguage()"
-        class="btn btn-primary rounded-circle shadow-lg d-md-none d-flex justify-content-center align-items-center p-0"
-        style="width: 50px; height: 50px;">
-        <i class="fa-solid fa-earth-americas fa-xl"></i>
-    </button>
-
-    <!-- Desktop: Pill Button with Text -->
-    <button onclick="toggleLanguage()"
-        class="btn btn-primary rounded-pill shadow-lg d-none d-md-flex align-items-center gap-2 px-3 py-2">
-        <i class="fa-solid fa-earth-americas fa-xl"></i>
-        <span class="fw-bold" id="langLabel">{{ _('Read in Kurdish / وەرگێڕان') }}</span>
-    </button>
-</div>
-{% endif %}
-
-<!--
-    LANGUAGE SWITCHER LOGIC
--->
-<script>
-    function toggleLanguage() {
-        var en = document.getElementById("content-en");
-        var ku = document.getElementById("content-ku");
-        var label = document.getElementById("langLabel");
-
-        // Save scroll position relative to viewport
-        // Actually, simple d-none replacement preserves scroll Y exactly, 
-        // but if content is shorter validation might be needed.
-        // For now, simple toggling is the requested behavior.
-
-        if (en.classList.contains('d-none')) {
-            // Switch to ENGLISH
-            en.classList.remove('d-none');
-            ku.classList.add('d-none');
-            // Update Text
-            if (label) label.innerHTML = "{{ _('Read in Kurdish / وەرگێڕان') }}";
-        } else {
-            // Switch to KURDISH
-            en.classList.add('d-none');
-            ku.classList.remove('d-none');
-            // Update Text
-            if (label) label.innerHTML = "{{ _('Read in English') }}";
-        }
-    }
-</script>
 
 <!--
     RICH TEXT CSS OVERRIDES

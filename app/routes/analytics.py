@@ -16,6 +16,18 @@ from app.forms import InfoPageForm, RestoreBackupForm, WipeCleanForm
 
 analytics = Blueprint('analytics', __name__)
 
+
+def get_anonymous_student_name(student_id, is_admin=False):
+    """
+    Generate anonymous student identifier for teachers.
+    Admin sees full names, teachers see 'Student #ID' format.
+    """
+    if is_admin:
+        student = Student.query.get(student_id)
+        return student.full_name if student else f"Student #{student_id}"
+    return f"Student #{student_id}"
+
+
 # ==============================================================================
 # SECTION 11: ANALYTICS, EXPORTS & CMS
 # ==============================================================================
@@ -58,7 +70,7 @@ def teacher_analytics():
 
         student_obj = {
             'id': active_student.id,
-            'name': active_student.full_name,
+            'name': get_anonymous_student_name(active_student.id, current_user.is_admin),
             'avg_score': personal_average
         }
         student_metric_data.append(student_obj)
@@ -152,8 +164,11 @@ def student_detail_view(student_id):
 @analytics.route('/teacher/export/grades')
 @login_required
 def export_grades():
-    """Global CSV score export."""
-    results_to_export = ExamResult.query.all() if current_user.is_admin else ExamResult.query.join(Subject).filter(Subject.teacher_id == current_user.id).all()
+    """Global CSV score export. Admin only."""
+    if not current_user.is_admin:
+        abort(403)
+
+    results_to_export = ExamResult.query.all()
 
     output_stream = io.StringIO()
     output_stream.write('\ufeff') # BOM
@@ -178,7 +193,10 @@ def export_grades():
 @analytics.route('/teacher/export/student/answers/<int:student_id>')
 @login_required
 def export_student_answers(student_id):
-    """Detailed CSV choice log export."""
+    """Detailed CSV choice log export. Admin only."""
+    if not current_user.is_admin:
+        abort(403)
+
     target_student = Student.query.get_or_404(student_id)
     results_to_export = ExamResult.query.filter_by(student_id=target_student.id).order_by(desc(ExamResult.date_submitted)).all()
 
@@ -665,7 +683,7 @@ def wipe_clean():
 @analytics.route('/admin/edit/about', methods=['GET', 'POST'])
 @login_required
 def edit_about():
-    """CMS Administration for 'About Us'."""
+    """CMS Administration for 'About Us' with bilingual support."""
     if not current_user.is_admin:
         abort(403)
 
@@ -680,6 +698,7 @@ def edit_about():
             db.session.add(info_record)
         info_record.title = edit_form.title.data
         info_record.content = edit_form.content.data
+        info_record.content_ku = edit_form.content_ku.data
         db.session.commit()
         flash(_('Public Information Page Updated.'), 'success')
         return redirect(url_for('teacher.teacher_dashboard'))

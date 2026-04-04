@@ -16,14 +16,16 @@
         <!-- MAIN CONTENT CARD -->
         <div class="card shadow-lg border-0 card-accent">
             <div class="card-body p-4 p-md-5">
-                {% if info and info.content %}
+                {% set display_content = info.get_content(get_locale().language) if info else None %}
+                {% if info and display_content %}
                 <!-- 
                         RICH TEXT CONTENT
                         The 'safe' filter is required here because the content 
-                        comes from CKEditor and contains raw HTML tags.
+                        comes from the editor and contains raw HTML tags.
+                        Display based on user's language preference.
                     -->
-                <div class="rich-text-content">
-                    {{ info.content | safe }}
+                <div class="rich-text-content" {% if get_locale().language == 'ku' %}style="direction: rtl; text-align: right;"{% endif %}>
+                    {{ display_content | safe }}
                 </div>
                 {% else %}
                 <!-- FALLBACK STATE (If no content created yet) -->

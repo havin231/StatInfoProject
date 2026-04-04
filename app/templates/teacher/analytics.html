@@ -10,9 +10,6 @@
         <p class="text-muted small">{{ _('Executive overview of academic performance.') }}</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="/teacher/export/grades" class="btn btn-primary btn-sm">
-            <i class="fas fa-download me-2"></i>{{ _('Export Grades (CSV)') }}
-        </a>
         <a href="/teacher/dashboard" class="btn btn-outline btn-sm">
             <i class="fas fa-arrow-left me-2"></i>{{ _('Dashboard') }}
         </a>
@@ -157,7 +154,13 @@
             <tbody>
                 {% for act in recent_activity %}
                 <tr>
-                    <td class="ps-3 fw-bold">{{ act.student.full_name }}</td>
+                    <td class="ps-3 fw-bold">
+                        {% if current_user.is_authenticated and current_user.is_admin %}
+                            {{ act.student.full_name }}
+                        {% else %}
+                            {{ _('Student') }} #{{ act.student.id }}
+                        {% endif %}
+                    </td>
                     <td>{{ act.subject.name }}</td>
                     <td>
                         {% if act.score >= 50 %}

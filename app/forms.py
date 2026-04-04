@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo
+from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo, ValidationError
 from flask_babel import lazy_gettext as _l
 
 # ==========================================
@@ -63,17 +63,35 @@ class StudentForm(FlaskForm):
 class StudentSignupForm(FlaskForm):
     """
     Form for students to sign up themselves.
+    Includes password with complexity requirements.
     """
     full_name = StringField(_l('Full Name'), validators=[DataRequired()])
     email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
+    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=8)])
+    confirm_password = PasswordField(_l('Confirm Password'), validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField(_l('Register Account'))
+
+    def validate_password(self, field):
+        """Validate password complexity."""
+        password = field.data
+        if not any(c.isupper() for c in password):
+            raise ValidationError(_('Password must contain at least one uppercase letter.'))
+        if not any(c.islower() for c in password):
+            raise ValidationError(_('Password must contain at least one lowercase letter.'))
+        if not any(c.isdigit() for c in password):
+            raise ValidationError(_('Password must contain at least one number.'))
+        if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
+            raise ValidationError(_('Password must contain at least one special character.'))
 
 class StudentSettingsForm(FlaskForm):
     """
-    Form for students to update their profile (email and access code).
+    Form for students to update their profile (email, access code, and password).
     """
     email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
     access_code = StringField(_l('Change Access Code'), validators=[DataRequired(), Length(min=6)])
+    current_password = PasswordField(_l('Current Password'), validators=[Optional()])
+    new_password = PasswordField(_l('New Password'), validators=[Optional(), Length(min=8)])
+    confirm_password = PasswordField(_l('Confirm New Password'), validators=[EqualTo('new_password')])
     submit = SubmitField(_l('Save Changes'))
 
 class StudentEditForm(FlaskForm):
@@ -92,9 +110,11 @@ class StudentEditForm(FlaskForm):
 class InfoPageForm(FlaskForm):
     """
     Form for editing static pages like 'About Us'.
+    Supports bilingual content (English & Kurdish).
     """
     title = StringField(_l('Page Title'), default="About Us", validators=[DataRequired()])
-    content = TextAreaField(_l('Page Content'), validators=[DataRequired()])
+    content = TextAreaField(_l('Content (English)'), validators=[DataRequired()])
+    content_ku = TextAreaField(_l('Content (Kurdish)'), validators=[Optional()])
     submit = SubmitField(_l('Save Page'))
 
 # ==========================================

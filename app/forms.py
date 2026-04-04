@@ -56,9 +56,21 @@ class StudentForm(FlaskForm):
     Form for registering new students.
     """
     full_name = StringField(_l('Full Name'), validators=[DataRequired()])
-    email = StringField(_l('Email Address'), validators=[Optional(), Email()])
-    access_code = StringField(_l('Access Code (Unique)'), validators=[DataRequired()])
+    email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
+    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=8)])
     submit = SubmitField(_l('Add Student'))
+
+    def validate_password(self, field):
+        """Validate password complexity."""
+        password = field.data
+        if not any(c.isupper() for c in password):
+            raise ValidationError(_('Password must contain at least one uppercase letter.'))
+        if not any(c.islower() for c in password):
+            raise ValidationError(_('Password must contain at least one lowercase letter.'))
+        if not any(c.isdigit() for c in password):
+            raise ValidationError(_('Password must contain at least one number.'))
+        if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
+            raise ValidationError(_('Password must contain at least one special character.'))
 
 class StudentSignupForm(FlaskForm):
     """
@@ -85,10 +97,9 @@ class StudentSignupForm(FlaskForm):
 
 class StudentSettingsForm(FlaskForm):
     """
-    Form for students to update their profile (email, access code, and password).
+    Form for students to update their profile (email and password).
     """
     email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
-    access_code = StringField(_l('Change Access Code'), validators=[DataRequired(), Length(min=6)])
     current_password = PasswordField(_l('Current Password'), validators=[Optional()])
     new_password = PasswordField(_l('New Password'), validators=[Optional(), Length(min=8)])
     confirm_password = PasswordField(_l('Confirm New Password'), validators=[EqualTo('new_password')])
@@ -96,12 +107,25 @@ class StudentSettingsForm(FlaskForm):
 
 class StudentEditForm(FlaskForm):
     """
-    Form for editing existing student details (Task 1).
+    Form for editing existing student details.
     """
     full_name = StringField(_l('Full Name'), validators=[DataRequired()])
-    email = StringField(_l('Email Address'), validators=[Optional(), Email()])
-    access_code = StringField(_l('Access Code'), validators=[DataRequired()])
+    email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
+    password = PasswordField(_l('Reset Password (Optional)'), validators=[Optional(), Length(min=8)])
     submit = SubmitField(_l('Update Student Details'))
+
+    def validate_password(self, field):
+        """Validate password complexity if provided."""
+        if field.data:
+            password = field.data
+            if not any(c.isupper() for c in password):
+                raise ValidationError(_('Password must contain at least one uppercase letter.'))
+            if not any(c.islower() for c in password):
+                raise ValidationError(_('Password must contain at least one lowercase letter.'))
+            if not any(c.isdigit() for c in password):
+                raise ValidationError(_('Password must contain at least one number.'))
+            if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
+                raise ValidationError(_('Password must contain at least one special character.'))
 
 # ==========================================
 # 3. SITE CONTENT (CMS)

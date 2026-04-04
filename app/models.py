@@ -38,26 +38,19 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.username}', Admin: {self.is_admin})"
 
-# ==========================================
-# 2. STUDENT MODEL
-# ==========================================
 class Student(db.Model):
     """
     Represents the students taking exams.
-    Students access the system via a unique Access Code.
-    Task 1: If an Admin edits name/code, the ID stays same, keeping data linked.
+    Students access the system via Email and Password.
     """
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100), nullable=False)
 
-    # The unique token used for login
-    access_code = db.Column(db.String(20), unique=True, nullable=False, index=True)
-
     # Password for secure authentication
-    password_hash = db.Column(db.String(60), nullable=True)
+    password_hash = db.Column(db.String(128), nullable=True)
 
-    # NEW: Email (Optional for old students, Required for new)
-    email = db.Column(db.String(120), unique=True, nullable=True)
+    # Email is now the unique identifier for login
+    email = db.Column(db.String(120), unique=True, nullable=False)
 
     # Preferred Language for UI
     preferred_lang = db.Column(db.String(10), default='en')

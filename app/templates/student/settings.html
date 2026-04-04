@@ -57,41 +57,13 @@
                         </div>
                     </div>
 
-                    <hr class="my-4 text-muted opacity-25">
-
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-danger">{{ _('Security') }}</label>
-                        <div class="p-3 rounded border" style="background: rgba(255, 255, 255, 0.05);">
-                            <label class="form-label small text-uppercase text-muted fw-bold">{{ _('My Access Code')
-                                }}</label>
-                            <div class="input-group mb-2">
-                                <span class="input-group-text bg-transparent border-end-0"><i
-                                        class="fas fa-key text-muted"></i></span>
-                                {{ form.access_code(class="form-control font-monospace fw-bold border-start-0 ps-0
-                                bg-transparent text-body", style="letter-spacing: 1px;") }}
-                            </div>
-                            {% for error in form.access_code.errors %}
-                            <div class="text-danger small mt-1">{{ error }}</div>
-                            {% endfor %}
-                            <div class="form-text text-warning small">
-                                <i class="fas fa-info-circle me-1"></i>
-                                {{ _('If you change this, you will need to use the new code to login next time.') }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <hr class="my-4 text-muted opacity-25">
-
-                    <!-- PASSWORD CHANGE SECTION -->
                     <div class="mb-4">
                         <label class="form-label fw-bold text-primary">{{ _('Change Password') }}</label>
                         <div class="p-3 rounded border" style="background: rgba(13, 110, 253, 0.05);">
-                            {% if student.password_hash %}
                             <div class="mb-3">
                                 {{ form.current_password.label(class="form-label small text-uppercase text-muted fw-bold") }}
                                 {{ form.current_password(class="form-control", placeholder="Enter current password") }}
                             </div>
-                            {% endif %}
                             <div class="mb-3">
                                 {{ form.new_password.label(class="form-label small text-uppercase text-muted fw-bold") }}
                                 {{ form.new_password(class="form-control", placeholder="Enter new password (min 8 chars)") }}
@@ -133,35 +105,40 @@
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- Delete Account Confirmation Modal -->
-                <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header bg-danger text-white">
-                                <h5 class="modal-title" id="deleteAccountModalLabel">{{ _('Confirm Account Deletion') }}</h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <form method="POST" action="{{ url_for('auth.delete_account') }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <div class="modal-body">
-                                    <div class="alert alert-warning">
-                                        <i class="fas fa-exclamation-triangle me-2"></i>
-                                        {{ _('This action cannot be undone. Your personal data will be permanently removed.') }}
-                                    </div>
-                                    <p class="small text-muted">
-                                        {{ _('Please type DELETE in the box below to confirm:') }}
-                                    </p>
-                                    <input type="text" name="confirmation" class="form-control" placeholder="DELETE" required>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
-                                    <button type="submit" class="btn btn-danger">{{ _('Permanently Delete Account') }}</button>
-                                </div>
-                            </form>
-                        </div>
+<!-- Delete Account Confirmation Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteAccountModalLabel">{{ _('Confirm Account Deletion') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('auth.delete_account') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ _('This action cannot be undone. Your personal data will be permanently removed.') }}
                     </div>
+                    <p class="small text-muted">
+                        {{ _('Please type DELETE in the box below to confirm:') }}
+                    </p>
+                    <input type="text" name="confirmation" class="form-control" placeholder="DELETE" required>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-danger">{{ _('Permanently Delete Account') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
             </div>
         </div>
     </div>

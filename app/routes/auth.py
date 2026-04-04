@@ -47,13 +47,13 @@ def student_login():
     """
     STUDENT PORTAL LOGIN
 
-    Authenticates students via Access Code and Password.
+    Authenticates students via Email and Password.
     Implements redirection logic for deep links (Task Fix).
     """
     if request.method == 'POST':
-        user_token = request.form.get('access_code')
+        email = request.form.get('email')
         password = request.form.get('password')
-        student_record = Student.query.filter_by(access_code=user_token).first()
+        student_record = Student.query.filter_by(email=email).first()
 
         if student_record and student_record.password_hash:
             # Verify password
@@ -70,13 +70,8 @@ def student_login():
                 return redirect(url_for('student.student_dashboard'))
             else:
                 flash(_('Invalid password.'), 'danger')
-        elif student_record and not student_record.password_hash:
-            # Legacy account without password - allow access code only
-            session['student_id'] = student_record.id
-            flash(_('Welcome, %(name)s. Please set a password for enhanced security.', name=student_record.full_name), 'warning')
-            return redirect(url_for('auth.student_settings'))
         else:
-            flash(_('The Access Code provided is invalid.'), 'danger')
+            flash(_('Invalid email or password.'), 'danger')
 
     return render_template('student_login.html')
 
@@ -128,15 +123,9 @@ def student_signup():
             flash(_('Password must contain at least one special character.'), 'danger')
             return render_template('student_signup.html', form=form)
             
-        # Generate unique access code
-        new_code = generate_access_code()
-        while Student.query.filter_by(access_code=new_code).first():
-            new_code = generate_access_code()
-            
         new_student = Student(
             full_name=form.full_name.data,
             email=form.email.data,
-            access_code=new_code,
             password_hash=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         )
         
@@ -155,9 +144,7 @@ Dear {new_student.full_name},
 
 Your account has been successfully created.
 
-Your Access Code: {new_code}
-
-Please save your access code in a secure place. You will need it to log in to the system.
+Your login email: {new_student.email}
 
 Best regards,
 StatInfoPro Team
@@ -166,7 +153,6 @@ StatInfoPro Team
             
             # Replace variables in template
             welcome_body = welcome_body.replace('{{name}}', new_student.full_name)
-            welcome_body = welcome_body.replace('{{access_code}}', new_code)
             welcome_body = welcome_body.replace('{{email}}', new_student.email or '')
             
             try:
@@ -182,7 +168,7 @@ StatInfoPro Team
             
             # Auto-login
             session['student_id'] = new_student.id
-            flash(_('Account created! Your Access Code is: %(code)s. Please save it!', code=new_code), 'success')
+            flash(_('Account created! Welcome to StatInfoPro.'), 'success')
             return redirect(url_for('student.student_dashboard'))
             
         except Exception as e:
@@ -195,7 +181,7 @@ StatInfoPro Team
 def student_settings():
     """
     STUDENT PROFILE SETTINGS
-    Allows updating email and access code.
+    Allows updating email and password.
     """
     if 'student_id' not in session:
         return redirect(url_for('auth.student_login'))
@@ -205,19 +191,12 @@ def student_settings():
     
     if request.method == 'GET':
         form.email.data = student.email
-        form.access_code.data = student.access_code
         
     if form.validate_on_submit():
         # Check email uniqueness if changed
         if form.email.data != student.email:
             if Student.query.filter_by(email=form.email.data).first():
                 flash(_('Error: Email already in use by another student.'), 'danger')
-                return render_template('student/settings.html', form=form, student=student)
-        
-        # Check access code uniqueness if changed
-        if form.access_code.data != student.access_code:
-            if Student.query.filter_by(access_code=form.access_code.data).first():
-                flash(_('Error: Access code already taken.'), 'danger')
                 return render_template('student/settings.html', form=form, student=student)
         
         # Handle password change
@@ -228,26 +207,10 @@ def student_settings():
                     flash(_('Current password is incorrect.'), 'danger')
                     return render_template('student/settings.html', form=form, student=student)
             
-            # Validate new password complexity
-            new_password = form.new_password.data
-            if not any(c.isupper() for c in new_password):
-                flash(_('New password must contain at least one uppercase letter.'), 'danger')
-                return render_template('student/settings.html', form=form, student=student)
-            if not any(c.islower() for c in new_password):
-                flash(_('New password must contain at least one lowercase letter.'), 'danger')
-                return render_template('student/settings.html', form=form, student=student)
-            if not any(c.isdigit() for c in new_password):
-                flash(_('New password must contain at least one number.'), 'danger')
-                return render_template('student/settings.html', form=form, student=student)
-            if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in new_password):
-                flash(_('New password must contain at least one special character.'), 'danger')
-                return render_template('student/settings.html', form=form, student=student)
-            
             # Update password
-            student.password_hash = bcrypt.generate_password_hash(new_password).decode('utf-8')
+            student.password_hash = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
                 
         student.email = form.email.data
-        student.access_code = form.access_code.data
         
         try:
             db.session.commit()
@@ -284,8 +247,7 @@ def delete_account():
     try:
         # Soft delete: Clear personal info but keep ID for exam data integrity
         student.full_name = 'Deleted Student'
-        student.email = None
-        student.access_code = f'DELETED_{student.id}_{datetime.utcnow().timestamp()}'
+        student.email = f'deleted_{student.id}_{datetime.utcnow().timestamp()}@deleted.com'
         student.is_deleted = True
         
         db.session.commit()

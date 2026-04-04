@@ -17,7 +17,7 @@
                 <div class="text-center mb-4">
                     <div class="h1 text-primary mb-3"><i class="fas fa-user-graduate"></i></div>
                     <h2 class="h4 fw-bold">{{ _('Student Portal') }}</h2>
-                    <p class="text-muted small">{{ _('Enter your unique access code to continue.') }}</p>
+                    <p class="text-muted small">{{ _('Enter your email and password to continue.') }}</p>
                 </div>
 
                 <!--
@@ -30,20 +30,14 @@
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
                     <div class="mb-4">
-                        <label for="access_code" class="form-label small fw-bold text-muted">{{ _('Access Code')
+                        <label for="email" class="form-label small fw-bold text-muted">{{ _('Email Address')
                             }}</label>
                         <div class="input-group input-group-lg">
                             <span class="input-group-text bg-transparent border-end-0"><i
-                                    class="fas fa-key text-muted"></i></span>
-                            <!--
-                                Special styling for the Code Input:
-                                - font-monospace: Looks like code
-                                - text-uppercase: Forces caps visual
-                                - text-center: Centers the code
-                            -->
-                            <input type="text" name="access_code" id="access_code"
-                                class="form-control font-monospace text-uppercase fw-bold text-center border-start-0 ps-0 bg-transparent text-body"
-                                placeholder="XXX-0000" style="letter-spacing: 2px;" required autocomplete="off">
+                                    class="fas fa-envelope text-muted"></i></span>
+                            <input type="email" name="email" id="email"
+                                class="form-control border-start-0 ps-0 bg-transparent text-body"
+                                placeholder="name@example.com" required autocomplete="email">
                         </div>
                     </div>
 
@@ -56,9 +50,6 @@
                             <input type="password" name="password" id="password"
                                 class="form-control border-start-0 ps-0 bg-transparent text-body"
                                 placeholder="Enter your password" required>
-                        </div>
-                        <div class="form-text small text-muted">
-                            {{ _('Legacy accounts: leave blank if you haven\'t set a password yet.') }}
                         </div>
                     </div>
 

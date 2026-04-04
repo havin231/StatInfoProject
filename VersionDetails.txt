@@ -325,3 +325,57 @@ Whenever a change or new feature is added, append a new version block following 
 - Test email functionality
 
 ---
+
+## Version 0.5.1
+**Date:** 2026-04-05
+**Summary:** Removed Access Code system, replaced with Email/Password login. Fixed UI and backend bugs.
+
+### Changes & Improvements:
+
+#### Access Code Removal - Major Architecture Change
+- **Database Schema**: Removed `access_code` column from `Student` model.
+- **Email as Login**: `email` is now unique and required (`nullable=False`).
+- **Student Wipe**: All existing student records wiped to support new schema (as requested).
+- **Forms Updated**: `StudentForm`, `StudentSignupForm`, `StudentSettingsForm`, `StudentEditForm` - removed access_code fields, added password fields.
+- **Routes Updated**: 
+  - `student_login()` - now uses email/password authentication
+  - `student_signup()` - generates password only, no access code
+  - `student_settings()` - removed access_code management
+  - `admin_students()` - manual registration with password
+  - `edit_student()` - password reset option instead of access code
+- **Templates Updated**:
+  - `student_login.html` - email field instead of access code
+  - `student_signup.html` - no access code display
+  - `student/settings.html` - removed access_code section
+  - `admin/students.html` - email/password fields, custom welcome message
+  - `admin/edit_student.html` - password reset instead of access code
+
+#### Bug Fixes
+- **Teacher Creation Error**: Fixed `NameError: name 'request' is not defined` in `teacher.py` by adding missing import.
+- **Student Deletion UI**: Fixed modal "graying out" issue by moving delete confirmation modal outside the card container in `settings.html`.
+
+#### Email Features Completed
+- **Student Welcome Email**: Custom welcome message field added to `/admin/students` form. Admins can personalize welcome emails with variables: `{{name}}`, `{{email}}`, `{{password}}`.
+- **Default Template**: Uses SiteInfo template `student_welcome` or built-in default.
+
+#### Bulk Import Updated
+- **Required Columns**: Now requires `Name`, `Email`, `Password` columns (instead of just Name).
+
+### Files Modified:
+- `app/models.py` - Removed access_code, made email required/unique
+- `app/forms.py` - Updated all student forms
+- `app/routes/auth.py` - Email/password login
+- `app/routes/admin.py` - Student management with passwords
+- `app/routes/teacher.py` - Fixed request import
+- `app/templates/student_login.html` - Email login
+- `app/templates/admin/students.html` - Custom welcome email field
+- `app/templates/admin/edit_student.html` - Password reset
+- `app/templates/student/settings.html` - Fixed modal UI
+- `SKILL.md` - Updated schema documentation
+- `VersionDetails.txt` - This entry
+
+### Breaking Changes:
+- All existing student accounts wiped (as requested).
+- Student login now requires email and password (no access code).
+
+---

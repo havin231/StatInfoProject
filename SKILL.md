@@ -95,7 +95,7 @@ Models & Fields
 
 User: id, username, email, password_hash, is_admin (Bool), preferred_lang (String, default='en'), show_name_on_subject (Bool, default=False).
 
-Student: id, full_name, access_code (Unique Index), email (String, nullable), password_hash (String, nullable), preferred_lang (String, default='en'), is_deleted (Bool, default=False), created_at, updated_at.
+Student: id, full_name, email (String, unique, required), password_hash (String, nullable), preferred_lang (String, default='en'), is_deleted (Bool, default=False), created_at, updated_at.
 
 Subject: id, name, slug, description, teacher_id, is_public (Bool, default=True).
 

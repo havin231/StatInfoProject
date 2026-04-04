@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, flash, redirect, abort
+from flask import Blueprint, render_template, url_for, flash, redirect, abort, request
 from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
@@ -140,56 +140,6 @@ def add_teacher():
         try:
             db.session.add(new_staff_member)
             db.session.commit()
-
-            # Send notification email to new teacher
-            from flask_mail import Message
-            from app import mail
-            from app.models import SiteInfo
-            
-            email_message = request.form.get('email_message', '').strip()
-            
-            if email_message and new_staff_member.email:
-                # Use custom message from admin
-                email_body = email_message
-                email_body = email_body.replace('{{name}}', new_staff_member.username)
-                email_body = email_body.replace('{{email}}', new_staff_member.email)
-                email_body = email_body.replace('{{password}}', form.password.data)
-                email_body = email_body.replace('{{role}}', role_label)
-            else:
-                # Use default template
-                default_template = f"""Welcome to StatInfoPro!
-
-Dear {new_staff_member.username},
-
-An administrator has created an account for you on the StatInfoPro platform.
-
-Your login credentials:
-Email: {new_staff_member.email}
-Password: {form.password.data}
-Role: {role_label}
-
-Please log in at your earliest convenience and consider changing your password after your first login.
-
-Best regards,
-StatInfoPro Team
-"""
-                email_body = SiteInfo.get_email_template('teacher_welcome', default_template)
-                email_body = email_body.replace('{{name}}', new_staff_member.username)
-                email_body = email_body.replace('{{email}}', new_staff_member.email)
-                email_body = email_body.replace('{{password}}', form.password.data)
-                email_body = email_body.replace('{{role}}', role_label)
-            
-            try:
-                msg = Message(
-                    subject='Your StatInfoPro Account Has Been Created',
-                    recipients=[new_staff_member.email],
-                    body=email_body
-                )
-                mail.send(msg)
-                flash(_('Welcome email sent to %(email)s.', email=new_staff_member.email), 'info')
-            except Exception as email_err:
-                # Log error but don't block account creation
-                print(f"Failed to send welcome email to teacher: {email_err}")
 
             role_label = _("Administrator") if is_admin_user else _("Teacher")
             flash(_('Success: %(role)s account created for %(username)s.', role=role_label, username=form.username.data), 'success')

@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Teacher Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+    <!-- 
+        SIDEBAR: Controls & Settings 
+        On mobile/tablet (< lg), this column moves to the bottom (order-lg-last) 
+        so the main content (Subjects) appears first.
+    -->
+    <div class="col-lg-3 order-lg-last">
+
+        <!-- MOBILE ONLY: Logout Button -->
+        <div class="d-lg-none mb-3 d-grid">
+            <a href="/logout" class="btn btn-outline-danger shadow-sm">
+                <i class="fas fa-sign-out-alt me-2"></i>{{ _('Logout') }}
+            </a>
+        </div>
+
+        <!-- ANALYTICS & TOOLS CARD -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Class Insights') }}</h6>
+                <div class="d-grid gap-2">
+                    <!-- Logic: Check if an Admin is viewing this teacher's profile -->
+                    {% if view_as_admin %}
+                    <div class="alert alert-warning py-2 small mb-2 text-center">
+                        <i class="fas fa-eye me-1"></i> {{ _('Viewing as:') }} <strong>{{ teacher_name }}</strong>
+                    </div>
+                    <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+                        <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Admin') }}
+                    </a>
+                    {% else %}
+                    <a href="/teacher/analytics" class="btn btn-lime">
+                        <i class="fas fa-chart-pie me-2"></i>{{ _('View Analytics') }}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- THEME SETTINGS CARD -->
+        <div class="card">
+            <div class="card-body">
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Interface Theme') }}</h6>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline btn-sm text-start" onclick="setTheme('glass')">
+                        <i class="fas fa-circle text-info me-2"></i>{{ _('Academic Glass') }}
+                    </button>
+                    <button class="btn btn-outline btn-sm text-start" onclick="setTheme('cyber')">
+                        <i class="fas fa-square text-success me-2"></i>{{ _('Cyber Command') }}
+                    </button>
+
+                    <hr class="my-2 text-muted">
+
+                    <a href="/logout" class="btn btn-outline-danger btn-sm text-start">
+                        <i class="fas fa-sign-out-alt me-2"></i>{{ _('Logout') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEACHER NAME DISPLAY CONSENT -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Privacy') }}</h6>
+                <form method="POST" action="/teacher/toggle_name_display">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="showNameToggle" 
+                            {% if current_user.show_name_on_subject %}checked{% endif %} 
+                            onchange="this.form.submit()">
+                        <label class="form-check-label small" for="showNameToggle">
+                            {{ _('Show my name on subjects') }}
+                        </label>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+        MAIN CONTENT: Subjects Grid
+        This takes up the majority of the screen width.
+    -->
+    <div class="col-lg-9">
+
+        <!-- Dashboard Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-1">{{ _('My Classroom') }}</h1>
+                <p class="text-muted small mb-0">{{ subjects|length }} {{ _('Subjects Assigned') }}</p>
+            </div>
+            <!-- Stats Badge (Hidden on very small screens) -->
+            <div class="d-none d-md-block text-muted small">
+                {{ _('Total Exams Taken:') }} <span class="fw-bold text-highlight">{{ total_results }}</span>
+            </div>
+        </div>
+
+        {% if subjects %}
+        <div class="row g-4">
+            {% for sub in subjects %}
+            <div class="col-md-6">
+                <!-- Subject Card -->
+                <div class="card h-100 card-accent d-flex flex-column">
+                    <div class="card-body d-flex flex-column">
+
+                        <!-- Header & Options Dropdown -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h4 class="h5 fw-bold mb-0 text-truncate" title="{{ sub.name }}">{{ sub.name }}</h4>
+
+                            <!-- Context Menu -->
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-link text-muted p-0" type="button"
+                                    data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v px-2"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                    <li>
+                                        <h6 class="dropdown-header">{{ _('Settings') }}</h6>
+                                    </li>
+                                    <li><a class="dropdown-item small" href="/teacher/edit/subject/{{ sub.id }}"><i
+                                                class="fas fa-edit me-2"></i>{{ _('Edit Name') }}</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item text-danger small"
+                                            href="/teacher/delete/subject/{{ sub.id }}"
+                                            onclick="return confirm('{{ _('Delete') }} {{ sub.name }}? {{ _('This cannot be undone.') }}')"><i
+                                                class="fas fa-trash me-2"></i>{{ _('Delete Subject') }}</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <p class="small text-muted mb-4 flex-grow-1">
+                            {{ sub.description | truncate(100) }}
+                        </p>
+
+                        <!-- Action Area -->
+                        <div class="mt-auto">
+                            <!-- Visibility Toggle (Form POST) -->
+                            <form method="POST" action="/subject/{{ sub.id }}/toggle_visibility" class="mb-3">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="small text-muted">
+                                        <i class="fas fa-globe me-1"></i>
+                                        {% if sub.is_public %}
+                                        <span class="text-success">{{ _('Public') }}</span>
+                                        {% else %}
+                                        <span class="text-danger">{{ _('Hidden') }}</span>
+                                        {% endif %}
+                                    </span>
+                                    <button type="submit"
+                                        class="btn btn-sm {% if sub.is_public %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                        {% if sub.is_public %}
+                                        <i class="fas fa-eye-slash me-1"></i>{{ _('Hide') }}
+                                        {% else %}
+                                        <i class="fas fa-eye me-1"></i>{{ _('Show') }}
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Primary Action -->
+                            <div class="d-grid mb-2">
+                                <a href="/subject/{{ sub.slug }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-folder-open me-2"></i>{{ _('Manage Content') }}
+                                </a>
+                            </div>
+
+                            <!-- Quick Shortcuts (Page vs Quiz) -->
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <a href="/teacher/builder/info?subject={{ sub.id }}"
+                                        class="btn btn-outline btn-sm w-100" title="{{ _('Add Study Page') }}">
+                                        <i class="fas fa-plus me-1"></i>{{ _('Page') }}
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="/teacher/builder/exam?subject={{ sub.id }}"
+                                        class="btn btn-outline btn-sm w-100" title="{{ _('Add Quiz Question') }}">
+                                        <i class="fas fa-plus me-1"></i>{{ _('Quiz') }}
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+
+        <!-- Empty State -->
+        <div class="alert alert-info text-center py-5 border-dashed">
+            <div class="display-4 text-info mb-3"><i class="fas fa-book-reader"></i></div>
+            <h4>{{ _('No Subjects Assigned') }}</h4>
+            <p class="small text-muted">{{ _('Please contact the Headmaster to have a subject assigned to your
+                account.') }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

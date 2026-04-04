@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Student Registration{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-primary border-opacity-25 rounded-4 bg-card">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <i class="fas fa-user-graduate text-primary display-4 mb-3"></i>
+                    <h2 class="fw-bold">{{ _('Student Registration') }}</h2>
+                    <p class="text-muted">{{ _('Create your account to access exams and study materials.') }}</p>
+                </div>
+
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    <div class="mb-3">
+                        {{ form.full_name.label(class="form-label fw-bold small text-uppercase text-muted") }}
+                        {{ form.full_name(class="form-control form-control-lg bg-transparent", placeholder="e.g. John
+                        Doe") }}
+                        {% for error in form.full_name.errors %}
+                        <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label fw-bold small text-uppercase text-muted") }}
+                        {{ form.email(class="form-control form-control-lg bg-transparent",
+                        placeholder="name@example.com") }}
+                        {% for error in form.email.errors %}
+                        <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label fw-bold small text-uppercase text-muted") }}
+                        {{ form.password(class="form-control form-control-lg bg-transparent",
+                        placeholder="Create a strong password") }}
+                        <div class="form-text small text-muted">
+                            {{ _('Min 8 chars, with uppercase, lowercase, number, and special character.') }}
+                        </div>
+                        {% for error in form.password.errors %}
+                        <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.confirm_password.label(class="form-label fw-bold small text-uppercase text-muted") }}
+                        {{ form.confirm_password(class="form-control form-control-lg bg-transparent",
+                        placeholder="Confirm your password") }}
+                        {% for error in form.confirm_password.errors %}
+                        <span class="text-danger small">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        {{ form.submit(class="btn btn-primary btn-lg shadow-sm") }}
+                    </div>
+                </form>
+
+                <div class="text-center mt-4">
+                    <p class="small text-muted">{{ _('Already have an account?') }} <a
+                            href="{{ url_for('auth.student_login') }}" class="text-decoration-none fw-bold">{{ _('Login
+                            here') }}</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

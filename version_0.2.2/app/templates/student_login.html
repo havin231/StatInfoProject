@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Student Portal{% endblock %}
+
+{% block content %}
+<!--
+    LAYOUT CONTAINER
+    Vertically and horizontally centered card.
+-->
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-md-6 col-lg-4">
+
+        <div class="card border-primary border-opacity-25 card-accent">
+            <div class="card-body p-4 p-md-5">
+
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <div class="h1 text-primary mb-3"><i class="fas fa-user-graduate"></i></div>
+                    <h2 class="h4 fw-bold">{{ _('Student Portal') }}</h2>
+                    <p class="text-muted small">{{ _('Enter your email and password to continue.') }}</p>
+                </div>
+
+                <!--
+                    CRITICAL FIX: action=""
+                    This tells the form to post back to the EXACT same URL,
+                    preserving any '?next=...' parameters for redirection.
+                -->
+                <form method="POST" action="">
+                    <!-- CSRF Token for Security -->
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                    <div class="mb-4">
+                        <label for="email" class="form-label small fw-bold text-muted">{{ _('Email Address')
+                            }}</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-transparent border-end-0"><i
+                                    class="fas fa-envelope text-muted"></i></span>
+                            <input type="email" name="email" id="email"
+                                class="form-control border-start-0 ps-0 bg-transparent text-body"
+                                placeholder="name@example.com" required autocomplete="email">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label small fw-bold text-muted">{{ _('Password')
+                            }}</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-transparent border-end-0"><i
+                                    class="fas fa-lock text-muted"></i></span>
+                            <input type="password" name="password" id="password"
+                                class="form-control border-start-0 ps-0 bg-transparent text-body"
+                                placeholder="Enter your password" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            {{ _('Enter Classroom') }} <i class="fas fa-sign-in-alt ms-2"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer Link -->
+            <div class="card-footer bg-transparent text-center py-3 border-top border-light border-opacity-10">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('auth.student_signup') }}" class="btn btn-outline-primary shadow-sm">
+                        <i class="fas fa-user-plus me-2"></i>{{ _('Register New Student') }}
+                    </a>
+                    <a href="/login" class="btn btn-outline-secondary btn-sm d-md-none">
+                        <i class="fas fa-chalkboard-user me-2"></i>{{ _('Login as Teacher') }}
+                    </a>
+                    <a href="/" class="small text-muted text-decoration-none">← {{ _('Return Home') }}</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

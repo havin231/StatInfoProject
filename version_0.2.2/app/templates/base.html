@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<!--
+    The <html> tag holds the state of the UI:
+    data-bs-theme: Controls Light/Dark mode (Bootstrap standard)
+    data-theme: Controls the specific visual style (Glass vs Cyber)
+-->
+<html lang="{{ get_locale().language }}" dir="{{ 'rtl' if get_locale().language == 'ku' else 'ltr' }}"
+    data-bs-theme="light" data-theme="glass">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _('StatInfoPRO') }} | {% block title %}{{ _('Welcome') }}{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='Logo/Dark_AcademicGlass.svg') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+
+    <!--
+        1. THEME LOADER SCRIPT
+        This runs immediately before the body loads to apply user preferences
+        from localStorage. This prevents the screen from flashing white
+        if the user prefers dark mode.
+    -->
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('app_theme') || 'glass';
+            const savedMode = localStorage.getItem('app_mode') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.documentElement.setAttribute('data-bs-theme', savedMode);
+        })();
+    </script>
+
+    <!-- 2. Bootstrap 5.3 CSS (CDN) -->
+    {% if get_locale().language == 'ku' %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css" rel="stylesheet">
+    {% else %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% endif %}
+
+    <!-- 3. FontAwesome Icons (CDN) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <!-- 4. Custom Design System (Modular CSS) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/variables.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/utilities.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tinymce.css') }}">
+
+    <!--
+        5. MATHJAX (LATEX SUPPORT)
+        Allows rendering of mathematical formulas.
+    -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+        </script>
+
+    <!--
+        6. RESPONSIVE MATH FIX
+        Ensures long equations scroll instead of breaking the layout.
+    -->
+    <style>
+        /* Force MathJax containers to scroll if they exceed screen width */
+        mjx-container {
+            max-width: 100% !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            white-space: nowrap;
+            /* Prevents awkward wrapping */
+        }
+
+        /* Ensure display math ($$ ... $$) centers and scrolls properly */
+        mjx-container[display="true"] {
+            display: block !important;
+            margin: 1em 0 !important;
+            text-align: center;
+        }
+
+        /* Hide scrollbar for cleaner look (optional, works on Chrome/Safari) */
+        mjx-container::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        mjx-container::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- ==========================================
+         NAVIGATION BAR
+         ========================================== -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <!-- Brand Logo -->
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img id="brandLogo" src="" alt="Logo" class="me-2" style="height: 1.25rem; width: auto;"
+                    data-light-cyber="{{ url_for('static', filename='Logo/Light_CyberCommand.svg') }}"
+                    data-light-glass="{{ url_for('static', filename='Logo/light_AcademicGlass.svg') }}"
+                    data-dark-cyber="{{ url_for('static', filename='Logo/Dark_CyberCommand.svg') }}"
+                    data-dark-glass="{{ url_for('static', filename='Logo/Dark_AcademicGlass.svg') }}">
+                <div class="ms-1" style="direction: ltr !important; display: inline-flex; align-items: center;">
+                    StatInfo<span>Project</span>
+                </div>
+            </a>
+
+            <!-- Mobile Theme Toggle & Language Toggle (Visible only on < lg) -->
+            <div class="d-flex d-lg-none mt-1">
+                <a href="{{ url_for('public.set_lang', lang='en' if get_locale().language == 'ku' else 'ku') }}"
+                    class="btn btn-link text-reset p-0 me-3" title="Toggle Language">
+                    <i class="fas fa-globe fa-lg"></i>
+                </a>
+                <button class="btn btn-link text-reset p-0 me-3" onclick="toggleMode()" title="Toggle Light/Dark">
+                    <i class="fas fa-moon fa-lg" id="mobileModeIcon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile 'About Us' Text Link (Visible only on < lg) -->
+            <!-- Mobile Menu Toggler Links -->
+            <div class="d-lg-none ms-auto me-3 d-flex gap-3">
+                <a href="/about" class="nav-link fw-bold text-decoration-none">{{ _('About Us') }}</a>
+            </div>
+
+            <!-- Mobile Menu Toggler (Hamburger) - HIDDEN for Instagram Style -->
+            <button class="navbar-toggler d-none" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Menu Links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center gap-2">
+
+                    <!-- Public Links -->
+                    <li class="nav-item"><a class="nav-link" href="/">{{ _('Home') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/toolbase">{{ _('Tools') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/about">{{ _('About Us') }}</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/public/stats">{{ _('Stats') }}</a></li>
+
+                    <!-- Language Switcher -->
+                    <li class="nav-item">
+                        <a href="{{ url_for('public.set_lang', lang='en' if get_locale().language == 'ku' else 'ku') }}"
+                            class="btn btn-sm btn-outline" title="{{ _('Toggle Language') }}">
+                            <i class="fas fa-globe"></i>
+                        </a>
+                    </li>
+
+                    <!-- Dark/Light Mode Toggle Button -->
+                    <li class="nav-item">
+                        <button class="btn btn-sm btn-outline" id="modeToggle" onclick="toggleMode()"
+                            title="Toggle Light/Dark">
+                            <i class="fas fa-moon" id="modeIcon"></i>
+                        </button>
+                    </li>
+
+                    <!-- Divider -->
+                    <div class="vr d-none d-lg-block mx-2 text-secondary"></div>
+
+                    <!-- Dynamic Auth Links -->
+                    {% if current_user.is_authenticated %}
+                    <!-- Logged in as Teacher/Admin -->
+                    <li class="nav-item"><a class="nav-link fw-bold" href="/teacher/dashboard">{{ _('Teacher Dash')
+                            }}</a></li>
+
+
+
+
+                    <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">{{ _('Logout') }}</a>
+                    </li>
+                    {% elif session.get('student_id') %}
+                    <!-- Logged in as Student -->
+                    <!-- Logged in as Student -->
+                    <li class="nav-item"><a class="nav-link fw-bold text-highlight" href="/student/dashboard">{{
+                            _('Student Dash') }}</a></li>
+
+                    <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">{{ _('Logout') }}</a>
+                    </li>
+                    {% else %}
+                    <!-- Guest -->
+                    <li class="nav-item"><a class="nav-link" href="/student/login">{{ _('Student') }}</a></li>
+                    <li class="nav-item"><a class="btn btn-primary px-4 btn-sm" href="/login">{{ _('Teacher') }}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ==========================================
+         FLASH MESSAGES (Notifications)
+         ========================================== -->
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'danger' else 'danger' }} alert-dismissible fade show shadow-sm"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- ==========================================
+         MAIN CONTENT BLOCK
+         ========================================== -->
+    <main class="container py-4 flex-grow-1 mb-5 mb-lg-0">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- NO FOOTER (As requested for cleaner UI) -->
+
+    <!-- ==========================================
+         SCRIPTS
+         ========================================== -->
+    <!-- Bootstrap Bundle (Includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- UI Interaction Logic -->
+    <script>
+        const htmlEl = document.documentElement;
+        const modeIcon = document.getElementById('modeIcon');
+
+        // Function: Toggle between Light and Dark mode
+        function toggleMode() {
+            const current = htmlEl.getAttribute('data-bs-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+
+            htmlEl.setAttribute('data-bs-theme', next);
+            localStorage.setItem('app_mode', next);
+            updateIcons();
+            updateLogo();
+        }
+
+        // Function: Set specific theme (Glass/Cyber) - Called from Dashboards
+        function setTheme(themeName) {
+            htmlEl.setAttribute('data-theme', themeName);
+            localStorage.setItem('app_theme', themeName);
+            updateLogo();
+        }
+
+        // Function: Update the Sun/Moon icon based on current mode
+        function updateIcons() {
+            const mode = htmlEl.getAttribute('data-bs-theme');
+            if (mode === 'light') {
+                modeIcon.classList.remove('fa-sun');
+                modeIcon.classList.add('fa-moon');
+                // Mobile Icon
+                const mobileIcon = document.getElementById('mobileModeIcon');
+                if (mobileIcon) {
+                    mobileIcon.classList.remove('fa-sun');
+                    mobileIcon.classList.add('fa-moon');
+                }
+            } else {
+                modeIcon.classList.remove('fa-moon');
+                modeIcon.classList.add('fa-sun');
+                // Mobile Icon
+                const mobileIcon = document.getElementById('mobileModeIcon');
+                if (mobileIcon) {
+                    mobileIcon.classList.remove('fa-moon');
+                    mobileIcon.classList.add('fa-sun');
+                }
+            }
+        }
+
+        // Function: Update the Brand Logo based on Theme & Mode
+        function updateLogo() {
+            const mode = htmlEl.getAttribute('data-bs-theme') || 'light';
+            const theme = htmlEl.getAttribute('data-theme') || 'glass';
+
+            // Construct data attribute key: data-{mode}-{theme}
+            // e.g. data-light-glass, data-dark-cyber
+            const key = `data-${mode}-${theme}`;
+
+            const brandLogo = document.getElementById('brandLogo');
+            if (brandLogo && brandLogo.hasAttribute(key)) {
+                brandLogo.src = brandLogo.getAttribute(key);
+            }
+        }
+
+        // Initialize icons and logo on load
+        updateIcons();
+        updateLogo();
+    </script>
+    <!--
+         MOBILE BOTTOM NAVIGATION (Instagram Style)
+         Visible only on screens < lg (d-lg-none)
+         Using 'navbar' class to inherit theme background/blur
+    -->
+    <nav class="navbar fixed-bottom border-top d-lg-none d-flex justify-content-around py-3 shadow-lg"
+        style="padding-bottom: env(safe-area-inset-bottom); background-color: var(--bg-card) !important; backdrop-filter: blur(var(--backdrop-blur));">
+        <!-- Home -->
+        <a href="/" class="text-reset text-decoration-none text-center flex-grow-1">
+            <i
+                class="fa-solid fa-house fa-2x {{ 'text-highlight' if request.endpoint == 'main.index' else 'text-muted' }}"></i>
+        </a>
+
+        <!-- Stats -->
+        <a href="/public/stats" class="text-reset text-decoration-none text-center flex-grow-1">
+            <i
+                class="fa-solid fa-chart-simple fa-2x {{ 'text-highlight' if 'stats' in request.endpoint else 'text-muted' }}"></i>
+        </a>
+
+        <!-- Tools (Mobile) - Visible if logged in -->
+        <!-- Tools (Mobile) - Public -->
+        <a href="/toolbase" class="text-reset text-decoration-none text-center flex-grow-1">
+            <i
+                class="fa-solid fa-toolbox fa-2x {{ 'text-highlight' if 'toolbase' in request.endpoint else 'text-muted' }}"></i>
+        </a>
+
+        <!-- Profile / Login -->
+        {% if current_user.is_authenticated %}
+        <!-- Logged in as Teacher -->
+        <a href="/teacher/dashboard" class="text-reset text-decoration-none text-center flex-grow-1">
+            <i
+                class="fa-solid fa-user-tie fa-2x {{ 'text-highlight' if 'teacher' in request.endpoint else 'text-muted' }}"></i>
+        </a>
+        {% elif session.get('student_id') %}
+        <!-- Logged in as Student -->
+        <a href="/student/dashboard" class="text-reset text-decoration-none text-center flex-grow-1">
+            <i
+                class="fa-solid fa-user-graduate fa-2x {{ 'text-highlight' if 'student' in request.endpoint else 'text-muted' }}"></i>
+        </a>
+        {% else %}
+        <!-- Guest -> Login -->
+        <a href="/student/login" class="text-reset text-decoration-none text-center flex-grow-1">
+            <i
+                class="fa-solid fa-right-to-bracket fa-2x {{ 'text-highlight' if 'login' in request.endpoint else 'text-muted' }}"></i>
+        </a>
+        {% endif %}
+    </nav>
+
+</body>
+
+</html>

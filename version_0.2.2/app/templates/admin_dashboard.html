@@ -1,0 +1,373 @@
+{% extends "base.html" %}
+
+{% block title %}Headquarters{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+    <!--
+        LEFT SIDEBAR: Admin Tools & Settings
+        Hidden during printing to save ink and focus on the roster.
+    -->
+    <div class="col-lg-3 order-lg-last d-print-none">
+
+        <!-- MOBILE ONLY: Logout Button -->
+        <div class="d-lg-none mb-3 d-grid">
+            <a href="/logout" class="btn btn-outline-danger shadow-sm">
+                <i class="fas fa-sign-out-alt me-2"></i>{{ _('Logout') }}
+            </a>
+        </div>
+
+        <!-- GLOBAL ACTIONS CARD -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-transparent fw-bold text-muted text-uppercase small border-bottom-0">
+                {{ _('System Management') }}
+            </div>
+            <div class="card-body d-grid gap-2">
+                <a href="/admin/students" class="btn btn-primary">
+                    <i class="fas fa-user-graduate me-2"></i>{{ _('Manage Students') }}
+                </a>
+                <a href="/teacher/analytics" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-line me-2"></i>{{ _('Global Analytics') }}
+                </a>
+                <a href="/admin/system/commands" class="btn btn-outline-body btn-sm">
+                    <i class="fas fa-terminal me-2"></i>{{ _('System Commands') }}
+                </a>
+                <a href="/toolbase" class="btn btn-outline-body btn-sm">
+                    <i class="fas fa-toolbox me-2"></i>{{ _('Tool Base') }}
+                </a>
+                <a href="/admin/edit/about" class="btn btn-outline-body btn-sm">
+                    <i class="fas fa-globe me-2"></i>{{ _('Edit "About Us"') }}
+                </a>
+
+                <hr class="text-muted opacity-25 my-2">
+
+                <!-- FULL BACKUP BUTTON -->
+                <a href="{{ url_for('analytics.export_full_backup') }}" class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-file-archive me-2"></i>{{ _('Download Full Backup (.zip)') }}
+                </a>
+
+                <hr class="text-muted opacity-25 my-2">
+
+                <!-- RESTORE CENTER BUTTON -->
+                <a href="/admin/system/restore" class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-biohazard me-2"></i>{{ _('Restore System') }}
+                </a>
+            </div>
+        </div>
+
+        <!-- CREATE SUBJECT FORM -->
+        <div class="card mb-4 card-accent shadow-sm">
+            <div class="card-body">
+                <h6 class="fw-bold small text-uppercase mb-3"><i class="fas fa-book me-2 text-highlight"></i>{{
+                    _('Create New Subject') }}</h6>
+                <form method="POST" action="/teacher/add_subject">
+                    {{ subject_form.hidden_tag() }}
+
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">{{ _('Subject Name') }}</label>
+                        {{ subject_form.name(class="form-control form-control-sm", placeholder="e.g., Economics 101") }}
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">{{ _('URL Slug') }}</label>
+                        {{ subject_form.slug(class="form-control form-control-sm font-monospace", placeholder="e.g.,
+                        econ-101") }}
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">{{ _('Assign Teacher') }}</label>
+                        {{ subject_form.teacher_id(class="form-select form-select-sm") }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Description') }}</label>
+                        {{ subject_form.description(class="form-control form-control-sm", rows="2", placeholder="Brief
+                        summary of the subject...") }}
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-lime btn-sm w-100">{{ _('Initialize Subject') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- THEME SETTINGS -->
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Interface Theme') }}</h6>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline btn-sm text-start" onclick="setTheme('glass')">
+                        <i class="fas fa-circle text-info me-2"></i>{{ _('Academic Glass') }}
+                    </button>
+                    <button class="btn btn-outline btn-sm text-start" onclick="setTheme('cyber')">
+                        <i class="fas fa-square text-success me-2"></i>{{ _('Cyber Command') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--
+        CENTER: Staff Management
+        This section expands to full width when printing.
+    -->
+    <div class="col-lg-9">
+
+        <!-- GLOBAL SUBJECT MANAGEMENT -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">{{ _('Global Subject Control') }}</h1>
+        </div>
+
+        <div class="row g-4 mb-5">
+            {% for sub in subjects %}
+            <div class="col-md-6 col-xl-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title text-truncate mb-0" title="{{ sub.name }}">{{ sub.name }}</h5>
+                            <span class="badge bg-light text-dark border">{{ sub.teacher.username }}</span>
+                        </div>
+                        <p class="small text-muted flex-grow-1">{{ sub.description | truncate(60) }}</p>
+
+                        <div class="mt-auto pt-3 border-top">
+                            <!-- Visibility Toggle (Form POST) -->
+                            <form method="POST" action="/subject/{{ sub.id }}/toggle_visibility" class="mb-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="small">
+                                        <i class="fas fa-globe me-1 text-muted"></i>
+                                        {% if sub.is_public %}
+                                        <span class="text-success">{{ _('Public') }}</span>
+                                        {% else %}
+                                        <span class="text-danger">{{ _('Hidden') }}</span>
+                                        {% endif %}
+                                    </span>
+                                    <button type="submit"
+                                        class="btn btn-sm {% if sub.is_public %}btn-outline-warning{% else %}btn-outline-success{% endif %}">
+                                        {% if sub.is_public %}
+                                        <i class="fas fa-eye-slash me-1"></i>{{ _('Hide') }}
+                                        {% else %}
+                                        <i class="fas fa-eye me-1"></i>{{ _('Show') }}
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="d-grid mt-2">
+                                <a href="/subject/{{ sub.slug }}" class="btn btn-sm btn-outline-primary mb-2">{{ _('Open')
+                                    }}</a>
+                                <!-- Transfer Subject Form (Admin Only) -->
+                                <form method="POST" action="/teacher/edit/subject/{{ sub.id }}" class="d-flex gap-2">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <input type="hidden" name="name" value="{{ sub.name }}">
+                                    <input type="hidden" name="slug" value="{{ sub.slug }}">
+                                    <input type="hidden" name="description" value="{{ sub.description }}">
+                                    <select name="teacher_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        {% for teacher in teachers %}
+                                        <option value="{{ teacher.id }}" {% if teacher.id == sub.teacher_id %}selected{% endif %}>
+                                            {{ teacher.username }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">{{ _('Admin Headquarters') }}</h1>
+            <!-- Print Button (Hidden on mobile and print) -->
+            <button class="btn btn-sm btn-outline-secondary d-none d-md-inline-block d-print-none"
+                onclick="window.print()">
+                <i class="fas fa-print me-2"></i>{{ _('Print Staff Roster') }}
+            </button>
+        </div>
+
+        <!-- TEACHER LIST TABLE -->
+        <div class="card mb-4 shadow-sm">
+            <div
+                class="card-header bg-transparent fw-bold d-flex justify-content-between align-items-center border-bottom-0 py-3">
+                <span><i class="fas fa-chalkboard-teacher me-2 text-highlight"></i>{{ _('Teaching Staff') }}</span>
+            </div>
+
+            <div class="table-responsive border-0">
+                <table class="table align-middle mb-0">
+                    <thead class="bg-body-secondary">
+                        <tr>
+                            <th class="ps-3">{{ _('Name') }}</th>
+                            <th class="d-none d-sm-table-cell">{{ _('Email') }}</th>
+                            <th>{{ _('Subjects Assigned') }}</th>
+
+                            <!-- PRINT ONLY HEADER: For writing passwords manually -->
+                            <th class="d-none d-print-table-cell" style="width: 150px;">{{ _('Manual Password') }}</th>
+
+                            <!-- SCREEN ONLY HEADER: Edit buttons -->
+                            <th class="text-end pe-3 d-print-none">{{ _('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for t in teachers %}
+                        <tr>
+                            <td class="ps-3">
+                                <div class="fw-bold">{{ t.username }}</div>
+                                <!-- Admin Badge Indicator -->
+                                {% if t.is_admin %}
+                                <span class="badge bg-warning border border-warning-subtle"
+                                    style="font-size: 0.65rem;">ADMIN</span>
+                                {% endif %}
+                            </td>
+                            <td class="d-none d-sm-table-cell small text-muted">{{ t.email }}</td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    {% for sub in t.subjects %}
+                                    <span class="badge bg-body-secondary text-body border fw-normal">{{ sub.name
+                                        }}</span>
+                                    {% else %}
+                                    <span class="small text-muted fst-italic">{{ _('None') }}</span>
+                                    {% endfor %}
+                                </div>
+                            </td>
+
+                            <!-- PRINT ONLY CELL: A blank line for writing -->
+                            <td class="d-none d-print-table-cell">
+                                <div style="border-bottom: 1px solid #000; height: 30px; width: 100%;"></div>
+                            </td>
+
+                            <!-- SCREEN ONLY ACTIONS -->
+                            <td class="text-end pe-3 d-print-none">
+                                <div class="btn-group shadow-sm">
+                                    <a href="/admin/edit/teacher/{{ t.id }}"
+                                        class="btn btn-sm btn-outline-secondary border" title="{{ _('Edit Profile') }}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="/admin/view_teacher/{{ t.id }}"
+                                        class="btn btn-sm btn-outline-primary border"
+                                        title="{{ _('View Dashboard As...') }}">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="/admin/delete/teacher/{{ t.id }}"
+                                        class="btn btn-sm btn-outline-danger border"
+                                        onclick="return confirm('{{ _('Delete') }} {{ t.username }}? {{ _('This removes all their subjects and questions!') }}')"
+                                        title="{{ _('Delete Account') }}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">{{ _('No staff members found. Use the
+                                form below to add the first teacher.') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- QUICK ADD TEACHER FORM (Screen Only) -->
+        <div class="card d-print-none shadow-sm">
+            <div class="card-body bg-body-tertiary">
+                <h6 class="fw-bold small mb-3">{{ _('Quick Register Staff') }}</h6>
+                <form method="POST" action="/admin/add_teacher">
+                    {{ teacher_form.hidden_tag() }}
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            {{ teacher_form.username(class="form-control form-control-sm", placeholder="Full Name") }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ teacher_form.email(class="form-control form-control-sm", placeholder="Email") }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ teacher_form.password(class="form-control form-control-sm", placeholder="Password") }}
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-check form-switch mb-2 small">
+                                {{ teacher_form.is_admin(class="form-check-input", role="switch") }}
+                                <label class="form-check-label" for="is_admin">{{ _('Admin?') }}</label>
+                            </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <label class="form-label small fw-bold text-muted">{{ _('Welcome Email Message (Optional)') }}</label>
+                            <textarea name="email_message" class="form-control form-control-sm" rows="3" placeholder="{{ _('Enter custom welcome message for the new teacher. Available variables: {{name}}, {{email}}, {{password}}, {{role}}') }}"></textarea>
+                            <div class="form-text small text-muted">
+                                {{ _('Leave blank to use default welcome email template.') }}
+                            </div>
+                        </div>
+                        <div class="col-12 mt-3">
+                            <div class="d-grid">
+                                {{ teacher_form.submit(class="btn btn-lime btn-sm w-100") }}
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--
+    PRINT MEDIA QUERIES
+    These styles activate only when the user presses CTRL+P or clicks the Print button.
+-->
+<style>
+    @media print {
+
+        /* Hide UI elements not needed on paper */
+        .navbar,
+        .alert,
+        footer,
+        .d-print-none {
+            display: none !important;
+        }
+
+        /* Expand content to full width */
+        .container,
+        .row,
+        .col-lg-9 {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
+        }
+
+        /* Flatten cards for print */
+        .card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .card-header {
+            display: none !important;
+        }
+
+        /* Add borders to table for readability */
+        table {
+            width: 100% !important;
+            border: 1px solid #000 !important;
+            border-collapse: collapse !important;
+        }
+
+        th,
+        td {
+            border: 1px solid #000 !important;
+            padding: 10px !important;
+            color: black !important;
+        }
+
+        /* Ensure badges print visibly */
+        .badge {
+            border: 1px solid #000 !important;
+            color: #000 !important;
+        }
+
+        /* Reveal the manual password column */
+        .d-print-table-cell {
+            display: table-cell !important;
+        }
+    }
+</style>
+{% endblock %}

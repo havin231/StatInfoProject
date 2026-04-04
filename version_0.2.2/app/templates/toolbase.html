@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Tool Base{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center">
+                <div class="icon-square bg-primary text-white rounded-3 me-3 d-flex align-items-center justify-content-center"
+                    style="width: 48px; height: 48px;">
+                    <i class="fas fa-toolbox fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-0 fw-bold">{{ _('Tool Base') }}</h1>
+                    <p class="text-muted mb-0 small">{{ _('External Links & Tools') }}</p>
+                </div>
+            </div>
+            {% if is_admin %}
+            <a href="/teacher/dashboard" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>{{ _('Dashboard') }}
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- NEW TOOL FORM -->
+        {% if is_admin %}
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted">
+                {{ _('Add New Tool') }}
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Tool Name') }}</label>
+                        {{ form.title(class="form-control", placeholder="e.g. Google Drive") }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('URL / Link') }}</label>
+                        {{ form.link(class="form-control", placeholder="https://...") }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Description (Optional)') }}</label>
+                        {{ form.description(class="form-control", rows="3", placeholder="Brief description...") }}
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>{{ _('Add to Library') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- BULK IMPORT SECTION (Admin Only) -->
+        {% if is_admin %}
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted cursor-pointer"
+                data-bs-toggle="collapse" data-bs-target="#bulkImportCancel" aria-expanded="false"
+                style="cursor: pointer;">
+                <i class="fas fa-file-csv me-2"></i>{{ _('Bulk Import Tools') }}
+            </div>
+            <div class="collapse" id="bulkImportCancel">
+                <div class="card-body">
+                    <div class="alert alert-info py-2 small">
+                        <i class="fas fa-info-circle me-1"></i> {{ _('Upload a CSV or Excel file with columns:') }}
+                        <strong>{{ _('Name, Link, Description') }}</strong>.
+                    </div>
+                    <form method="POST" enctype="multipart/form-data">
+                        {{ import_form.hidden_tag() }}
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-9">
+                                {{ import_form.file(class="form-control") }}
+                            </div>
+                            <div class="col-md-3">
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="fas fa-upload me-2"></i>{{ _('Import') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- TOOLS LIST -->
+        <div class="card shadow-sm border-0">
+            <div
+                class="card-header bg-transparent border-bottom-0 fw-bold pt-3 pb-0 text-uppercase small text-muted d-flex justify-content-between align-items-center">
+                <span>{{ _('Existing Tools') }}</span>
+                {% if is_admin and tools %}
+                <form action="{{ url_for('tools.delete_all_tools') }}" method="POST"
+                    onsubmit="return confirm('{{ _('WARNING: Are you sure you want to delete ALL tools? This cannot be undone.') }}');">
+                    {{ form.hidden_tag() }}
+                    <button type="submit" class="btn btn-sm btn-link text-danger text-decoration-none p-0"
+                        style="font-size: 0.75rem;">
+                        <i class="fas fa-trash-alt me-1"></i>{{ _('Delete All') }}
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+            <div class="list-group list-group-flush pt-2">
+                {% for tool in tools %}
+                <div class="list-group-item p-3 d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3 text-secondary">
+                            <a href="{{ tool.link }}" target="_blank" class="btn btn-light rounded-circle"
+                                title="Go to Link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                        <div style="min-width: 0;">
+                            <h6 class="fw-bold mb-0 text-highlight text-break">
+                                <a href="{{ tool.link }}" target="_blank" class="text-decoration-none text-reset">
+                                    {{ tool.title }}
+                                </a>
+                            </h6>
+                            {% if tool.description %}
+                            <div class="text-muted small mt-1 text-break">{{ tool.description }}</div>
+                            {% endif %}
+                            <small class="text-muted d-block mt-1 font-monospace text-break"
+                                style="font-size: 0.75rem;">
+                                {{ tool.link }}
+                            </small>
+                        </div>
+                    </div>
+                    <div>
+                        <div>
+                            {% if is_admin %}
+                            <form action="{{ url_for('tools.delete_tool', tool_id=tool.id) }}" method="POST"
+                                onsubmit="return confirm('{{ _('Delete this tool?') }}');">
+                                {{ form.hidden_tag() }} <!-- reusing form token for csrf -->
+                                <button type="submit" class="btn btn-sm btn-outline-danger border-0"
+                                    title="Delete Tool">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="list-group-item p-4 text-center text-muted">
+                    {{ _('No tools added yet.') }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

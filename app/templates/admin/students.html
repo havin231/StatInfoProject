@@ -58,10 +58,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase">{{ _('Access Code') }}</label>
-                        {{ form.access_code(class="form-control font-monospace fw-bold", style="letter-spacing: 1px;")
+                        <label class="form-label small fw-bold text-muted text-uppercase">{{ _('Password') }}</label>
+                        {{ form.password(class="form-control font-monospace fw-bold", style="letter-spacing: 1px;", placeholder="Auto-generated password")
                         }}
-                        <div class="form-text small">{{ _('Auto-generated secure token.') }}</div>
+                        <div class="form-text small">{{ _('Auto-generated secure password.') }}</div>
                     </div>
 
 
@@ -110,7 +110,7 @@
                         <tr>
                             <th class="ps-4">{{ _('Full Name') }}</th>
                             <th>{{ _('Email') }}</th>
-                            <th>{{ _('Access Code') }}</th>
+                            <th>{{ _('Password') }}</th>
                             <th class="d-print-none text-end pe-4">{{ _('Manage') }}</th>
                         </tr>
                     </thead>
@@ -130,8 +130,11 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <code
-                                    class="text-primary fw-bold bg-primary bg-opacity-10 px-2 py-1 rounded border border-primary border-opacity-25">{{ s.access_code }}</code>
+                                {% if s.password_hash %}
+                                <span class="badge bg-success text-success-emphasis border border-success">{{ _('Has Password') }}</span>
+                                {% else %}
+                                <span class="badge bg-warning text-warning-emphasis border border-warning">{{ _('No Password') }}</span>
+                                {% endif %}
                             </td>
 
                             <td class="d-print-none text-end pe-4">

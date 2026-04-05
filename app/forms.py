@@ -58,7 +58,7 @@ class StudentForm(FlaskForm):
     """
     full_name = StringField(_l('Full Name'), validators=[DataRequired()])
     email = StringField(_l('Email Address'), validators=[Optional(), Email()])
-    access_code = StringField(_l('Access Code (Unique)'), validators=[DataRequired()])
+    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
     submit = SubmitField(_l('Add Student'))
 
 class StudentSignupForm(FlaskForm):

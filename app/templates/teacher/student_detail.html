@@ -5,20 +5,19 @@
 {% block content %}
 <!-- 
     HEADER 
-    Displays student name, group, and access code.
+    Displays student name.
     Now includes the new Export button.
 -->
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
     <div>
-        <h1 class="h3 mb-1">{{ student.full_name }}</h1>
-        <p class="text-muted small mb-0">
-            {{ _('Access Code:') }} <span class="font-monospace text-body">{{ student.access_code }}</span>
-        </p>
+        <h1 class="h3 mb-1">{{ display_name }}</h1>
     </div>
     <div class="d-flex gap-2">
+        {% if current_user.is_admin %}
         <a href="/teacher/export/student/answers/{{ student.id }}" class="btn btn-success btn-sm">
             <i class="fas fa-file-csv me-2"></i>{{ _('Export Detailed Log') }}
         </a>
+        {% endif %}
         <a href="/teacher/analytics" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Analytics') }}
         </a>

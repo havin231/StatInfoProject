@@ -125,6 +125,12 @@ def student_detail_view(student_id):
     """Detailed view for staff to see a student's answer grouped by attempt."""
     target_student = Student.query.get_or_404(student_id)
 
+    # Anonymize name for teachers (only admins see real names)
+    if current_user.is_admin:
+        display_name = target_student.full_name
+    else:
+        display_name = f"Student #{target_student.id}"
+
     attempt_query = ExamResult.query.filter_by(student_id=target_student.id)
     if not current_user.is_admin:
         teacher_subj_ids = [subj_obj.id for subj_obj in current_user.subjects]
@@ -151,6 +157,7 @@ def student_detail_view(student_id):
     return render_template(
         'teacher/student_detail.html',
         student=target_student,
+        display_name=display_name,
         history=final_grouped_history
     )
 

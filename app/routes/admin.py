@@ -4,7 +4,7 @@ from flask_login import login_required, current_user
 
 import pandas as pd
 
-from app import db
+from app import db, bcrypt
 from app.models import Student, ExamResult, StudentAnswer, SystemCommand
 from app.forms import StudentForm, StudentEditForm, BulkImportForm, CommandForm
 from app.routes.helpers import generate_access_code
@@ -32,21 +32,24 @@ def admin_students():
     form_manual = StudentForm()
     form_batch = BulkImportForm()
 
-    # Pre-generate a code to show in the UI placeholder
+    # Pre-generate a password to show in the UI placeholder
     if request.method == 'GET':
-        form_manual.access_code.data = generate_access_code()
+        import secrets
+        random_password = secrets.token_urlsafe(8)
+        form_manual.password.data = random_password
 
     # Manual Registration Logic
     if form_manual.validate_on_submit():
-        # Uniqueness Check
-        if Student.query.filter_by(access_code=form_manual.access_code.data).first():
-            flash(_('Error: This Access Code is already in use.'), 'danger')
-        elif form_manual.email.data and Student.query.filter_by(email=form_manual.email.data).first():
+        # Check email uniqueness
+        if form_manual.email.data and Student.query.filter_by(email=form_manual.email.data).first():
             flash(_('Error: This Email is already in use.'), 'danger')
         else:
+            # Hash the password
+            password_hash = bcrypt.generate_password_hash(form_manual.password.data).decode('utf-8')
+            
             new_student = Student(
                 full_name=form_manual.full_name.data,
-                access_code=form_manual.access_code.data,
+                password_hash=password_hash,
                 email=form_manual.email.data
             )
             db.session.add(new_student)

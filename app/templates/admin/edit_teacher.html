@@ -32,7 +32,7 @@
                         {{ form.password(class="form-control", placeholder="Leave empty to keep current password") }}
                     </div>
 
-                    <!-- 
+                    <!--
                         ADMIN PRIVILEGES
                         A Bootstrap switch for a clear On/Off state.
                         Placed in a warning box to prevent accidental promotions.
@@ -48,6 +48,20 @@
                             <i class="fas fa-exclamation-triangle me-1"></i>
                             <strong>{{ _('Warning:') }}</strong> {{ _('Admins have full control, including deleting
                             users and content.') }}
+                        </div>
+                    </div>
+
+                    <!-- Show Name on Subject Pages -->
+                    <div class="mb-4 p-3 bg-info-subtle border border-info rounded">
+                        <div class="form-check form-switch">
+                            {{ form.show_name_on_subject(class="form-check-input", role="switch") }}
+                            <label class="form-check-label fw-bold text-info-emphasis" for="show_name_on_subject">
+                                {{ _('Show Name on Subject Pages') }}
+                            </label>
+                        </div>
+                        <div class="small text-muted mt-2">
+                            <i class="fas fa-eye me-1"></i>
+                            {{ _('Display your name publicly on subject pages students view.') }}
                         </div>
                     </div>
 

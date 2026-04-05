@@ -18,8 +18,9 @@
                         {{ form.full_name(class="form-control") }}
                     </div>
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted opacity-75">{{ _('Access Code') }}</label>
-                        {{ form.access_code(class="form-control font-monospace") }}
+                        <label class="form-label small fw-bold text-muted opacity-75">{{ _('Password') }}</label>
+                        {{ form.password(class="form-control font-monospace", placeholder="Leave empty to keep current") }}
+                        <div class="form-text small">{{ _('Enter new password to reset (min 6 characters).') }}</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-muted opacity-75">{{ _('Email Address') }}</label>

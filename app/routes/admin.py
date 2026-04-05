@@ -85,13 +85,6 @@ def edit_student(student_id):
     form = StudentEditForm(obj=student_record)
 
     if form.validate_on_submit():
-        # Check if the code was changed and if the new one is taken
-        if student_record.access_code != form.access_code.data:
-            code_check = Student.query.filter_by(access_code=form.access_code.data).first()
-            if code_check:
-                flash(_('Critical Error: The new access code is already assigned to someone else.'), 'danger')
-                return render_template('admin/edit_student.html', form=form, student=student_record)
-
         # Check if email was changed and uniqueness
         if form.email.data and student_record.email != form.email.data:
             email_check = Student.query.filter_by(email=form.email.data).first()
@@ -102,7 +95,12 @@ def edit_student(student_id):
         # Update Record
         student_record.full_name = form.full_name.data
         student_record.email = form.email.data
-        student_record.access_code = form.access_code.data
+        
+        # Update password if provided
+        if form.password.data:
+            from app import bcrypt
+            student_record.password_hash = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+            flash(_('Password has been updated.'), 'success')
 
         try:
             db.session.commit()

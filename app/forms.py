@@ -83,11 +83,11 @@ class StudentSettingsForm(FlaskForm):
 
 class StudentEditForm(FlaskForm):
     """
-    Form for editing existing student details (Task 1).
+    Form for editing existing student details.
     """
     full_name = StringField(_l('Full Name'), validators=[DataRequired()])
     email = StringField(_l('Email Address'), validators=[Optional(), Email()])
-    access_code = StringField(_l('Access Code'), validators=[DataRequired()])
+    password = PasswordField(_l('Password'), validators=[Optional(), Length(min=6)])
     submit = SubmitField(_l('Update Student Details'))
 
 # ==========================================

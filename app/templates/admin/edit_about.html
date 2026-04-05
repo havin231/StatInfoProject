@@ -35,36 +35,18 @@
                         {{ form.title(class="form-control form-control-lg") }}
                     </div>
 
-                    <!-- Bilingual Content Tabs -->
-                    <ul class="nav nav-tabs mb-3" id="contentTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="en-tab" data-bs-toggle="tab" data-bs-target="#en-content"
-                                type="button" role="tab" aria-controls="en-content" aria-selected="true">
-                                <i class="fas fa-globe me-2"></i>{{ _('English') }}
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="ku-tab" data-bs-toggle="tab" data-bs-target="#ku-content"
-                                type="button" role="tab" aria-controls="ku-content" aria-selected="false">
-                                <i class="fas fa-language me-2"></i>{{ _('Kurdish') }}
-                            </button>
-                        </li>
-                    </ul>
+                    <!-- Content Editor (English) -->
+                    <div class="mb-4">
+                        {{ form.content.label(class="form-label fw-bold text-muted small text-uppercase") }}
+                        {{ form.content(class="form-control", rows="10") }}
+                    </div>
 
-                    <div class="tab-content" id="contentTabsContent">
-                        <!-- English Content -->
-                        <div class="tab-pane fade show active" id="en-content" role="tabpanel" aria-labelledby="en-tab">
-                            <div class="mb-4">
-                                {{ form.content.label(class="form-label fw-bold text-muted small text-uppercase") }}
-                                {{ form.content(class="form-control", rows="10", id="content-en") }}
-                            </div>
-                        </div>
-                        <!-- Kurdish Content -->
-                        <div class="tab-pane fade" id="ku-content" role="tabpanel" aria-labelledby="ku-tab">
-                            <div class="mb-4">
-                                {{ form.content_ku.label(class="form-label fw-bold text-muted small text-uppercase") }}
-                                {{ form.content_ku(class="form-control", rows="10", id="content-ku", style="direction: rtl;") }}
-                            </div>
+                    <!-- Content Editor (Kurdish) -->
+                    <div class="mb-4">
+                        {{ form.content_kurdish.label(class="form-label fw-bold text-muted small text-uppercase") }}
+                        {{ form.content_kurdish(class="form-control", rows="10") }}
+                        <div class="form-text small text-muted">
+                            <i class="fas fa-info-circle me-1"></i>{{ _('Leave empty if Kurdish translation is not available.') }}
                         </div>
                     </div>
 
@@ -83,48 +65,11 @@
 <script>
     // --- TINYMCE INITIALIZATION ---
     document.addEventListener("DOMContentLoaded", function () {
-        // Initialize English editor
+        // English content editor
         tinymce.init({
-            selector: '#content-en',
-            height: 500,
+            selector: '#content',
+            height: 400,
             directionality: 'ltr',
-            plugins: 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount',
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table image link | charmap emoticons pagebreak | searchreplace fullscreen preview wordcount',
-            browser_spellcheck: true,
-            contextmenu: 'link image table',
-            menubar: 'file edit view insert format tools table help',
-            toolbar_mode: 'sliding',
-            image_advtab: true,
-            paste_data_images: true,
-            promotion: false,
-            valid_elements: '*[*]',
-            extended_valid_elements: 'script[src|async|defer|type|charset]',
-            content_style: `
-                body {
-                    max-width: 21cm;
-                    min-height: 29.7cm;
-                    margin: 1cm auto;
-                    padding: 2cm;
-                    background: white;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                    font-family: Arial, sans-serif;
-                    font-size: 16px;
-                    box-sizing: border-box;
-                }
-                html {
-                    background: #f0f2f5; 
-                }
-            `,
-            paste_preprocess: function (plugin, args) {
-                args.content = args.content.replace(/<o:p>.*?<\/o:p>/g, '');
-            }
-        });
-
-        // Initialize Kurdish editor (RTL)
-        tinymce.init({
-            selector: '#content-ku',
-            height: 500,
-            directionality: 'rtl',
             plugins: 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount',
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | table image link | charmap emoticons pagebreak | searchreplace fullscreen preview wordcount ltr rtl',
             browser_spellcheck: true,
@@ -136,24 +81,27 @@
             promotion: false,
             valid_elements: '*[*]',
             extended_valid_elements: 'script[src|async|defer|type|charset]',
-            content_style: `
-                body {
-                    max-width: 21cm;
-                    min-height: 29.7cm;
-                    margin: 1cm auto;
-                    padding: 2cm;
-                    background: white;
-                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                    font-family: Arial, sans-serif;
-                    font-size: 16px;
-                    box-sizing: border-box;
-                    direction: rtl;
-                    text-align: right;
-                }
-                html {
-                    background: #f0f2f5; 
-                }
-            `,
+            paste_preprocess: function (plugin, args) {
+                args.content = args.content.replace(/<o:p>.*?<\/o:p>/g, '');
+            }
+        });
+
+        // Kurdish content editor (RTL)
+        tinymce.init({
+            selector: '#content_kurdish',
+            height: 400,
+            directionality: 'rtl',
+            plugins: 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | forecolor backcolor | alignright aligncenter alignleft alignjustify | bullist numlist outdent indent | table image link | charmap emoticons pagebreak | searchreplace fullscreen preview wordcount ltr rtl',
+            browser_spellcheck: true,
+            contextmenu: 'link image table',
+            menubar: 'file edit view insert format tools table help',
+            toolbar_mode: 'sliding',
+            image_advtab: true,
+            paste_data_images: true,
+            promotion: false,
+            valid_elements: '*[*]',
+            extended_valid_elements: 'script[src|async|defer|type|charset]',
             paste_preprocess: function (plugin, args) {
                 args.content = args.content.replace(/<o:p>.*?<\/o:p>/g, '');
             }

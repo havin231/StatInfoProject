@@ -58,21 +58,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase">{{ _('Email Address') }}</label>
-                        {{ form.email(class="form-control", placeholder="name@example.com") }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase">{{ _('Password') }}</label>
-                        {{ form.password(class="form-control", placeholder="Create a password") }}
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-muted text-uppercase">{{ _('Welcome Email Message (Optional)') }}</label>
-                        <textarea name="welcome_message" class="form-control form-control-sm" rows="3" placeholder="{{ _('Enter custom welcome message. Available variables: {{name}}, {{email}}, {{password}}') }}"></textarea>
-                        <div class="form-text small text-muted">
-                            {{ _('Leave blank to use default welcome email template.') }}
-                        </div>
+                        <label class="form-label small fw-bold text-muted text-uppercase">{{ _('Access Code') }}</label>
+                        {{ form.access_code(class="form-control font-monospace fw-bold", style="letter-spacing: 1px;")
+                        }}
+                        <div class="form-text small">{{ _('Auto-generated secure token.') }}</div>
                     </div>
 
 
@@ -121,6 +110,7 @@
                         <tr>
                             <th class="ps-4">{{ _('Full Name') }}</th>
                             <th>{{ _('Email') }}</th>
+                            <th>{{ _('Access Code') }}</th>
                             <th class="d-print-none text-end pe-4">{{ _('Manage') }}</th>
                         </tr>
                     </thead>
@@ -138,6 +128,10 @@
                                 <span class="badge bg-warning text-warning-emphasis border border-warning">{{
                                     _('Missing') }}</span>
                                 {% endif %}
+                            </td>
+                            <td>
+                                <code
+                                    class="text-primary fw-bold bg-primary bg-opacity-10 px-2 py-1 rounded border border-primary border-opacity-25">{{ s.access_code }}</code>
                             </td>
 
                             <td class="d-print-none text-end pe-4">
@@ -189,7 +183,8 @@
 
                     <div class="alert alert-info small mb-4">
                         <i class="fas fa-info-circle me-2"></i><strong>{{ _('Format Requirement:') }}</strong><br>
-                        {{ _('File must have columns:') }} <strong>"{{ _('Name') }}"</strong>, <strong>"{{ _('Email') }}"</strong>, <strong>"{{ _('Password') }}"</strong>.<br>
+                        {{ _('File must have a column:') }} <strong>"{{ _('Name') }}"</strong>.<br>
+                        {{ _('Access codes are generated automatically.') }}
                     </div>
 
                     <div class="mb-0">

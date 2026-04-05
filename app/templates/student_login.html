@@ -29,9 +29,8 @@
                     <!-- CSRF Token for Security -->
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
 
-                    <div class="mb-4">
-                        <label for="email" class="form-label small fw-bold text-muted">{{ _('Email Address')
-                            }}</label>
+                    <div class="mb-3">
+                        <label for="email" class="form-label small fw-bold text-muted">{{ _('Email Address') }}</label>
                         <div class="input-group input-group-lg">
                             <span class="input-group-text bg-transparent border-end-0"><i
                                     class="fas fa-envelope text-muted"></i></span>
@@ -42,14 +41,13 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="password" class="form-label small fw-bold text-muted">{{ _('Password')
-                            }}</label>
+                        <label for="password" class="form-label small fw-bold text-muted">{{ _('Password') }}</label>
                         <div class="input-group input-group-lg">
                             <span class="input-group-text bg-transparent border-end-0"><i
                                     class="fas fa-lock text-muted"></i></span>
                             <input type="password" name="password" id="password"
                                 class="form-control border-start-0 ps-0 bg-transparent text-body"
-                                placeholder="Enter your password" required>
+                                placeholder="••••••" required autocomplete="current-password">
                         </div>
                     </div>
 

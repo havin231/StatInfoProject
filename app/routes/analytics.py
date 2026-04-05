@@ -16,18 +16,6 @@ from app.forms import InfoPageForm, RestoreBackupForm, WipeCleanForm
 
 analytics = Blueprint('analytics', __name__)
 
-
-def get_anonymous_student_name(student_id, is_admin=False):
-    """
-    Generate anonymous student identifier for teachers.
-    Admin sees full names, teachers see 'Student #ID' format.
-    """
-    if is_admin:
-        student = Student.query.get(student_id)
-        return student.full_name if student else f"Student #{student_id}"
-    return f"Student #{student_id}"
-
-
 # ==============================================================================
 # SECTION 11: ANALYTICS, EXPORTS & CMS
 # ==============================================================================
@@ -68,9 +56,15 @@ def teacher_analytics():
         personal_scores = [r.score for r in set_results if r.student_id == active_student.id]
         personal_average = round(sum(personal_scores)/len(personal_scores), 1) if personal_scores else 0
 
+        # Anonymize student names for teachers (only admins see real names)
+        if current_user.is_admin:
+            display_name = active_student.full_name
+        else:
+            display_name = f"Student #{active_student.id}"
+
         student_obj = {
             'id': active_student.id,
-            'name': get_anonymous_student_name(active_student.id, current_user.is_admin),
+            'name': display_name,
             'avg_score': personal_average
         }
         student_metric_data.append(student_obj)
@@ -164,10 +158,11 @@ def student_detail_view(student_id):
 @analytics.route('/teacher/export/grades')
 @login_required
 def export_grades():
-    """Global CSV score export. Admin only."""
+    """Global CSV score export - ADMIN ONLY."""
+    # Restrict to admin only
     if not current_user.is_admin:
         abort(403)
-
+    
     results_to_export = ExamResult.query.all()
 
     output_stream = io.StringIO()
@@ -193,10 +188,11 @@ def export_grades():
 @analytics.route('/teacher/export/student/answers/<int:student_id>')
 @login_required
 def export_student_answers(student_id):
-    """Detailed CSV choice log export. Admin only."""
+    """Detailed CSV choice log export - ADMIN ONLY."""
+    # Restrict to admin only
     if not current_user.is_admin:
         abort(403)
-
+    
     target_student = Student.query.get_or_404(student_id)
     results_to_export = ExamResult.query.filter_by(student_id=target_student.id).order_by(desc(ExamResult.date_submitted)).all()
 
@@ -259,9 +255,9 @@ def export_full_backup():
         s_obj = io.StringIO()
         s_obj.write('\ufeff')
         w_obj = csv.writer(s_obj, quoting=csv.QUOTE_ALL)
-        w_obj.writerow(['ID', 'Full_Name', 'Email', 'Created_At', 'Updated_At'])
+        w_obj.writerow(['ID', 'Full_Name', 'Access_Code', 'Email', 'Created_At', 'Updated_At'])
         for student in Student.query.all():
-            w_obj.writerow([student.id, student.full_name, student.email or '', student.created_at, student.updated_at])
+            w_obj.writerow([student.id, student.full_name, student.access_code, student.email or '', student.created_at, student.updated_at])
         master_zip.writestr('3_students.csv', s_obj.getvalue())
 
         # 4. Pages (Lectures)
@@ -683,7 +679,7 @@ def wipe_clean():
 @analytics.route('/admin/edit/about', methods=['GET', 'POST'])
 @login_required
 def edit_about():
-    """CMS Administration for 'About Us' with bilingual support."""
+    """CMS Administration for 'About Us'."""
     if not current_user.is_admin:
         abort(403)
 
@@ -698,7 +694,7 @@ def edit_about():
             db.session.add(info_record)
         info_record.title = edit_form.title.data
         info_record.content = edit_form.content.data
-        info_record.content_ku = edit_form.content_ku.data
+        info_record.content_kurdish = edit_form.content_kurdish.data
         db.session.commit()
         flash(_('Public Information Page Updated.'), 'success')
         return redirect(url_for('teacher.teacher_dashboard'))

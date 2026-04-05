@@ -37,10 +37,7 @@
                     <div class="mb-3">
                         {{ form.password.label(class="form-label fw-bold small text-uppercase text-muted") }}
                         {{ form.password(class="form-control form-control-lg bg-transparent",
-                        placeholder="Create a strong password") }}
-                        <div class="form-text small text-muted">
-                            {{ _('Min 8 chars, with uppercase, lowercase, number, and special character.') }}
-                        </div>
+                        placeholder="Create a password (min 6 characters)") }}
                         {% for error in form.password.errors %}
                         <span class="text-danger small">{{ error }}</span>
                         {% endfor %}

@@ -26,11 +26,11 @@ class User(db.Model, UserMixin):
     # Permission Flag: If True, user can manage other users and global settings
     is_admin = db.Column(db.Boolean, default=False)
 
+    # NEW: Display name on subject pages (with teacher's consent)
+    show_name_on_subject = db.Column(db.Boolean, default=False)
+
     # Preferred Language for UI (e.g., 'en', 'ku')
     preferred_lang = db.Column(db.String(10), default='en')
-
-    # Consent: If True, teacher name is displayed on subject pages
-    show_name_on_subject = db.Column(db.Boolean, default=False)
 
     # Relationship: A teacher teaches many Subjects
     subjects = db.relationship('Subject', backref='teacher', lazy=True)
@@ -38,25 +38,29 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.username}', Admin: {self.is_admin})"
 
+# ==========================================
+# 2. STUDENT MODEL
+# ==========================================
 class Student(db.Model):
     """
     Represents the students taking exams.
-    Students access the system via Email and Password.
+    Students access the system via a unique Access Code.
+    Task 1: If an Admin edits name/code, the ID stays same, keeping data linked.
     """
     id = db.Column(db.Integer, primary_key=True)
     full_name = db.Column(db.String(100), nullable=False)
 
-    # Password for secure authentication
-    password_hash = db.Column(db.String(128), nullable=True)
+    # The unique token used for login
+    access_code = db.Column(db.String(20), unique=True, nullable=True, index=True)
 
-    # Email is now the unique identifier for login
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    # NEW: Password for authentication (replaces access_code for new students)
+    password_hash = db.Column(db.String(60), nullable=True)
+
+    # NEW: Email (Optional for old students, Required for new)
+    email = db.Column(db.String(120), unique=True, nullable=True)
 
     # Preferred Language for UI
     preferred_lang = db.Column(db.String(10), default='en')
-
-    # Soft Delete Flag: If True, student's personal info is cleared but exam data remains
-    is_deleted = db.Column(db.Boolean, default=False)
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -220,37 +224,13 @@ class SiteInfo(db.Model):
     """
     Stores static site content managed by the Admin.
     Example key: 'about' for the About Us page.
-    Supports bilingual content (English & Kurdish).
     """
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(50), unique=True, nullable=False) # Unique identifier
     title = db.Column(db.String(100), default="About Us")
-    content = db.Column(db.Text, nullable=True) # HTML content (English)
-    content_ku = db.Column(db.Text, nullable=True) # HTML content (Kurdish)
+    content = db.Column(db.Text, nullable=True) # HTML content
+    content_kurdish = db.Column(db.Text, nullable=True)  # Kurdish translation
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    def get_content(self, locale='en'):
-        """Returns content based on locale preference."""
-        if locale == 'ku' and self.content_ku:
-            return self.content_ku
-        return self.content
-
-    @staticmethod
-    def get_email_template(template_key, default_content=''):
-        """Get email template from SiteInfo or return default."""
-        record = SiteInfo.query.filter_by(key=f'email_{template_key}').first()
-        return record.content if record else default_content
-
-    @staticmethod
-    def set_email_template(template_key, content, title=None):
-        """Save email template to SiteInfo."""
-        record = SiteInfo.query.filter_by(key=f'email_{template_key}').first()
-        if not record:
-            record = SiteInfo(key=f'email_{template_key}', title=title or f'Email: {template_key}')
-            db.session.add(record)
-        record.content = content
-        db.session.commit()
-        return record
 
 # ==========================================
 # 10. SYSTEM COMMANDS (Documentation)

@@ -306,3 +306,46 @@ def submit_exam(slug):
         flash(_('Critical system error during submission: %(error)s', error=str(db_err)), 'danger')
 
     return redirect(url_for('student.student_dashboard'))
+
+
+@student.route('/student/delete-account', methods=['GET', 'POST'])
+def delete_account():
+    """
+    STUDENT SELF-DELETION
+
+    Allows students to delete their own account.
+    Personal data is anonymized but exam results are kept for analytics.
+    """
+    if 'student_id' not in session:
+        return redirect(url_for('auth.student_login'))
+
+    student = Student.query.get_or_404(session['student_id'])
+
+    if request.method == 'POST':
+        confirm_delete = request.form.get('confirm_delete')
+
+        if not confirm_delete:
+            flash(_('Please confirm that you understand the consequences.'), 'warning')
+            return render_template('student/delete_account.html', student=student)
+
+        try:
+            # Anonymize student data (keep ID for exam result relationships)
+            student.full_name = f"Deleted Student #{student.id}"
+            student.email = None
+            student.password_hash = None
+            student.access_code = None
+
+            db.session.commit()
+
+            # Clear session
+            session.pop('student_id', None)
+
+            flash(_('Your account has been deleted. Your exam data has been anonymized and retained for analytics.'), 'info')
+            return redirect(url_for('public.index'))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error deleting account: %(error)s', error=str(e)), 'danger')
+            return redirect(url_for('student.student_dashboard'))
+
+    return render_template('student/delete_account.html', student=student)

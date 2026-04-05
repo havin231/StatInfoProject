@@ -57,7 +57,8 @@ def import_students_step1():
             batch_preview_list = []
             for index, row in data_frame.iterrows():
                 batch_preview_list.append({
-                    'full_name': str(row['name'])
+                    'full_name': str(row['name']),
+                    'access_code': generate_access_code()
                 })
 
             # Render the intermediate preview page
@@ -175,8 +176,14 @@ def process_import_confirmation():
 
             save_count = 0
             for student_row in parsed_data:
+                # Resolve potential access code collisions
+                final_code = student_row['access_code']
+                while Student.query.filter_by(access_code=final_code).first():
+                    final_code = generate_access_code()
+
                 db.session.add(Student(
-                    full_name=student_row['full_name']
+                    full_name=student_row['full_name'],
+                    access_code=final_code
                 ))
                 save_count += 1
 

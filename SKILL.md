@@ -93,9 +93,9 @@ Constraint: InnoDB Engine (Enforces Foreign Keys).
 
 Models & Fields
 
-User: id, username, email, password_hash, is_admin (Bool), preferred_lang (String, default='en'), show_name_on_subject (Bool, default=False).
+User: id, username, email, password_hash, is_admin (Bool), show_name_on_subject (Bool, default=False), preferred_lang (String, default='en').
 
-Student: id, full_name, email (String, unique, required), password_hash (String, nullable), preferred_lang (String, default='en'), is_deleted (Bool, default=False), created_at, updated_at.
+Student: id, full_name, access_code (Unique Index, nullable), password_hash (String, nullable), email (String, nullable), preferred_lang (String, default='en'), created_at, updated_at.
 
 Subject: id, name, slug, description, teacher_id, is_public (Bool, default=True).
 
@@ -119,7 +119,7 @@ StudentAnswer: id, student_id, question_id, exam_id, selected_option, is_correct
 
 Constraint: Must link to exam_id (Parent Attempt).
 
-SiteInfo: id, key, title, content, content_ku (HTML, Kurdish), last_updated. Supports email templates via get_email_template() and set_email_template().
+SiteInfo: id, key, title, content, content_kurdish (HTML, nullable), last_updated.
 
 SystemCommand: id, title, command_text, description.
 
@@ -301,29 +301,7 @@ Error 500 (Internal Server): Usually a Jinja template trying to access a variabl
 Error 2013 (Lost Connection): MySQL timeout. Ensure pool_recycle: 280 is in config.py.
 
 
-## 8. RECENT FIXES & UPDATES (April 2026)
-
-### Critical Bug Fixes Applied:
-1. **Student Settings Template Error**: Fixed Jinja2 syntax error in `student/settings.html` - removed duplicate `{% endblock %}` tags
-2. **Student Registration SQL Error**: Removed all `access_code` references from Student model and related code since field was deprecated
-3. **Teacher Email Configuration**: Added welcome email functionality for teacher account creation with Gmail SMTP configuration
-
-### Email System Updates:
-- **Gmail SMTP**: Configured for havinmas3ud@gmail.com with App Password support
-- **Teacher Welcome Emails**: Now automatically sent when admin creates teacher accounts
-- **Custom Email Templates**: Support for personalized welcome messages with variables: `{{name}}`, `{{email}}`, `{{password}}`, `{{role}}`
-
-### Files Modified:
-- `app/templates/student/settings.html` - Fixed template syntax
-- `app/routes/analytics.py` - Removed access_code references
-- `app/routes/content.py` - Updated student import logic
-- `app/templates/admin/import_preview.html` - Removed access_code display
-- `app/templates/teacher/student_detail.html` - Removed access_code display
-- `app/routes/auth.py` - Updated comments
-- `app/routes/teacher.py` - Added teacher welcome email functionality
-- `.env` - Created with email configuration
-
-## 9. DEPLOYMENT AUTOMATION
+## 8. DEPLOYMENT AUTOMATION
 **Git Credentials:**
 - Username: `havin231`
 - Token: `ghp_YOUR_TOKEN_HERE`

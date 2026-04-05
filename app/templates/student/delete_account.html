@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Account{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-danger border-opacity-50 shadow-sm">
+            <div class="card-body p-4 p-md-5">
+                <!-- Header -->
+                <div class="text-center mb-4">
+                    <i class="fas fa-exclamation-triangle text-danger display-4 mb-3"></i>
+                    <h2 class="fw-bold text-danger">{{ _('Delete Account') }}</h2>
+                    <p class="text-muted">{{ _('This action cannot be undone. Please read carefully.') }}</p>
+                </div>
+
+                <!-- Warning Information -->
+                <div class="alert alert-warning border-warning mb-4">
+                    <h5 class="alert-heading h6 fw-bold">
+                        <i class="fas fa-info-circle me-2"></i>{{ _('What will happen:') }}
+                    </h5>
+                    <ul class="small mb-0">
+                        <li>{{ _('Your personal information (name, email) will be permanently removed') }}</li>
+                        <li>{{ _('Your exam scores and answers will be kept for analytics (anonymized)') }}</li>
+                        <li>{{ _('You will lose access to all study materials and exam history') }}</li>
+                        <li>{{ _('This action is irreversible') }}</li>
+                    </ul>
+                </div>
+
+                <!-- Confirmation Form -->
+                <form method="POST" action="">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="confirm_delete" id="confirm_delete" required>
+                            <label class="form-check-label small text-muted" for="confirm_delete">
+                                {{ _('I understand that my account will be permanently deleted and this action cannot be undone.') }}
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger btn-lg">
+                            <i class="fas fa-trash-alt me-2"></i>{{ _('Permanently Delete My Account') }}
+                        </button>
+                        <a href="{{ url_for('student.student_dashboard') }}" class="btn btn-outline-secondary">
+                            {{ _('Cancel - Keep My Account') }}
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

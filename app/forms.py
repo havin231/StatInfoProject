@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo
 from flask_babel import lazy_gettext as _l
 
 # ==========================================
@@ -49,6 +49,7 @@ class TeacherEditForm(FlaskForm):
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(_l('Reset Password (Optional)'), validators=[Optional(), Length(min=6)])
     is_admin = BooleanField(_l('Grant Admin Access'))
+    show_name_on_subject = BooleanField(_l('Show my name on subject pages'))
     submit = SubmitField(_l('Update Account'))
 
 class StudentForm(FlaskForm):
@@ -56,44 +57,19 @@ class StudentForm(FlaskForm):
     Form for registering new students.
     """
     full_name = StringField(_l('Full Name'), validators=[DataRequired()])
-    email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=8)])
+    email = StringField(_l('Email Address'), validators=[Optional(), Email()])
+    access_code = StringField(_l('Access Code (Unique)'), validators=[DataRequired()])
     submit = SubmitField(_l('Add Student'))
-
-    def validate_password(self, field):
-        """Validate password complexity."""
-        password = field.data
-        if not any(c.isupper() for c in password):
-            raise ValidationError(_('Password must contain at least one uppercase letter.'))
-        if not any(c.islower() for c in password):
-            raise ValidationError(_('Password must contain at least one lowercase letter.'))
-        if not any(c.isdigit() for c in password):
-            raise ValidationError(_('Password must contain at least one number.'))
-        if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
-            raise ValidationError(_('Password must contain at least one special character.'))
 
 class StudentSignupForm(FlaskForm):
     """
     Form for students to sign up themselves.
-    Includes password with complexity requirements.
     """
     full_name = StringField(_l('Full Name'), validators=[DataRequired()])
     email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=8)])
+    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField(_l('Confirm Password'), validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField(_l('Register Account'))
-
-    def validate_password(self, field):
-        """Validate password complexity."""
-        password = field.data
-        if not any(c.isupper() for c in password):
-            raise ValidationError(_('Password must contain at least one uppercase letter.'))
-        if not any(c.islower() for c in password):
-            raise ValidationError(_('Password must contain at least one lowercase letter.'))
-        if not any(c.isdigit() for c in password):
-            raise ValidationError(_('Password must contain at least one number.'))
-        if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
-            raise ValidationError(_('Password must contain at least one special character.'))
 
 class StudentSettingsForm(FlaskForm):
     """
@@ -101,31 +77,18 @@ class StudentSettingsForm(FlaskForm):
     """
     email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
     current_password = PasswordField(_l('Current Password'), validators=[Optional()])
-    new_password = PasswordField(_l('New Password'), validators=[Optional(), Length(min=8)])
-    confirm_password = PasswordField(_l('Confirm New Password'), validators=[EqualTo('new_password')])
+    new_password = PasswordField(_l('New Password'), validators=[Optional(), Length(min=6)])
+    confirm_new_password = PasswordField(_l('Confirm New Password'), validators=[EqualTo('new_password')])
     submit = SubmitField(_l('Save Changes'))
 
 class StudentEditForm(FlaskForm):
     """
-    Form for editing existing student details.
+    Form for editing existing student details (Task 1).
     """
     full_name = StringField(_l('Full Name'), validators=[DataRequired()])
-    email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Reset Password (Optional)'), validators=[Optional(), Length(min=8)])
+    email = StringField(_l('Email Address'), validators=[Optional(), Email()])
+    access_code = StringField(_l('Access Code'), validators=[DataRequired()])
     submit = SubmitField(_l('Update Student Details'))
-
-    def validate_password(self, field):
-        """Validate password complexity if provided."""
-        if field.data:
-            password = field.data
-            if not any(c.isupper() for c in password):
-                raise ValidationError(_('Password must contain at least one uppercase letter.'))
-            if not any(c.islower() for c in password):
-                raise ValidationError(_('Password must contain at least one lowercase letter.'))
-            if not any(c.isdigit() for c in password):
-                raise ValidationError(_('Password must contain at least one number.'))
-            if not any(c in '!@#$%^&*()_+-=[]{}|;:,.<>?' for c in password):
-                raise ValidationError(_('Password must contain at least one special character.'))
 
 # ==========================================
 # 3. SITE CONTENT (CMS)
@@ -134,11 +97,10 @@ class StudentEditForm(FlaskForm):
 class InfoPageForm(FlaskForm):
     """
     Form for editing static pages like 'About Us'.
-    Supports bilingual content (English & Kurdish).
     """
     title = StringField(_l('Page Title'), default="About Us", validators=[DataRequired()])
-    content = TextAreaField(_l('Content (English)'), validators=[DataRequired()])
-    content_ku = TextAreaField(_l('Content (Kurdish)'), validators=[Optional()])
+    content = TextAreaField(_l('Page Content (English)'), validators=[DataRequired()])
+    content_kurdish = TextAreaField(_l('Page Content (Kurdish)'), validators=[Optional()])
     submit = SubmitField(_l('Save Page'))
 
 # ==========================================

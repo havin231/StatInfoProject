@@ -39,8 +39,11 @@
                     <a href="{{ url_for('auth.student_settings') }}" class="btn btn-outline-dark text-start">
                         <i class="fas fa-cog me-2"></i>{{ _('My Settings') }}
                     </a>
-                    <a href="/logout" class="btn btn-outline-danger text-start">
+                    <a href="/logout" class="btn btn-outline-secondary text-start">
                         <i class="fas fa-sign-out-alt me-2"></i>{{ _('Sign Out') }}
+                    </a>
+                    <a href="{{ url_for('student.delete_account') }}" class="btn btn-outline-danger text-start">
+                        <i class="fas fa-trash-alt me-2"></i>{{ _('Delete Account') }}
                     </a>
                 </div>
             </div>

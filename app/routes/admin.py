@@ -32,70 +32,27 @@ def admin_students():
     form_manual = StudentForm()
     form_batch = BulkImportForm()
 
+    # Pre-generate a code to show in the UI placeholder
+    if request.method == 'GET':
+        form_manual.access_code.data = generate_access_code()
+
     # Manual Registration Logic
     if form_manual.validate_on_submit():
         # Uniqueness Check
-        if Student.query.filter_by(email=form_manual.email.data).first():
+        if Student.query.filter_by(access_code=form_manual.access_code.data).first():
+            flash(_('Error: This Access Code is already in use.'), 'danger')
+        elif form_manual.email.data and Student.query.filter_by(email=form_manual.email.data).first():
             flash(_('Error: This Email is already in use.'), 'danger')
         else:
             new_student = Student(
                 full_name=form_manual.full_name.data,
-                email=form_manual.email.data,
-                password_hash=bcrypt.generate_password_hash(form_manual.password.data).decode('utf-8')
+                access_code=form_manual.access_code.data,
+                email=form_manual.email.data
             )
-            
-            try:
-                db.session.add(new_student)
-                db.session.commit()
-                
-                # Handle Welcome Email
-                from flask_mail import Message
-                from app import mail
-                from app.models import SiteInfo
-                
-                welcome_message = request.form.get('welcome_message', '').strip()
-                
-                if welcome_message:
-                    # Use custom message from admin
-                    email_body = welcome_message
-                    email_body = email_body.replace('{{name}}', new_student.full_name)
-                    email_body = email_body.replace('{{email}}', new_student.email)
-                    email_body = email_body.replace('{{password}}', form_manual.password.data)
-                else:
-                    # Use default template
-                    default_welcome = f"""Welcome to StatInfoPro!
-
-Dear {new_student.full_name},
-
-Your account has been successfully created by an administrator.
-
-Your login email: {new_student.email}
-Your password: {form_manual.password.data}
-
-Best regards,
-StatInfoPro Team
-"""
-                    email_body = SiteInfo.get_email_template('student_welcome', default_welcome)
-                    email_body = email_body.replace('{{name}}', new_student.full_name)
-                    email_body = email_body.replace('{{email}}', new_student.email)
-                    email_body = email_body.replace('{{password}}', form_manual.password.data)
-
-                try:
-                    msg = Message(
-                        subject='Welcome to StatInfoPro!',
-                        recipients=[new_student.email],
-                        body=email_body
-                    )
-                    mail.send(msg)
-                    flash(_('Welcome email sent to %(email)s.', email=new_student.email), 'info')
-                except Exception as email_err:
-                    print(f"Failed to send welcome email: {email_err}")
-
-                flash(_('Student "%(name)s" registered successfully.', name=form_manual.full_name.data), 'success')
-                return redirect(url_for('admin.admin_students'))
-            except Exception as e:
-                db.session.rollback()
-                flash(_('Database Error: %(error)s', error=str(e)), 'danger')
+            db.session.add(new_student)
+            db.session.commit()
+            flash(_('Student "%(name)s" registered successfully.', name=form_manual.full_name.data), 'success')
+            return redirect(url_for('admin.admin_students'))
 
     # Fetch all students for the table (Sorted by Newest First)
     all_students_roster = Student.query.order_by(Student.created_at.desc()).all()
@@ -125,8 +82,15 @@ def edit_student(student_id):
     form = StudentEditForm(obj=student_record)
 
     if form.validate_on_submit():
+        # Check if the code was changed and if the new one is taken
+        if student_record.access_code != form.access_code.data:
+            code_check = Student.query.filter_by(access_code=form.access_code.data).first()
+            if code_check:
+                flash(_('Critical Error: The new access code is already assigned to someone else.'), 'danger')
+                return render_template('admin/edit_student.html', form=form, student=student_record)
+
         # Check if email was changed and uniqueness
-        if student_record.email != form.email.data:
+        if form.email.data and student_record.email != form.email.data:
             email_check = Student.query.filter_by(email=form.email.data).first()
             if email_check:
                 flash(_('Critical Error: The new email is already assigned to someone else.'), 'danger')
@@ -135,9 +99,7 @@ def edit_student(student_id):
         # Update Record
         student_record.full_name = form.full_name.data
         student_record.email = form.email.data
-        
-        if form.password.data:
-            student_record.password_hash = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        student_record.access_code = form.access_code.data
 
         try:
             db.session.commit()
@@ -316,7 +278,7 @@ def import_commands_step1():
             data_frame.columns = [col_name.lower().strip() for col_name in data_frame.columns]
 
             # Validate required columns
-            required_fields = ['name', 'email', 'password']
+            required_fields = ['title', 'command']
             missing_fields = [f for f in required_fields if f not in data_frame.columns]
 
             if missing_fields:

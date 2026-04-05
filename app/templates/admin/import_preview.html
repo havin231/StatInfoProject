@@ -103,7 +103,7 @@
 
                                     {% if import_type == 'student' %}
                                     <td class="fw-bold">{{ row.full_name }}</td>
-                                    
+                                    <td><code class="text-primary fw-bold">{{ row.access_code }}</code></td>
 
                                     {% elif import_type == 'question' %}
                                     <!-- Added class 'preview-text' for JS targeting -->

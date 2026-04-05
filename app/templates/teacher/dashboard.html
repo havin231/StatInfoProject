@@ -36,6 +36,9 @@
                     <a href="/teacher/analytics" class="btn btn-lime">
                         <i class="fas fa-chart-pie me-2"></i>{{ _('View Analytics') }}
                     </a>
+                    <a href="/teacher/export/grades" class="btn btn-outline btn-sm">
+                        <i class="fas fa-file-csv me-2"></i>{{ _('Export Grades') }}
+                    </a>
                     {% endif %}
                 </div>
             </div>
@@ -59,24 +62,6 @@
                         <i class="fas fa-sign-out-alt me-2"></i>{{ _('Logout') }}
                     </a>
                 </div>
-            </div>
-        </div>
-
-        <!-- TEACHER NAME DISPLAY CONSENT -->
-        <div class="card mt-4">
-            <div class="card-body">
-                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Privacy') }}</h6>
-                <form method="POST" action="/teacher/toggle_name_display">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="showNameToggle" 
-                            {% if current_user.show_name_on_subject %}checked{% endif %} 
-                            onchange="this.form.submit()">
-                        <label class="form-check-label small" for="showNameToggle">
-                            {{ _('Show my name on subjects') }}
-                        </label>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

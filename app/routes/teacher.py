@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, url_for, flash, redirect, abort, request
+from flask import Blueprint, render_template, url_for, flash, redirect, abort
 from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
@@ -60,10 +60,40 @@ def teacher_dashboard():
             Subject.teacher_id == current_user.id
         ).count()
 
+        # Student Rankings
+        set_results = ExamResult.query.join(Subject).filter(
+            Subject.teacher_id == current_user.id
+        ).all()
+        unique_student_ids = set(result.student_id for result in set_results)
+        students_active = Student.query.filter(Student.id.in_(unique_student_ids)).all()
+        student_metric_data = []
+        at_risk_student_list = []
+
+        for active_student in students_active:
+            personal_scores = [r.score for r in set_results if r.student_id == active_student.id]
+            personal_average = round(sum(personal_scores)/len(personal_scores), 1) if personal_scores else 0
+
+            # Anonymize student names for teachers (only admins see real names)
+            if current_user.is_admin:
+                display_name = active_student.full_name
+            else:
+                display_name = f"Student #{active_student.id}"
+
+            student_obj = {
+                'id': active_student.id,
+                'name': display_name,
+                'avg_score': personal_average
+            }
+            student_metric_data.append(student_obj)
+            if personal_average < 50:
+                at_risk_student_list.append(student_obj)
+
         return render_template(
             'teacher/dashboard.html',
             subjects=assigned_subjects,
-            total_results=aggregate_results_count
+            total_results=aggregate_results_count,
+            student_metric_data=student_metric_data,
+            at_risk_student_list=at_risk_student_list
         )
 
 
@@ -141,57 +171,7 @@ def add_teacher():
             db.session.add(new_staff_member)
             db.session.commit()
 
-            # F. Send Welcome Email
-            from flask_mail import Message
-            from app import mail
-            from app.models import SiteInfo
-            
             role_label = _("Administrator") if is_admin_user else _("Teacher")
-            
-            # Get custom email message if provided
-            email_message = request.form.get('email_message', '').strip()
-            
-            if email_message:
-                # Use custom message from admin
-                email_body = email_message
-                email_body = email_body.replace('{{name}}', new_staff_member.username)
-                email_body = email_body.replace('{{email}}', new_staff_member.email)
-                email_body = email_body.replace('{{password}}', form.password.data)
-                email_body = email_body.replace('{{role}}', role_label)
-            else:
-                # Use default template
-                default_welcome = f"""Welcome to StatInfoPro!
-
-Dear {new_staff_member.username},
-
-Your {role_label} account has been successfully created by an administrator.
-
-Your login email: {new_staff_member.email}
-Your password: {form.password.data}
-
-Please log in and change your password after your first login.
-
-Best regards,
-StatInfoPro Team
-"""
-                email_body = SiteInfo.get_email_template('teacher_welcome', default_welcome)
-                email_body = email_body.replace('{{name}}', new_staff_member.username)
-                email_body = email_body.replace('{{email}}', new_staff_member.email)
-                email_body = email_body.replace('{{password}}', form.password.data)
-                email_body = email_body.replace('{{role}}', role_label)
-            
-            try:
-                msg = Message(
-                    subject=f'Welcome to StatInfoPro - {role_label} Account',
-                    recipients=[new_staff_member.email],
-                    body=email_body
-                )
-                mail.send(msg)
-                flash(_('Welcome email sent to %(email)s.', email=new_staff_member.email), 'info')
-            except Exception as email_err:
-                print(f"Failed to send welcome email: {email_err}")
-                flash(_('Account created but welcome email failed to send.'), 'warning')
-
             flash(_('Success: %(role)s account created for %(username)s.', role=role_label, username=form.username.data), 'success')
         except Exception as db_err:
             db.session.rollback()
@@ -230,6 +210,7 @@ def edit_teacher(teacher_id):
         # Update Visible Info
         target_staff.username = form.username.data
         target_staff.email = form.email.data
+        target_staff.show_name_on_subject = form.show_name_on_subject.data
 
         # Security Logic: Prevent Admins from accidentally downgrading themselves
         if target_staff.id == current_user.id:
@@ -309,6 +290,43 @@ def delete_teacher(teacher_id):
     return redirect(url_for('teacher.teacher_dashboard'))
 
 
+@teacher.route('/admin/transfer/subject/<int:subject_id>', methods=['POST'])
+@login_required
+def transfer_subject(subject_id):
+    """
+    TRANSFER SUBJECT TO ANOTHER TEACHER
+
+    Allows Admin to change the teacher assignment of a subject.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    subject = Subject.query.get_or_404(subject_id)
+    new_teacher_id = request.form.get('new_teacher_id', type=int)
+
+    if not new_teacher_id:
+        flash(_('Error: Please select a new teacher.'), 'danger')
+        return redirect(url_for('teacher.teacher_dashboard'))
+
+    new_teacher = User.query.get(new_teacher_id)
+    if not new_teacher:
+        flash(_('Error: Selected teacher not found.'), 'danger')
+        return redirect(url_for('teacher.teacher_dashboard'))
+
+    old_teacher_name = subject.teacher.username
+    subject.teacher_id = new_teacher_id
+
+    try:
+        db.session.commit()
+        flash(_('Subject "%(subject)s" transferred from %(old)s to %(new)s.', 
+               subject=subject.name, old=old_teacher_name, new=new_teacher.username), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error transferring subject: %(error)s', error=str(e)), 'danger')
+
+    return redirect(url_for('teacher.teacher_dashboard'))
+
+
 @teacher.route('/admin/view_teacher/<int:teacher_id>')
 @login_required
 def view_teacher(teacher_id):
@@ -336,20 +354,3 @@ def view_teacher(teacher_id):
         view_as_admin=True,
         teacher_name=teacher_record.username
     )
-
-
-@teacher.route('/teacher/toggle_name_display', methods=['POST'])
-@login_required
-def toggle_name_display():
-    """
-    Toggle whether the teacher's name is displayed on their subject pages.
-    """
-    current_user.show_name_on_subject = not current_user.show_name_on_subject
-    try:
-        db.session.commit()
-        status = _('shown') if current_user.show_name_on_subject else _('hidden')
-        flash(_('Your name will now be %(status)s on subject pages.', status=status), 'success')
-    except Exception as e:
-        db.session.rollback()
-        flash(_('Error updating preference: %(error)s', error=str(e)), 'danger')
-    return redirect(url_for('teacher.teacher_dashboard'))

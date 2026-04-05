@@ -152,23 +152,28 @@
                                 </div>
                             </form>
 
-                            <div class="d-grid mt-2">
-                                <a href="/subject/{{ sub.slug }}" class="btn btn-sm btn-outline-primary mb-2">{{ _('Open')
-                                    }}</a>
-                                <!-- Transfer Subject Form (Admin Only) -->
-                                <form method="POST" action="/teacher/edit/subject/{{ sub.id }}" class="d-flex gap-2">
-                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                    <input type="hidden" name="name" value="{{ sub.name }}">
-                                    <input type="hidden" name="slug" value="{{ sub.slug }}">
-                                    <input type="hidden" name="description" value="{{ sub.description }}">
-                                    <select name="teacher_id" class="form-select form-select-sm" onchange="this.form.submit()">
-                                        {% for teacher in teachers %}
-                                        <option value="{{ teacher.id }}" {% if teacher.id == sub.teacher_id %}selected{% endif %}>
-                                            {{ teacher.username }}
-                                        </option>
+                            <!-- Transfer Subject Form -->
+                            <form method="POST" action="/admin/transfer/subject/{{ sub.id }}" class="mb-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="input-group input-group-sm">
+                                    <select name="new_teacher_id" class="form-select form-select-sm" required>
+                                        <option value="">{{ _('Transfer to...') }}</option>
+                                        {% for t in teachers %}
+                                            {% if t.id != sub.teacher_id %}
+                                            <option value="{{ t.id }}">{{ t.username }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
-                                </form>
+                                    <button type="submit" class="btn btn-outline-secondary"
+                                            onclick="return confirm('{{ _('Transfer this subject to another teacher?') }}')">
+                                        <i class="fas fa-exchange-alt"></i>
+                                    </button>
+                                </div>
+                            </form>
+
+                            <div class="d-grid mt-2">
+                                <a href="/subject/{{ sub.slug }}" class="btn btn-sm btn-outline-primary">{{ _('Open')
+                                    }}</a>
                             </div>
                         </div>
                     </div>
@@ -290,14 +295,7 @@
                                 <label class="form-check-label" for="is_admin">{{ _('Admin?') }}</label>
                             </div>
                         </div>
-                        <div class="col-12 mt-3">
-                            <label class="form-label small fw-bold text-muted">{{ _('Welcome Email Message (Optional)') }}</label>
-                            <textarea name="email_message" class="form-control form-control-sm" rows="3" placeholder="{{ _('Enter custom welcome message for the new teacher. Available variables: {{name}}, {{email}}, {{password}}, {{role}}') }}"></textarea>
-                            <div class="form-text small text-muted">
-                                {{ _('Leave blank to use default welcome email template.') }}
-                            </div>
-                        </div>
-                        <div class="col-12 mt-3">
+                        <div class="col-12">
                             <div class="d-grid">
                                 {{ teacher_form.submit(class="btn btn-lime btn-sm w-100") }}
                             </div>

@@ -26,6 +26,8 @@
                     <i class="fas fa-stopwatch me-2"></i>{{ _('Take Lecture Quiz') }}
                 </a>
                 {% endif %}
+
+                <!-- KURDISH TOGGLE MOVED TO FLOATING BUTTON -->
             </div>
         </div>
 
@@ -38,15 +40,16 @@
                     {{ page.title }}
                 </h1>
 
-                <!-- CONTENT BASED ON GLOBAL LANGUAGE -->
+                <!-- CONTENT BASED ON GLOBAL LOCALE -->
                 {% if get_locale().language == 'ku' and page.content_body_kurdish %}
-                <!-- KURDISH CONTENT -->
-                <div class="rich-text-content overflow-hidden" style="direction: rtl; text-align: right;">
+                <!-- KURDISH CONTENT (when locale is Kurdish) -->
+                <div id="content-display" class="rich-text-content overflow-hidden"
+                    style="direction: rtl; text-align: right;">
                     {{ page.content_body_kurdish | safe }}
                 </div>
                 {% else %}
-                <!-- ENGLISH CONTENT (Default) -->
-                <div class="rich-text-content overflow-hidden">
+                <!-- ENGLISH CONTENT (default) -->
+                <div id="content-display" class="rich-text-content overflow-hidden">
                     {{ page.content_body | safe }}
                 </div>
                 {% endif %}

@@ -45,7 +45,7 @@
         </div>
 
         <!-- THEME SETTINGS CARD -->
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-body">
                 <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Interface Theme') }}</h6>
                 <div class="d-grid gap-2">
@@ -55,9 +55,32 @@
                     <button class="btn btn-outline btn-sm text-start" onclick="setTheme('cyber')">
                         <i class="fas fa-square text-success me-2"></i>{{ _('Cyber Command') }}
                     </button>
+                </div>
+            </div>
+        </div>
 
-                    <hr class="my-2 text-muted">
+        <!-- PROFILE SETTINGS CARD -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Profile Settings') }}</h6>
+                <form method="POST" action="/teacher/toggle_name_visibility" class="d-grid">
+                    <button type="submit" class="btn btn-sm {% if current_user.show_name_on_subject %}btn-info{% else %}btn-outline-info{% endif %} text-start">
+                        <i class="fas fa-eye{% if not current_user.show_name_on_subject %}-slash{% endif %} me-2"></i>
+                        {% if current_user.show_name_on_subject %}
+                            {{ _('Name: Shown') }}
+                        {% else %}
+                            {{ _('Name: Hidden') }}
+                        {% endif %}
+                    </button>
+                    <div class="form-text small mt-2">{{ _('Toggle whether students see your name on subject pages.') }}</div>
+                </form>
+            </div>
+        </div>
 
+        <!-- LOGOUT CARD -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-grid">
                     <a href="/logout" class="btn btn-outline-danger btn-sm text-start">
                         <i class="fas fa-sign-out-alt me-2"></i>{{ _('Logout') }}
                     </a>

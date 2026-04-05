@@ -97,6 +97,29 @@ def teacher_dashboard():
         )
 
 
+@teacher.route('/teacher/toggle_name_visibility', methods=['POST'])
+@login_required
+def toggle_name_visibility():
+    """
+    TEACHER NAME VISIBILITY TOGGLE
+    
+    Allows teachers to control whether their name appears publicly
+    on subject pages that students view.
+    """
+    # Toggle the setting
+    current_user.show_name_on_subject = not current_user.show_name_on_subject
+    
+    try:
+        db.session.commit()
+        status = _('shown') if current_user.show_name_on_subject else _('hidden')
+        flash(_('Your name will be %(status)s on subject pages.', status=status), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error updating setting: %(error)s', error=str(e)), 'danger')
+    
+    return redirect(url_for('teacher.teacher_dashboard'))
+
+
 @teacher.route('/subject/<int:subject_id>/toggle_visibility', methods=['POST'])
 @login_required
 def toggle_visibility(subject_id):

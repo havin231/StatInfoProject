@@ -1,8 +1,12 @@
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Get the directory where this config file is located
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+# Load environment variables from .env file in project root
+env_path = os.path.join(BASE_DIR, '.env')
+load_dotenv(env_path)
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'academic-minimalist-secure-key-2025'

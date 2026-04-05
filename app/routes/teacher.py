@@ -3,7 +3,7 @@ from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
 from app import db, bcrypt
-from app.models import User, Subject, Page, Question, ExamResult, StudentAnswer
+from app.models import User, Subject, Page, Question, ExamResult, StudentAnswer, Student
 from app.forms import SubjectForm, TeacherSignupForm, TeacherEditForm
 
 teacher = Blueprint('teacher', __name__)

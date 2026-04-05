@@ -64,6 +64,7 @@
             <div class="card-body">
                 <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Profile Settings') }}</h6>
                 <form method="POST" action="/teacher/toggle_name_visibility" class="d-grid">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-sm {% if current_user.show_name_on_subject %}btn-info{% else %}btn-outline-info{% endif %} text-start">
                         <i class="fas fa-eye{% if not current_user.show_name_on_subject %}-slash{% endif %} me-2"></i>
                         {% if current_user.show_name_on_subject %}

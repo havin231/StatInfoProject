@@ -250,3 +250,26 @@ Whenever a change or new feature is added, append a new version block following 
 - Git commit and push
 
 ---
+
+## Version 0.4.2
+**Date:** 2026-04-06
+**Summary:** Bug fixes for student signup, teacher dashboard, and code cleanup.
+
+### Changes & Improvements:
+- **Fixed Student Signup**: Resolved MySQL database connection issue that was causing "Access denied" errors. Updated `config.py` to properly load `.env` file from project root.
+- **Teacher Name Visibility Toggle**: Fixed the teacher name display toggle on dashboard. Added proper CSRF token handling and Kurdish translations.
+- **Admin Edit Student**: Fixed the admin edit student page to use password field instead of access code. Students now use email+password authentication.
+- **Kurdish Translations**: Added Kurdish (Sorani) translations for all new UI text including profile settings and password fields.
+- **Code Cleanup**: Deleted unnecessary one-time scripts and example files: `.env.example`, `.env.mysql`, `add_subject_is_public.py`, `convert_sql_to_backup.py`, `drop_group_id.py`, `fix_quotes.py`, `regrade_all.py`, `update_db.py`, `translate.py`, `messages.pot`.
+- **Documentation Update**: Updated `SKILL.md` to clarify which files should NOT be pushed to GitHub (one-time scripts, local env files, cache folders).
+
+### Files Modified:
+- `config.py` - Fixed load_dotenv to explicitly load from project root directory
+- `app/translations/ku/LC_MESSAGES/messages.po` - Added Kurdish translations for new strings
+- `SKILL.md` - Updated file categories documentation
+
+### Next Steps:
+- Snapshot as `version_0.4.2`
+- Git commit and push
+
+---

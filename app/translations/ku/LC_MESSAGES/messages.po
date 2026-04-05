@@ -1939,3 +1939,39 @@ msgstr "تێدەگەم کە ئەمە بە هەمیشەیی هەموو داتا �
 #: app/forms.py:195
 msgid "WIPE EVERYTHING & START FRESH"
 msgstr "سڕینەوەی هەموو شتێک & دەستپێکردنەوەی نوێ"
+
+#: app/routes/teacher.py:114
+msgid "shown"
+msgstr "پیشاندراو"
+
+#: app/routes/teacher.py:115
+msgid "Your name will be %(status)s on subject pages."
+msgstr "ناوەکەت %(status)s دەبێت لە لاپەڕەکانی بابەتەکان."
+
+#: app/routes/teacher.py:118
+msgid "Error updating setting: %(error)s"
+msgstr "هەڵە لە نوێکردنەوەی ڕێکخستن: %(error)s"
+
+#: app/templates/teacher/dashboard.html:65
+msgid "Profile Settings"
+msgstr "ڕێکخستنەکانی پڕۆفایل"
+
+#: app/templates/teacher/dashboard.html:71
+msgid "Name: Shown"
+msgstr "ناو: پیشاندراو"
+
+#: app/templates/teacher/dashboard.html:73
+msgid "Name: Hidden"
+msgstr "ناو: شاراوە"
+
+#: app/templates/teacher/dashboard.html:76
+msgid "Toggle whether students see your name on subject pages."
+msgstr "گۆڕینی ئەوەی کە ئایا قوتابیان ناوی تۆ ببینن لە لاپەڕەکانی بابەتەکان."
+
+#: app/templates/admin/edit_student.html:21
+msgid "Enter new password to reset (min 6 characters)."
+msgstr "تێپەڕەوشەیەکی نوێ بنووسە بۆ گۆڕین (کەمتر نەبێت لە ٦ پیت)."
+
+#: app/templates/admin/students.html:64
+msgid "Auto-generated secure password."
+msgstr "تێپەڕەوشەیەکی پارێزراو کە بە شێوەیەکی خۆکار دروستکراوە."

@@ -213,8 +213,10 @@ def add_command():
     if form.validate_on_submit():
         new_cmd = SystemCommand(
             title=form.title.data,
+            title_kurdish=form.title_kurdish.data,
             command_text=form.command_text.data,
-            description=form.description.data
+            description=form.description.data,
+            description_kurdish=form.description_kurdish.data
         )
 
         try:

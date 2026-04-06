@@ -39,8 +39,10 @@ def toolbase():
             else:
                 new_tool = Tool(
                     title=form.title.data,
+                    title_kurdish=form.title_kurdish.data,
                     link=form.link.data,
-                    description=form.description.data
+                    description=form.description.data,
+                    description_kurdish=form.description_kurdish.data
                 )
                 try:
                     db.session.add(new_tool)

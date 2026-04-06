@@ -99,6 +99,10 @@ class Subject(db.Model):
     questions = db.relationship('Question', backref='subject', lazy=True)
     results = db.relationship('ExamResult', backref='subject', lazy=True)
 
+    # Bilingual Support: Kurdish translations
+    name_kurdish = db.Column(db.String(100), nullable=True)
+    description_kurdish = db.Column(db.Text, nullable=True)
+
     def __repr__(self):
         return f"Subject('{self.name}', Slug: {self.slug})"
 
@@ -135,9 +139,11 @@ class Resource(db.Model):
     """
     Stores multiple external links for a single Page.
     Added in Phase 4 Update.
+    Supports bilingual titles (English & Kurdish).
     """
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False) # e.g. "Watch Video"
+    title_kurdish = db.Column(db.String(100), nullable=True)  # Kurdish translation
     link = db.Column(db.String(500), nullable=False)  # The URL
     page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=False)
 
@@ -239,11 +245,14 @@ class SystemCommand(db.Model):
     """
     Stores server maintenance commands for the Admin Command Center.
     Allows dynamic adding/editing of help commands.
+    Supports bilingual content (English & Kurdish).
     """
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False) # e.g. "Restart Server"
+    title_kurdish = db.Column(db.String(100), nullable=True)  # Kurdish translation
     command_text = db.Column(db.Text, nullable=False) # e.g. "touch /var/www/..."
     description = db.Column(db.Text, nullable=True)   # Instructions on when to use
+    description_kurdish = db.Column(db.Text, nullable=True)  # Kurdish translation
 
     def __repr__(self):
         return f"Command('{self.title}')"
@@ -254,11 +263,14 @@ class SystemCommand(db.Model):
 class Tool(db.Model):
     """
     Represents an external toollink/page added by the Admin.
+    Supports bilingual content (English & Kurdish).
     """
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
+    title_kurdish = db.Column(db.String(100), nullable=True)  # Kurdish translation
     link = db.Column(db.String(500), nullable=False)
     description = db.Column(db.Text, nullable=True)
+    description_kurdish = db.Column(db.Text, nullable=True)  # Kurdish translation
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):

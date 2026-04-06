@@ -278,8 +278,10 @@ def add_subject():
         else:
             new_subj = Subject(
                 name=form.name.data,
+                name_kurdish=form.name_kurdish.data,
                 slug=form.slug.data,
                 description=form.description.data,
+                description_kurdish=form.description_kurdish.data,
                 teacher_id=form.teacher_id.data
             )
             db.session.add(new_subj)
@@ -308,8 +310,10 @@ def edit_subject(subject_id):
 
     if form.validate_on_submit():
         subj_record.name = form.name.data
+        subj_record.name_kurdish = form.name_kurdish.data
         subj_record.slug = form.slug.data
         subj_record.description = form.description.data
+        subj_record.description_kurdish = form.description_kurdish.data
 
         if current_user.is_admin:
              subj_record.teacher_id = form.teacher_id.data
@@ -462,6 +466,7 @@ def add_resource(page_id):
     if form.validate_on_submit():
         new_res = Resource(
             title=form.title.data,
+            title_kurdish=form.title_kurdish.data,
             link=form.link.data,
             page_id=target_page.id
         )

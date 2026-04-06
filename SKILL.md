@@ -24,6 +24,13 @@
   - `ResourceForm`: `title_kurdish`
   - `ToolForm`: `title_kurdish`, `description_kurdish`
   - `CommandForm`: `title_kurdish`, `description_kurdish`
+- **Database Schema Update**: Added Kurdish columns to models:
+  - `Subject`: `name_kurdish` (VARCHAR 100), `description_kurdish` (TEXT)
+  - `Resource`: `title_kurdish` (VARCHAR 100)
+  - `SystemCommand`: `title_kurdish` (VARCHAR 100), `description_kurdish` (TEXT)
+  - `Tool`: `title_kurdish` (VARCHAR 100), `description_kurdish` (TEXT)
+- **Route Updates**: Updated all create/edit routes to save/load Kurdish fields from forms to database
+- **Migration Script**: Created `update_db_v043.py` for safe database schema migration
 - **Translation Update**: Added 86 missing translation entries to Kurdish .po file
 - **Template Updates**: Updated all relevant templates to display new Kurdish input fields
 
@@ -113,13 +120,13 @@ User: id, username, email, password_hash, is_admin (Bool), show_name_on_subject 
 
 Student: id, full_name, access_code (Unique Index, nullable), password_hash (String, nullable), email (String, nullable), preferred_lang (String, default='en'), created_at, updated_at.
 
-Subject: id, name, slug, description, teacher_id, is_public (Bool, default=True).
+Subject: id, name, name_kurdish (VARCHAR 100, nullable), slug, description, description_kurdish (TEXT, nullable), teacher_id, is_public (Bool, default=True).
 
 Page (Lecture): id, title, content_body (HTML), content_body_kurdish (HTML), subject_id.
 
 Relationship: resources (Cascade Delete), questions (Backref).
 
-Resource: id, title, link, page_id.
+Resource: id, title, title_kurdish (VARCHAR 100, nullable), link, page_id.
 
 Question: id, question_text, option_a...option_d, correct_answer, subject_id.
 
@@ -137,11 +144,11 @@ Constraint: Must link to exam_id (Parent Attempt).
 
 SiteInfo: id, key, title, content, content_kurdish (HTML, nullable), last_updated.
 
-SystemCommand: id, title, command_text, description.
+SystemCommand: id, title, title_kurdish (VARCHAR 100, nullable), command_text, description, description_kurdish (TEXT, nullable).
 
-Bulk Import Supported: Yes (via `/admin/system/commands/import`). CSV columns: Title, Command, Description (optional).
+Bulk Import Supported: Yes (via `/admin/system/commands/import`). CSV columns: Title, Title_Kurdish (optional), Command, Description (optional), Description_Kurdish (optional).
 
-Tool: id, title, link, description, created_at.
+Tool: id, title, title_kurdish (VARCHAR 100, nullable), link, description, description_kurdish (TEXT, nullable), created_at.
 
 4. CRITICAL LOGIC PATTERNS
 A. The "Bottom-Up" Deletion Protocol (Anti-Crash)
@@ -299,6 +306,8 @@ Fix Grading Error: python regrade_all.py (Scans all answers against current Ques
 Convert SQL to Backup: python convert_sql_to_backup.py (Converts database to CSV backup format).
 
 Update Database Schema: python update_db.py (Handles database migrations).
+
+Update Database Schema v0.4.3: python update_db_v043.py (Adds Kurdish bilingual columns to Subject, Resource, SystemCommand, and Tool tables).
 
 Fix Quote Encoding: python fix_quotes.py (Fixes Kurdish character encoding issues).
 

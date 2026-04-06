@@ -276,16 +276,26 @@ Whenever a change or new feature is added, append a new version block following 
 
 ## Version 0.4.3
 **Date:** 2026-04-06
-**Summary:** Bilingual form enhancement - Added Kurdish text inputs to all content forms and updated translations.
+**Summary:** Complete bilingual support implementation - Added Kurdish database columns, form fields, and translations.
 
 ### Changes & Improvements:
-- **Bilingual Form Enhancement**: Added Kurdish text input fields to all content-related forms for complete bilingual support:
+- **Database Schema Update**: Added Kurdish columns for complete bilingual data storage:
+  - `Subject`: `name_kurdish` (VARCHAR 100), `description_kurdish` (TEXT)
+  - `Resource`: `title_kurdish` (VARCHAR 100)
+  - `SystemCommand`: `title_kurdish` (VARCHAR 100), `description_kurdish` (TEXT)
+  - `Tool`: `title_kurdish` (VARCHAR 100), `description_kurdish` (TEXT)
+- **Bilingual Form Enhancement**: Added Kurdish text input fields to all content-related forms:
   - `SubjectForm`: Added `name_kurdish`, `description_kurdish` fields
   - `PageForm`: Added `title_kurdish` field
   - `InfoPageForm`: Added `title_kurdish` field  
   - `ResourceForm`: Added `title_kurdish` field
   - `ToolForm`: Added `title_kurdish`, `description_kurdish` fields
   - `CommandForm`: Added `title_kurdish`, `description_kurdish` fields
+- **Route Updates**: Updated all create/edit routes to save/load Kurdish fields:
+  - `content.py`: `add_subject()`, `edit_subject()`, `add_resource()`
+  - `admin.py`: `add_command()`
+  - `toolbase.py`: Tool creation
+- **Migration Script**: Created `update_db_v043.py` for safe database schema migration
 - **Translation Update**: Added 86 missing translation entries to Kurdish (Sorani) messages.po file
 - **Template Updates**: Updated templates to display new Kurdish input fields:
   - `admin_dashboard.html` - Subject creation form with Kurdish fields
@@ -295,16 +305,25 @@ Whenever a change or new feature is added, append a new version block following 
   - `admin/commands.html` - Command title and description (Kurdish)
 
 ### Files Modified:
+- `app/models.py` - Added Kurdish columns to 4 models
 - `app/forms.py` - Added Kurdish field variants to 6 form classes
+- `app/routes/content.py` - Updated Subject and Resource routes
+- `app/routes/admin.py` - Updated Command routes
+- `app/routes/toolbase.py` - Updated Tool routes
 - `app/translations/ku/LC_MESSAGES/messages.po` - Added 86 missing translations
 - `app/templates/admin_dashboard.html` - Added Kurdish subject fields
 - `app/templates/admin/edit_about.html` - Added Kurdish title field
 - `app/templates/teacher/builder.html` - Added Kurdish page title and resource title
 - `app/templates/toolbase.html` - Added Kurdish tool fields
 - `app/templates/admin/commands.html` - Added Kurdish command fields
-- `SKILL.md` - Updated version and changelog
+- `SKILL.md` - Updated database schema and documentation
+- `VersionDetails.txt` - This changelog
+
+### New Files:
+- `update_db_v043.py` - Database migration script for Kurdish columns
 
 ### Next Steps:
+- Run `python update_db_v043.py` to migrate database schema
 - Snapshot as `version_0.4.3`
 - Git commit and push
 

@@ -1975,3 +1975,355 @@ msgstr "تێپەڕەوشەیەکی نوێ بنووسە بۆ گۆڕین (کەمت
 #: app/templates/admin/students.html:64
 msgid "Auto-generated secure password."
 msgstr "تێپەڕەوشەیەکی پارێزراو کە بە شێوەیەکی خۆکار دروستکراوە."
+
+# === AUTOMATICALLY ADDED MISSING TRANSLATIONS ===
+#: app/routes/admin.py:92
+msgid "Student \"%(name)s\" registered successfully."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/admin.py:107
+msgid "Password has been updated."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/admin.py:141
+msgid "Student \"%(name)s\" and all their records have been removed."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/admin.py:307 app/routes/content.py:73
+msgid "Import Error: Missing required columns: %(fields)s"
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/analytics.py:679
+msgid "System wiped clean. Please create a new administrator account."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/analytics.py:682
+msgid "CRITICAL WIPE FAILURE: %(error)s"
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/analytics.py:706
+msgid "Invalid form submission."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/auth.py:83
+msgid "Invalid email or password."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/auth.py:126
+msgid "Account created successfully! Welcome!"
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/auth.py:161
+msgid "Please enter your current password to set a new password."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/auth.py:168
+msgid "Current password is incorrect."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/content.py:123
+msgid "Import Error: Your file must contain a column named \"Name\"."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/content.py:253
+msgid "Batch Processed: %(count)s system commands documented."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/content.py:318
+msgid "Subject \"%(name)s\" created successfully."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/content.py:366
+msgid "Subject \"%(name)s\" and all internal content has been deleted."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/student.py:343
+msgid "Please confirm that you understand the consequences."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/teacher.py:114
+msgid "Error deleting account: %(error)s"
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/teacher.py:145
+msgid "Subject \"%(name)s\" is now %(status)s on the public homepage."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/teacher.py:177
+msgid "Error: The email address \"%(email)s\" is already in use."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/teacher.py:197
+msgid "Error: The name \"%(username)s\" is already taken."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/teacher.py:336
+msgid "Error: Please select a new teacher."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/teacher.py:344
+msgid "Error: Selected teacher not found."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/teacher.py:348
+msgid "Subject \"%(subject)s\" transferred from %(old)s to %(new)s."
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/toolbase.py:48
+msgid "Error transferring subject: %(error)s"
+msgstr "LEAVE THIS TO ME"
+
+#: app/routes/toolbase.py:91
+msgid "Import Error: CSV must have \"Name\" and \"Link\" columns."
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin_dashboard.html:47
+msgid "Edit \"About Us\""
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin_dashboard.html:168
+msgid "Transfer to..."
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin_dashboard.html:175
+msgid "Transfer this subject to another teacher?"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/setup.html:16
+msgid "Open in New Tab"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student_login.html:66
+msgid "Enter your email and password to continue."
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/subject.html:33
+msgid "Taught by"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/commands.html:70
+msgid "Bulk Import Commands"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/commands.html:70
+msgid "CSV Format:"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/commands.html:76
+msgid "Columns: Title, Command, Description (optional)"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/commands.html:101
+msgid "Preview Import"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/edit_about.html:55
+#: app/templates/admin/edit_student.html:31
+#: app/templates/admin/edit_teacher.html:70
+#: app/templates/admin/students.html:198
+#: app/templates/student/settings.html:101
+#: app/templates/teacher/builder.html:285
+msgid "Leave empty if Kurdish translation is not available."
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/edit_teacher.html:64
+msgid "Show Name on Subject Pages"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/import_preview.html:13
+msgid "Display your name publicly on subject pages students view."
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/import_preview.html:94
+msgid "Title"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/import_preview.html:133
+msgid "Command"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/students.html:136
+msgid "Has Password"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/admin/students.html:144
+msgid "No Password"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/delete_account.html:20
+msgid "This action cannot be undone. Please read carefully."
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/delete_account.html:23
+msgid "What will happen:"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/delete_account.html:24
+msgid "Your personal information (name, email) will be permanently removed"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/delete_account.html:25
+msgid "Your exam scores and answers will be kept for analytics (anonymized)"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/delete_account.html:26
+msgid "You will lose access to all study materials and exam history"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/delete_account.html:38
+msgid "This action is irreversible"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/delete_account.html:48
+msgid "Permanently Delete My Account"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/review_exam.html:11
+msgid "Cancel - Keep My Account"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/settings.html:66
+msgid "Change Password"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/settings.html:73
+msgid "Current Password"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/settings.html:83
+msgid "New Password"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/student/settings.html:94
+msgid "Confirm New Password"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/analytics.html:9
+msgid "Leave password fields empty to keep your current password."
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:46
+msgid "Subject Context:"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:57
+msgid "Validation Error:"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:65
+msgid "Lecture Title"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:91
+msgid "Add / Edit Kurdish Section"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:100
+msgid "Discard Changes"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:115
+msgid "Resource Manager"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:122
+msgid "Video"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:124
+msgid "YouTube"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:127
+msgid "Vimeo"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:131
+msgid "Link"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:138
+msgid "Test"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:150
+msgid "Preview"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:156
+msgid "No resources attached yet. Add one below."
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:178
+msgid "Add New Link"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:200
+msgid "Detailed Question Bank"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:207
+msgid "Manage questions, assign lectures, and set languages."
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:211
+msgid "Import Excel"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:223
+msgid "Save All Changes"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:226
+msgid "Is Kurdish? (RTL)"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:228
+msgid "Question Text"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:246
+msgid "Assigned Lecture"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:265
+msgid "Add New Question Row"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:269
+msgid "URL Slug (Unique)"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:275
+msgid "Subject Description"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:278
+msgid "Admin Control: Reassign Teacher"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:310
+#: app/templates/teacher/builder.html:338
+msgid "Video Preview"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:325
+msgid "Close"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:332
+msgid "Bulk Question Import"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:333
+msgid "Required Columns:"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/builder.html:339
+msgid "Question, Opt A, Opt B, Opt C, Opt D, Answer"
+msgstr "LEAVE THIS TO ME"
+
+#: app/templates/teacher/dashboard.html:25
+msgid "Preview Questions"
+msgstr "LEAVE THIS TO ME"
+

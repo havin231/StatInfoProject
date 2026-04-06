@@ -69,6 +69,10 @@
                         {{ subject_form.name(class="form-control form-control-sm", placeholder="e.g., Economics 101") }}
                     </div>
                     <div class="mb-2">
+                        <label class="form-label small fw-bold">{{ _('Subject Name (Kurdish)') }}</label>
+                        {{ subject_form.name_kurdish(class="form-control form-control-sm", placeholder="e.g., ئابووری ١٠١") }}
+                    </div>
+                    <div class="mb-2">
                         <label class="form-label small fw-bold">{{ _('URL Slug') }}</label>
                         {{ subject_form.slug(class="form-control form-control-sm font-monospace", placeholder="e.g.,
                         econ-101") }}
@@ -81,6 +85,10 @@
                         <label class="form-label small fw-bold">{{ _('Description') }}</label>
                         {{ subject_form.description(class="form-control form-control-sm", rows="2", placeholder="Brief
                         summary of the subject...") }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Description (Kurdish)') }}</label>
+                        {{ subject_form.description_kurdish(class="form-control form-control-sm", rows="2", placeholder="کورتەیەکی بابەتەکە...") }}
                     </div>
 
                     <div class="d-grid">

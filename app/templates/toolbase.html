@@ -39,12 +39,20 @@
                         {{ form.title(class="form-control", placeholder="e.g. Google Drive") }}
                     </div>
                     <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Tool Name (Kurdish)') }}</label>
+                        {{ form.title_kurdish(class="form-control", placeholder="e.g. گووگل درایڤ") }}
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label small fw-bold">{{ _('URL / Link') }}</label>
                         {{ form.link(class="form-control", placeholder="https://...") }}
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">{{ _('Description (Optional)') }}</label>
                         {{ form.description(class="form-control", rows="3", placeholder="Brief description...") }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Description (Kurdish)') }}</label>
+                        {{ form.description_kurdish(class="form-control", rows="3", placeholder="وەسفی کورت...") }}
                     </div>
                     <div class="d-grid">
                         <button type="submit" class="btn btn-primary">

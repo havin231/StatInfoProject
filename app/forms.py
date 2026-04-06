@@ -99,6 +99,7 @@ class InfoPageForm(FlaskForm):
     Form for editing static pages like 'About Us'.
     """
     title = StringField(_l('Page Title'), default="About Us", validators=[DataRequired()])
+    title_kurdish = StringField(_l('Page Title (Kurdish)'), validators=[Optional()])
     content = TextAreaField(_l('Page Content (English)'), validators=[DataRequired()])
     content_kurdish = TextAreaField(_l('Page Content (Kurdish)'), validators=[Optional()])
     submit = SubmitField(_l('Save Page'))
@@ -112,8 +113,10 @@ class SubjectForm(FlaskForm):
     Form for creating/editing Subjects.
     """
     name = StringField(_l('Subject Name'), validators=[DataRequired()])
+    name_kurdish = StringField(_l('Subject Name (Kurdish)'), validators=[Optional()])
     slug = StringField(_l('Unique Slug (e.g. math-101)'), validators=[DataRequired()])
     description = TextAreaField(_l('Description'), validators=[DataRequired()])
+    description_kurdish = TextAreaField(_l('Description (Kurdish)'), validators=[Optional()])
     teacher_id = SelectField(_l('Assign Teacher'), coerce=int)
     submit = SubmitField(_l('Create Subject'))
 
@@ -123,6 +126,7 @@ class PageForm(FlaskForm):
     """
     subject_id = SelectField(_l('Select Subject'), coerce=int, validators=[DataRequired()])
     title = StringField(_l('Page Title'), validators=[DataRequired()])
+    title_kurdish = StringField(_l('Page Title (Kurdish)'), validators=[Optional()])
     content_body = TextAreaField(_l('Content (English)'), validators=[DataRequired()])
     content_body_kurdish = TextAreaField(_l('Content (Kurdish)'), validators=[Optional()])
     submit = SubmitField(_l('Publish Content'))
@@ -165,6 +169,7 @@ class ResourceForm(FlaskForm):
     Form for adding a single resource link to a page.
     """
     title = StringField(_l('Resource Title (e.g. Watch Video)'), validators=[DataRequired()])
+    title_kurdish = StringField(_l('Resource Title (Kurdish)'), validators=[Optional()])
     link = StringField(_l('URL (Link)'), validators=[DataRequired()])
     submit = SubmitField(_l('Add Resource'))
 
@@ -177,8 +182,10 @@ class CommandForm(FlaskForm):
     NEW: Form for adding system commands to the admin cheat-sheet.
     """
     title = StringField(_l('Command Title (e.g. Reset DB)'), validators=[DataRequired()])
+    title_kurdish = StringField(_l('Command Title (Kurdish)'), validators=[Optional()])
     command_text = TextAreaField(_l('Command Code'), validators=[DataRequired()])
     description = TextAreaField(_l('Description / When to use'), validators=[DataRequired()])
+    description_kurdish = TextAreaField(_l('Description (Kurdish)'), validators=[Optional()])
     submit = SubmitField(_l('Save Command'))
 
 class RestoreBackupForm(FlaskForm):
@@ -206,6 +213,8 @@ class ToolForm(FlaskForm):
     Form for adding external tool links.
     """
     title = StringField(_l('Tool Name'), validators=[DataRequired()])
+    title_kurdish = StringField(_l('Tool Name (Kurdish)'), validators=[Optional()])
     link = StringField(_l('Tool URL (https://...)'), validators=[DataRequired()])
     description = TextAreaField(_l('Description'), validators=[Optional()])
+    description_kurdish = TextAreaField(_l('Description (Kurdish)'), validators=[Optional()])
     submit = SubmitField(_l('Add Tool'))

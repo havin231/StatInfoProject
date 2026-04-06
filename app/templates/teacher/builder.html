@@ -60,6 +60,13 @@
                         Informatic Systems") }}
                     </div>
 
+                    <!-- Lecture Title (Kurdish) -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase">{{ _('Lecture Title (Kurdish)')
+                            }}</label>
+                        {{ form.title_kurdish(class="form-control form-control-lg", placeholder="e.g., دەستپێکی سیستەمی زانیاری") }}
+                    </div>
+
                     <!-- English Content (Standard) -->
                     <div class="mb-4">
                         <label class="form-label fw-bold text-muted small text-uppercase">{{ _('Lecture Content
@@ -157,15 +164,18 @@
                         <form method="POST" action="/teacher/resource/add/{{ page.id }}"
                             class="row g-2 align-items-end">
                             {{ resource_form.hidden_tag() }}
-                            <div class="col-md-5">
+                            <div class="col-md-4">
                                 {{ resource_form.title(class="form-control form-control-sm", placeholder="Title (e.g.
                                 Lecture Slides)") }}
                             </div>
-                            <div class="col-md-5">
+                            <div class="col-md-3">
+                                {{ resource_form.title_kurdish(class="form-control form-control-sm", placeholder="Kurdish Title") }}
+                            </div>
+                            <div class="col-md-4">
                                 {{ resource_form.link(class="form-control form-control-sm", placeholder="https://...")
                                 }}
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 {{ resource_form.submit(class="btn btn-success btn-sm w-100") }}
                             </div>
                         </form>

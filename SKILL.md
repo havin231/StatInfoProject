@@ -10,11 +10,22 @@
 
 ## 1. PROJECT IDENTITY & CONTEXT
 - **System Name:** StatInfoProject (StatInfoPRO)
-- **Current Version:** 0.4.2 (2026-04-06)
+- **Current Version:** 0.4.3 (2026-04-06)
 - **Deployment:** PythonAnywhere (Linux/Bash/MySQL).
 - **Primary Language:** Python 3.10 / Flask 3.0.0.
 - **Frontend:** HTML5, Bootstrap 5.3, Jinja2, Custom CSS Variables.
 - **Context:** A bilingual (English/Kurdish) Learning Management System for the University of Sulaimani.
+
+## RECENT CHANGES (v0.4.3)
+- **Bilingual Form Enhancement**: Added Kurdish text input fields to all content-related forms:
+  - `SubjectForm`: `name_kurdish`, `description_kurdish`
+  - `PageForm`: `title_kurdish`
+  - `InfoPageForm`: `title_kurdish`
+  - `ResourceForm`: `title_kurdish`
+  - `ToolForm`: `title_kurdish`, `description_kurdish`
+  - `CommandForm`: `title_kurdish`, `description_kurdish`
+- **Translation Update**: Added 86 missing translation entries to Kurdish .po file
+- **Template Updates**: Updated all relevant templates to display new Kurdish input fields
 
 ## 2. FILE STRUCTURE ARCHITECTURE
 

@@ -31,13 +31,21 @@
                     <form method="POST" action="/admin/system/commands/add">
                         {{ form.hidden_tag() }}
                         <div class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 {{ form.title.label(class="form-label small fw-bold") }}
                                 {{ form.title(class="form-control", placeholder="e.g. Reset Database") }}
                             </div>
-                            <div class="col-md-8">
+                            <div class="col-md-6">
+                                {{ form.title_kurdish.label(class="form-label small fw-bold") }}
+                                {{ form.title_kurdish(class="form-control", placeholder="e.g. ڕیسێتکردنی داتابەیس") }}
+                            </div>
+                            <div class="col-md-6">
                                 {{ form.description.label(class="form-label small fw-bold") }}
                                 {{ form.description(class="form-control", placeholder="When to use this...") }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.description_kurdish.label(class="form-label small fw-bold") }}
+                                {{ form.description_kurdish(class="form-control", placeholder="کەی ئەمە بەکاربهێنرێت...") }}
                             </div>
                             <div class="col-12">
                                 {{ form.command_text.label(class="form-label small fw-bold") }}

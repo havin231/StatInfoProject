@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ subject.name }}{% endblock %}
+{% block title %}{{ subject.name_kurdish if get_locale().language == 'ku' and subject.name_kurdish else subject.name }}{% endblock %}
 
 {% block content %}
 <!--
@@ -11,11 +11,11 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-2">
             <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">{{ _('Home') }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ subject.name }}</li>
+            <li class="breadcrumb-item active" aria-current="page">{{ subject.name_kurdish if get_locale().language == 'ku' and subject.name_kurdish else subject.name }}</li>
         </ol>
     </nav>
-    <h1 class="display-5 fw-bold">{{ subject.name }}</h1>
-    <p class="lead text-muted">{{ subject.description }}</p>
+    <h1 class="display-5 fw-bold">{{ subject.name_kurdish if get_locale().language == 'ku' and subject.name_kurdish else subject.name }}</h1>
+    <p class="lead text-muted">{{ subject.description_kurdish if get_locale().language == 'ku' and subject.description_kurdish else subject.description }}</p>
     {% if subject.teacher.show_name_on_subject %}
     <p class="text-muted small">
         <i class="fas fa-chalkboard-teacher me-1"></i>

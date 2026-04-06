@@ -112,11 +112,12 @@
                     <div class="list-group mb-4">
                         {% for res in page.resources %}
                         {% set is_video = 'youtube.com' in res.link or 'youtu.be' in res.link or 'vimeo.com' in res.link %}
+                        {% set display_title = res.title_kurdish if get_locale().language == 'ku' and res.title_kurdish else res.title %}
                         
                         <div class="list-group-item d-flex justify-content-between align-items-center">
                             <div class="flex-grow-1">
                                 <div class="d-flex align-items-center mb-2">
-                                    <strong>{{ res.title }}</strong>
+                                    <strong>{{ display_title }}</strong>
                                     {% if is_video %}
                                         <span class="badge bg-primary text-white ms-2">
                                             <i class="fas fa-video me-1"></i>{{ _('Video') }}
@@ -272,12 +273,20 @@
                             {{ form.name(class="form-control") }}
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label small fw-bold">{{ _('Subject Name (Kurdish)') }}</label>
+                            {{ form.name_kurdish(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label small fw-bold">{{ _('URL Slug (Unique)') }}</label>
                             {{ form.slug(class="form-control font-monospace") }}
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">{{ _('Subject Description') }}</label>
                             {{ form.description(class="form-control", rows="3") }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">{{ _('Subject Description (Kurdish)') }}</label>
+                            {{ form.description_kurdish(class="form-control", rows="3") }}
                         </div>
                         {% if current_user.is_admin %}
                         <div class="col-12 border-top pt-3 mt-3">

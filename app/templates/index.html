@@ -56,12 +56,12 @@
             <div class="card-body d-flex flex-column">
                 <!-- Card Header -->
                 <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h3 class="h5 fw-bold">{{ subject.name }}</h3>
+                    <h3 class="h5 fw-bold">{{ subject.name_kurdish if get_locale().language == 'ku' and subject.name_kurdish else subject.name }}</h3>
                     <i class="fas fa-book text-highlight"></i>
                 </div>
 
                 <!-- Description (Truncated to keep cards even) -->
-                <p class="text-muted small flex-grow-1">{{ subject.description | truncate(100) }}</p>
+                <p class="text-muted small flex-grow-1">{{ (subject.description_kurdish if get_locale().language == 'ku' and subject.description_kurdish else subject.description) | truncate(100) }}</p>
 
                 <!-- Action Button -->
                 <a href="/subject/{{ subject.slug }}" class="btn btn-primary mt-3">
@@ -95,10 +95,10 @@
             <div class="card h-100 border-0 shadow-sm">
                 <div class="card-body d-flex flex-column">
                     <div class="d-flex justify-content-between align-items-start mb-2">
-                        <h4 class="h6 fw-bold mb-1">{{ page.title }}</h4>
-                        <span class="badge bg-secondary-subtle text-secondary ms-2" style="font-size: 0.7rem;">{{ page.subject.name }}</span>
+                        <h4 class="h6 fw-bold mb-1">{{ page.title_kurdish if get_locale().language == 'ku' and page.title_kurdish else page.title }}</h4>
+                        <span class="badge bg-secondary-subtle text-secondary ms-2" style="font-size: 0.7rem;">{{ page.subject.name_kurdish if get_locale().language == 'ku' and page.subject.name_kurdish else page.subject.name }}</span>
                     </div>
-                    <p class="text-muted small flex-grow-1" style="font-size: 0.85rem;">{{ page.content_body | striptags | truncate(150) }}</p>
+                    <p class="text-muted small flex-grow-1" style="font-size: 0.85rem;">{{ page.content_body_kurdish if get_locale().language == 'ku' and page.content_body_kurdish else page.content_body | striptags | truncate(150) }}</p>
                     <a href="/subject/{{ page.subject.slug }}/page/{{ page.id }}" class="btn btn-outline-primary mt-3 btn-sm w-100">
                         <i class="fas fa-book-open me-2"></i>{{ _('View Lesson') }}
                     </a>

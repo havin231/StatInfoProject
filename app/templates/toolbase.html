@@ -127,11 +127,11 @@
                         <div style="min-width: 0;">
                             <h6 class="fw-bold mb-0 text-highlight text-break">
                                 <a href="{{ tool.link }}" target="_blank" class="text-decoration-none text-reset">
-                                    {{ tool.title }}
+                                    {{ tool.title_kurdish if get_locale().language == 'ku' and tool.title_kurdish else tool.title }}
                                 </a>
                             </h6>
                             {% if tool.description %}
-                            <div class="text-muted small mt-1 text-break">{{ tool.description }}</div>
+                            <div class="text-muted small mt-1 text-break">{{ tool.description_kurdish if get_locale().language == 'ku' and tool.description_kurdish else tool.description }}</div>
                             {% endif %}
                             <small class="text-muted d-block mt-1 font-monospace text-break"
                                 style="font-size: 0.75rem;">

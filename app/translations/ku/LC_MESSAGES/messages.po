@@ -1976,146 +1976,145 @@ msgstr "تێپەڕەوشەیەکی نوێ بنووسە بۆ گۆڕین (کەمت
 msgid "Auto-generated secure password."
 msgstr "تێپەڕەوشەیەکی پارێزراو کە بە شێوەیەکی خۆکار دروستکراوە."
 
-# === AUTOMATICALLY ADDED MISSING TRANSLATIONS ===
 #: app/routes/admin.py:92
 msgid "Student \"%(name)s\" registered successfully."
-msgstr "LEAVE THIS TO ME"
+msgstr "قوتابی \"%(name)s\" بە سەرکەوتوویی تۆمارکرا."
 
 #: app/routes/admin.py:107
 msgid "Password has been updated."
-msgstr "LEAVE THIS TO ME"
+msgstr "تێپەڕەوشە نوێکرایەوە."
 
 #: app/routes/admin.py:141
 msgid "Student \"%(name)s\" and all their records have been removed."
-msgstr "LEAVE THIS TO ME"
+msgstr "قوتابی \"%(name)s\" و هەموو تۆمارەکانی سڕانەوە."
 
 #: app/routes/admin.py:307 app/routes/content.py:73
 msgid "Import Error: Missing required columns: %(fields)s"
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵەی هێنانەناوەوە: ستوونی پێویست کەمە: %(fields)s"
 
 #: app/routes/analytics.py:679
 msgid "System wiped clean. Please create a new administrator account."
-msgstr "LEAVE THIS TO ME"
+msgstr "سیستەمەکە بە تەواوی سڕایەوە. تکایە ئەژمارێکی نوێی بەڕێوەبەر دروست بکە."
 
 #: app/routes/analytics.py:682
 msgid "CRITICAL WIPE FAILURE: %(error)s"
-msgstr "LEAVE THIS TO ME"
+msgstr "شکستی کوشندە لە سڕینەوە: %(error)s"
 
 #: app/routes/analytics.py:706
 msgid "Invalid form submission."
-msgstr "LEAVE THIS TO ME"
+msgstr "ناردنی فۆرمەکە نادروستە."
 
 #: app/routes/auth.py:83
 msgid "Invalid email or password."
-msgstr "LEAVE THIS TO ME"
+msgstr "ئیمەیڵ یان تێپەڕەوشە هەڵەیە."
 
 #: app/routes/auth.py:126
 msgid "Account created successfully! Welcome!"
-msgstr "LEAVE THIS TO ME"
+msgstr "ئەژمارەکە بە سەرکەوتوویی دروستکرا! بەخێربێیت!"
 
 #: app/routes/auth.py:161
 msgid "Please enter your current password to set a new password."
-msgstr "LEAVE THIS TO ME"
+msgstr "تکایە تێپەڕەوشەی ئێستات بنووسە بۆ دانانی تێپەڕەوشەیەکی نوێ."
 
 #: app/routes/auth.py:168
 msgid "Current password is incorrect."
-msgstr "LEAVE THIS TO ME"
+msgstr "تێپەڕەوشەی ئێستا هەڵەیە."
 
 #: app/routes/content.py:123
 msgid "Import Error: Your file must contain a column named \"Name\"."
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵەی هێنانەناوەوە: پێویستە فایلەکەت ستوونێکی تێدابێت بە ناوی \"Name\"."
 
 #: app/routes/content.py:253
 msgid "Batch Processed: %(count)s system commands documented."
-msgstr "LEAVE THIS TO ME"
+msgstr "بە کۆمەڵ جێبەجێکرا: %(count)s فرمانی سیستەم تۆمارکرا."
 
 #: app/routes/content.py:318
 msgid "Subject \"%(name)s\" created successfully."
-msgstr "LEAVE THIS TO ME"
+msgstr "بابەتی \"%(name)s\" بە سەرکەوتوویی دروستکرا."
 
 #: app/routes/content.py:366
 msgid "Subject \"%(name)s\" and all internal content has been deleted."
-msgstr "LEAVE THIS TO ME"
+msgstr "بابەتی \"%(name)s\" و تەواوی ناوەڕۆکەکانی سڕانەوە."
 
 #: app/routes/student.py:343
 msgid "Please confirm that you understand the consequences."
-msgstr "LEAVE THIS TO ME"
+msgstr "تکایە دووپاتی بکەرەوە کە لە دەرئەنجامەکان تێدەگەیت."
 
 #: app/routes/teacher.py:114
 msgid "Error deleting account: %(error)s"
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵە لە سڕینەوەی ئەژمار: %(error)s"
 
 #: app/routes/teacher.py:145
 msgid "Subject \"%(name)s\" is now %(status)s on the public homepage."
-msgstr "LEAVE THIS TO ME"
+msgstr "بابەتی \"%(name)s\" ئێستا %(status)s کرا لە پەڕەی سەرەکی گشتی."
 
 #: app/routes/teacher.py:177
 msgid "Error: The email address \"%(email)s\" is already in use."
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵە: ناونیشانی ئیمەیڵی \"%(email)s\" پێشتر بەکارهێنراوە."
 
 #: app/routes/teacher.py:197
 msgid "Error: The name \"%(username)s\" is already taken."
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵە: ناوی \"%(username)s\" پێشتر گیراوە."
 
 #: app/routes/teacher.py:336
 msgid "Error: Please select a new teacher."
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵە: تکایە مامۆستایەکی نوێ هەڵبژێرە."
 
 #: app/routes/teacher.py:344
 msgid "Error: Selected teacher not found."
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵە: مامۆستای هەڵبژێردراو نەدۆزرایەوە."
 
 #: app/routes/teacher.py:348
 msgid "Subject \"%(subject)s\" transferred from %(old)s to %(new)s."
-msgstr "LEAVE THIS TO ME"
+msgstr "بابەتی \"%(subject)s\" گوازرایەوە لە %(old)s بۆ %(new)s."
 
 #: app/routes/toolbase.py:48
 msgid "Error transferring subject: %(error)s"
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵە لە گواستنەوەی بابەت: %(error)s"
 
 #: app/routes/toolbase.py:91
 msgid "Import Error: CSV must have \"Name\" and \"Link\" columns."
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵەی هێنانەناوەوە: پێویستە فایلی CSV ستوونی \"Name\" و \"Link\"ی تێدابێت."
 
 #: app/templates/admin_dashboard.html:47
 msgid "Edit \"About Us\""
-msgstr "LEAVE THIS TO ME"
+msgstr "دەستکاری \"دەربارەی ئێمە\""
 
 #: app/templates/admin_dashboard.html:168
 msgid "Transfer to..."
-msgstr "LEAVE THIS TO ME"
+msgstr "گواستنەوە بۆ..."
 
 #: app/templates/admin_dashboard.html:175
 msgid "Transfer this subject to another teacher?"
-msgstr "LEAVE THIS TO ME"
+msgstr "ئەم بابەتە دەگوازیتەوە بۆ مامۆستایەکی تر؟"
 
 #: app/templates/setup.html:16
 msgid "Open in New Tab"
-msgstr "LEAVE THIS TO ME"
+msgstr "لە تابێکی نوێ بیکەرەوە"
 
 #: app/templates/student_login.html:66
 msgid "Enter your email and password to continue."
-msgstr "LEAVE THIS TO ME"
+msgstr "ئیمەیڵ و تێپەڕەوشەکەت بنووسە بۆ بەردەوامبوون."
 
 #: app/templates/subject.html:33
 msgid "Taught by"
-msgstr "LEAVE THIS TO ME"
+msgstr "لەلایەن"
 
 #: app/templates/admin/commands.html:70
 msgid "Bulk Import Commands"
-msgstr "LEAVE THIS TO ME"
+msgstr "هێنانەناوەوەی فرمانەکان بە کۆمەڵ"
 
 #: app/templates/admin/commands.html:70
 msgid "CSV Format:"
-msgstr "LEAVE THIS TO ME"
+msgstr "فۆرماتی CSV:"
 
 #: app/templates/admin/commands.html:76
 msgid "Columns: Title, Command, Description (optional)"
-msgstr "LEAVE THIS TO ME"
+msgstr "ستوونەکان: ناونیشان، فرمان، وەسف (ئارەزوومەندانە)"
 
 #: app/templates/admin/commands.html:101
 msgid "Preview Import"
-msgstr "LEAVE THIS TO ME"
+msgstr "پێشبینینی هێنانەناوەوە"
 
 #: app/templates/admin/edit_about.html:55
 #: app/templates/admin/edit_student.html:31
@@ -2124,206 +2123,205 @@ msgstr "LEAVE THIS TO ME"
 #: app/templates/student/settings.html:101
 #: app/templates/teacher/builder.html:285
 msgid "Leave empty if Kurdish translation is not available."
-msgstr "LEAVE THIS TO ME"
+msgstr "بە بەتاڵی بەجێی بهێڵە ئەگەر وەرگێڕانی کوردی بەردەست نییە."
 
 #: app/templates/admin/edit_teacher.html:64
 msgid "Show Name on Subject Pages"
-msgstr "LEAVE THIS TO ME"
+msgstr "پیشاندانی ناو لە لاپەڕەکانی بابەت"
 
 #: app/templates/admin/import_preview.html:13
 msgid "Display your name publicly on subject pages students view."
-msgstr "LEAVE THIS TO ME"
+msgstr "ناوەکەت بە گشتی پیشان بدە لەو لاپەڕانەی بابەت کە قوتابیان دەبینن."
 
 #: app/templates/admin/import_preview.html:94
 msgid "Title"
-msgstr "LEAVE THIS TO ME"
+msgstr "ناونیشان"
 
 #: app/templates/admin/import_preview.html:133
 msgid "Command"
-msgstr "LEAVE THIS TO ME"
+msgstr "فرمان"
 
 #: app/templates/admin/students.html:136
 msgid "Has Password"
-msgstr "LEAVE THIS TO ME"
+msgstr "تێپەڕەوشەی هەیە"
 
 #: app/templates/admin/students.html:144
 msgid "No Password"
-msgstr "LEAVE THIS TO ME"
+msgstr "تێپەڕەوشەی نییە"
 
 #: app/templates/student/delete_account.html:20
 msgid "This action cannot be undone. Please read carefully."
-msgstr "LEAVE THIS TO ME"
+msgstr "ئەم کردارە ناگەڕێتەوە. تکایە بە وریایی بیخوێنەرەوە."
 
 #: app/templates/student/delete_account.html:23
 msgid "What will happen:"
-msgstr "LEAVE THIS TO ME"
+msgstr "چی ڕوودەدات:"
 
 #: app/templates/student/delete_account.html:24
 msgid "Your personal information (name, email) will be permanently removed"
-msgstr "LEAVE THIS TO ME"
+msgstr "زانیارییە کەسییەکانت (ناو، ئیمەیڵ) بۆ هەمیشە دەسڕێنەوە"
 
 #: app/templates/student/delete_account.html:25
 msgid "Your exam scores and answers will be kept for analytics (anonymized)"
-msgstr "LEAVE THIS TO ME"
+msgstr "نمرەکانی تاقیکردنەوە و وەڵامەکانت بۆ شیکردنەوە دەمێننەوە (بەبێ ناو)"
 
 #: app/templates/student/delete_account.html:26
 msgid "You will lose access to all study materials and exam history"
-msgstr "LEAVE THIS TO ME"
+msgstr "دەستڕەسی بۆ هەموو ماددە خوێندنەکان و مێژووی تاقیکردنەوەکان لەدەست دەدەیت"
 
 #: app/templates/student/delete_account.html:38
 msgid "This action is irreversible"
-msgstr "LEAVE THIS TO ME"
+msgstr "ئەم کردارە ناگەڕێتەوە دواوە"
 
 #: app/templates/student/delete_account.html:48
 msgid "Permanently Delete My Account"
-msgstr "LEAVE THIS TO ME"
+msgstr "ئەژمارەکەم بۆ هەمیشە بسڕەوە"
 
 #: app/templates/student/review_exam.html:11
 msgid "Cancel - Keep My Account"
-msgstr "LEAVE THIS TO ME"
+msgstr "پاشگەزبوونەوە - هێشتنەوەی ئەژمارەکەم"
 
 #: app/templates/student/settings.html:66
 msgid "Change Password"
-msgstr "LEAVE THIS TO ME"
+msgstr "گۆڕینی تێپەڕەوشە"
 
 #: app/templates/student/settings.html:73
 msgid "Current Password"
-msgstr "LEAVE THIS TO ME"
+msgstr "تێپەڕەوشەی ئێستا"
 
 #: app/templates/student/settings.html:83
 msgid "New Password"
-msgstr "LEAVE THIS TO ME"
+msgstr "تێپەڕەوشەی نوێ"
 
 #: app/templates/student/settings.html:94
 msgid "Confirm New Password"
-msgstr "LEAVE THIS TO ME"
+msgstr "دووپاتکردنەوەی تێپەڕەوشەی نوێ"
 
 #: app/templates/teacher/analytics.html:9
 msgid "Leave password fields empty to keep your current password."
-msgstr "LEAVE THIS TO ME"
+msgstr "خانەکانی تێپەڕەوشە بە بەتاڵی جێبهێڵە بۆ هێشتنەوەی تێپەڕەوشەی ئێستات."
 
 #: app/templates/teacher/builder.html:46
 msgid "Subject Context:"
-msgstr "LEAVE THIS TO ME"
+msgstr "کۆنتێکستی بابەت:"
 
 #: app/templates/teacher/builder.html:57
 msgid "Validation Error:"
-msgstr "LEAVE THIS TO ME"
+msgstr "هەڵەی پشتڕاستکردنەوە:"
 
 #: app/templates/teacher/builder.html:65
 msgid "Lecture Title"
-msgstr "LEAVE THIS TO ME"
+msgstr "ناونیشانی وانە"
 
 #: app/templates/teacher/builder.html:91
 msgid "Add / Edit Kurdish Section"
-msgstr "LEAVE THIS TO ME"
+msgstr "زیادکردن / دەستکاریکردنی بەشی کوردی"
 
 #: app/templates/teacher/builder.html:100
 msgid "Discard Changes"
-msgstr "LEAVE THIS TO ME"
+msgstr "پاشگەزبوونەوە لە گۆڕانکارییەکان"
 
 #: app/templates/teacher/builder.html:115
 msgid "Resource Manager"
-msgstr "LEAVE THIS TO ME"
+msgstr "بەڕێوەبەری سەرچاوەکان"
 
 #: app/templates/teacher/builder.html:122
 msgid "Video"
-msgstr "LEAVE THIS TO ME"
+msgstr "ڤیدیۆ"
 
 #: app/templates/teacher/builder.html:124
 msgid "YouTube"
-msgstr "LEAVE THIS TO ME"
+msgstr "YouTube"
 
 #: app/templates/teacher/builder.html:127
 msgid "Vimeo"
-msgstr "LEAVE THIS TO ME"
+msgstr "Vimeo"
 
 #: app/templates/teacher/builder.html:131
 msgid "Link"
-msgstr "LEAVE THIS TO ME"
+msgstr "بەستەر"
 
 #: app/templates/teacher/builder.html:138
 msgid "Test"
-msgstr "LEAVE THIS TO ME"
+msgstr "تاقیکردنەوە"
 
 #: app/templates/teacher/builder.html:150
 msgid "Preview"
-msgstr "LEAVE THIS TO ME"
+msgstr "پێشبینین"
 
 #: app/templates/teacher/builder.html:156
 msgid "No resources attached yet. Add one below."
-msgstr "LEAVE THIS TO ME"
+msgstr "هیچ سەرچاوەیەک هاوپێچ نەکراوە. دانەیەک لە خوارەوە زیاد بکە."
 
 #: app/templates/teacher/builder.html:178
 msgid "Add New Link"
-msgstr "LEAVE THIS TO ME"
+msgstr "زیادکردنی بەستەری نوێ"
 
 #: app/templates/teacher/builder.html:200
 msgid "Detailed Question Bank"
-msgstr "LEAVE THIS TO ME"
+msgstr "بانکی پرسیاری ورد"
 
 #: app/templates/teacher/builder.html:207
 msgid "Manage questions, assign lectures, and set languages."
-msgstr "LEAVE THIS TO ME"
+msgstr "بەڕێوەبردنی پرسیارەکان، دیاریکردنی وانەکان، و ڕێکخستنی زمانەکان."
 
 #: app/templates/teacher/builder.html:211
 msgid "Import Excel"
-msgstr "LEAVE THIS TO ME"
+msgstr "هێنانەناوەوەی ئێکسڵ"
 
 #: app/templates/teacher/builder.html:223
 msgid "Save All Changes"
-msgstr "LEAVE THIS TO ME"
+msgstr "پاشەکەوتکردنی هەموو گۆڕانکارییەکان"
 
 #: app/templates/teacher/builder.html:226
 msgid "Is Kurdish? (RTL)"
-msgstr "LEAVE THIS TO ME"
+msgstr "بە کوردییە؟ (ڕاست بۆ چەپ)"
 
 #: app/templates/teacher/builder.html:228
 msgid "Question Text"
-msgstr "LEAVE THIS TO ME"
+msgstr "دەقی پرسیار"
 
 #: app/templates/teacher/builder.html:246
 msgid "Assigned Lecture"
-msgstr "LEAVE THIS TO ME"
+msgstr "وانەی دیاریکراو"
 
 #: app/templates/teacher/builder.html:265
 msgid "Add New Question Row"
-msgstr "LEAVE THIS TO ME"
+msgstr "زیادکردنی ڕیزە پرسیارێکی نوێ"
 
 #: app/templates/teacher/builder.html:269
 msgid "URL Slug (Unique)"
-msgstr "LEAVE THIS TO ME"
+msgstr "ناسنامەی بەستەر (بێهاوتا)"
 
 #: app/templates/teacher/builder.html:275
 msgid "Subject Description"
-msgstr "LEAVE THIS TO ME"
+msgstr "وەسفی بابەت"
 
 #: app/templates/teacher/builder.html:278
 msgid "Admin Control: Reassign Teacher"
-msgstr "LEAVE THIS TO ME"
+msgstr "کۆنتڕۆڵی بەڕێوەبەر: دووبارە دیاریکردنەوەی مامۆستا"
 
 #: app/templates/teacher/builder.html:310
 #: app/templates/teacher/builder.html:338
 msgid "Video Preview"
-msgstr "LEAVE THIS TO ME"
+msgstr "پێشبینینی ڤیدیۆ"
 
 #: app/templates/teacher/builder.html:325
 msgid "Close"
-msgstr "LEAVE THIS TO ME"
+msgstr "داخستن"
 
 #: app/templates/teacher/builder.html:332
 msgid "Bulk Question Import"
-msgstr "LEAVE THIS TO ME"
+msgstr "هێنانەناوەوەی پرسیار بە کۆمەڵ"
 
 #: app/templates/teacher/builder.html:333
 msgid "Required Columns:"
-msgstr "LEAVE THIS TO ME"
+msgstr "ستوونە داواکراوەکان:"
 
 #: app/templates/teacher/builder.html:339
 msgid "Question, Opt A, Opt B, Opt C, Opt D, Answer"
-msgstr "LEAVE THIS TO ME"
+msgstr "پرسیار، بژاردەی ئەی، بژاردەی بی، بژاردەی سی، بژاردەی دی، وەڵام"
 
 #: app/templates/teacher/dashboard.html:25
 msgid "Preview Questions"
-msgstr "LEAVE THIS TO ME"
-
+msgstr "پێشبینینی پرسیارەکان"

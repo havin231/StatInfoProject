@@ -57,6 +57,10 @@ msgstr "دروستکردنی بەڕێوەبەری سیستەم"
 msgid "Teacher Name"
 msgstr "ناوی مامۆستا"
 
+#: app/forms.py:39 app/forms.py:49
+msgid "Teacher Name (Kurdish)"
+msgstr "ناوی مامۆستا (کوردی)"
+
 #: app/forms.py:41 app/forms.py:51
 msgid "Grant Admin Access"
 msgstr "پێدانی دەسەڵاتی بەڕێوەبەر"

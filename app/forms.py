@@ -36,6 +36,7 @@ class TeacherSignupForm(FlaskForm):
     Form for Admins to create new staff accounts.
     """
     username = StringField(_l('Teacher Name'), validators=[DataRequired()])
+    username_kurdish = StringField(_l('Teacher Name (Kurdish)'), validators=[Optional()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
     is_admin = BooleanField(_l('Grant Admin Access'))
@@ -46,6 +47,7 @@ class TeacherEditForm(FlaskForm):
     Form for editing existing staff.
     """
     username = StringField(_l('Teacher Name'), validators=[DataRequired()])
+    username_kurdish = StringField(_l('Teacher Name (Kurdish)'), validators=[Optional()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(_l('Reset Password (Optional)'), validators=[Optional(), Length(min=6)])
     is_admin = BooleanField(_l('Grant Admin Access'))

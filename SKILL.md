@@ -10,11 +10,21 @@
 
 ## 1. PROJECT IDENTITY & CONTEXT
 - **System Name:** StatInfoProject (StatInfoPRO)
-- **Current Version:** 0.4.3 (2026-04-06)
+- **Current Version:** 0.4.4 (2026-04-06)
 - **Deployment:** PythonAnywhere (Linux/Bash/MySQL).
 - **Primary Language:** Python 3.10 / Flask 3.0.0.
 - **Frontend:** HTML5, Bootstrap 5.3, Jinja2, Custom CSS Variables.
 - **Context:** A bilingual (English/Kurdish) Learning Management System for the University of Sulaimani.
+
+## RECENT CHANGES (v0.4.4)
+- **Teacher Kurdish Name Support**: Added `username_kurdish` field to User model for bilingual teacher name display:
+  - `User`: `username_kurdish` (VARCHAR 20, nullable)
+  - `TeacherSignupForm`: Added `username_kurdish` field with optional validator
+  - `TeacherEditForm`: Added `username_kurdish` field for editing existing teachers
+  - Updated `add_teacher()` and `edit_teacher()` routes to save Kurdish names
+  - Updated `edit_teacher.html` template with Kurdish name input field
+  - Updated `subject.html` to display Kurdish teacher name when locale is 'ku'
+  - Added Kurdish translation "ناوی مامۆستا (کوردی)" for the form label
 
 ## RECENT CHANGES (v0.4.3)
 - **Bilingual Form Enhancement**: Added Kurdish text input fields to all content-related forms:
@@ -116,7 +126,7 @@ Constraint: InnoDB Engine (Enforces Foreign Keys).
 
 Models & Fields
 
-User: id, username, email, password_hash, is_admin (Bool), show_name_on_subject (Bool, default=False), preferred_lang (String, default='en').
+User: id, username, username_kurdish (String 20, nullable), email, password_hash, is_admin (Bool), show_name_on_subject (Bool, default=False), preferred_lang (String, default='en').
 
 Student: id, full_name, access_code (Unique Index, nullable), password_hash (String, nullable), email (String, nullable), preferred_lang (String, default='en'), created_at, updated_at.
 

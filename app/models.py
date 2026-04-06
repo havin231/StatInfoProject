@@ -29,6 +29,9 @@ class User(db.Model, UserMixin):
     # NEW: Display name on subject pages (with teacher's consent)
     show_name_on_subject = db.Column(db.Boolean, default=False)
 
+    # NEW: Kurdish name for bilingual display
+    username_kurdish = db.Column(db.String(20), nullable=True)
+
     # Preferred Language for UI (e.g., 'en', 'ku')
     preferred_lang = db.Column(db.String(10), default='en')
 

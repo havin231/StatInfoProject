@@ -328,3 +328,37 @@ Whenever a change or new feature is added, append a new version block following 
 - Git commit and push
 
 ---
+
+## Version 0.4.4
+**Date:** 2026-04-06
+**Summary:** Added bilingual teacher name support with Kurdish name field.
+
+### Changes & Improvements:
+- **Teacher Kurdish Name Support**: Added `username_kurdish` field to User model for bilingual teacher name display on subject pages.
+- **Database Schema Update**: Added `username_kurdish` column to User model (VARCHAR 20, nullable).
+- **Form Updates**: 
+  - `TeacherSignupForm`: Added `username_kurdish` field with optional validator
+  - `TeacherEditForm`: Added `username_kurdish` field for editing existing teachers
+- **Route Updates**: Updated `add_teacher()` and `edit_teacher()` routes in `teacher.py` to save/load Kurdish names.
+- **Template Updates**:
+  - `edit_teacher.html`: Added Kurdish name input field to teacher edit form
+  - `subject.html`: Displays Kurdish teacher name when locale is 'ku' and `username_kurdish` is set
+- **Translation Update**: Added Kurdish translation "ناوی مامۆستا (کوردی)" for the new form label.
+- **SKILL.md Update**: Updated database schema documentation and version history.
+
+### Files Modified:
+- `app/models.py` - Added `username_kurdish` column to User model
+- `app/forms.py` - Added `username_kurdish` fields to TeacherSignupForm and TeacherEditForm
+- `app/routes/teacher.py` - Updated add_teacher() and edit_teacher() routes
+- `app/templates/admin/edit_teacher.html` - Added Kurdish name input field
+- `app/templates/subject.html` - Updated teacher name display for bilingual support
+- `app/translations/ku/LC_MESSAGES/messages.po` - Added Kurdish translation for form label
+- `SKILL.md` - Updated version and database schema documentation
+- `VersionDetails.txt` - This changelog
+
+### Next Steps:
+- Run database migration to add username_kurdish column (if using existing database)
+- Snapshot as `version_0.4.4`
+- Git commit and push
+
+---

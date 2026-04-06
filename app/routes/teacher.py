@@ -184,6 +184,7 @@ def add_teacher():
         is_admin_user = form.is_admin.data
         new_staff_member = User(
             username=form.username.data,
+            username_kurdish=form.username_kurdish.data,
             email=form.email.data,
             password_hash=password_hash_str,
             is_admin=is_admin_user
@@ -232,6 +233,7 @@ def edit_teacher(teacher_id):
 
         # Update Visible Info
         target_staff.username = form.username.data
+        target_staff.username_kurdish = form.username_kurdish.data
         target_staff.email = form.email.data
         target_staff.show_name_on_subject = form.show_name_on_subject.data
 

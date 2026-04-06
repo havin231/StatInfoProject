@@ -19,7 +19,7 @@
     {% if subject.teacher.show_name_on_subject %}
     <p class="text-muted small">
         <i class="fas fa-chalkboard-teacher me-1"></i>
-        {{ _('Taught by') }}: <span class="fw-bold">{{ subject.teacher.username }}</span>
+        {{ _('Taught by') }}: <span class="fw-bold">{{ subject.teacher.username_kurdish if get_locale().language == 'ku' and subject.teacher.username_kurdish else subject.teacher.username }}</span>
     </p>
     {% endif %}
 </div>

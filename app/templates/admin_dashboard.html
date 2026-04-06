@@ -288,8 +288,11 @@
                 <form method="POST" action="/admin/add_teacher">
                     {{ teacher_form.hidden_tag() }}
                     <div class="row g-2 align-items-end">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             {{ teacher_form.username(class="form-control form-control-sm", placeholder="Full Name") }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ teacher_form.username_kurdish(class="form-control form-control-sm", placeholder="Kurdish Name") }}
                         </div>
                         <div class="col-md-3">
                             {{ teacher_form.email(class="form-control form-control-sm", placeholder="Email") }}
@@ -297,15 +300,15 @@
                         <div class="col-md-3">
                             {{ teacher_form.password(class="form-control form-control-sm", placeholder="Password") }}
                         </div>
-                        <div class="col-md-2">
-                            <div class="form-check form-switch mb-2 small">
-                                {{ teacher_form.is_admin(class="form-check-input", role="switch") }}
-                                <label class="form-check-label" for="is_admin">{{ _('Admin?') }}</label>
-                            </div>
-                        </div>
                         <div class="col-12">
-                            <div class="d-grid">
-                                {{ teacher_form.submit(class="btn btn-lime btn-sm w-100") }}
+                            <div class="d-flex gap-3 align-items-center">
+                                <div class="form-check form-switch small">
+                                    {{ teacher_form.is_admin(class="form-check-input", role="switch") }}
+                                    <label class="form-check-label" for="is_admin">{{ _('Admin?') }}</label>
+                                </div>
+                                <div class="flex-grow-1">
+                                    {{ teacher_form.submit(class="btn btn-lime btn-sm w-100") }}
+                                </div>
                             </div>
                         </div>
                     </div>

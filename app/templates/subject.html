@@ -14,14 +14,38 @@
             <li class="breadcrumb-item active" aria-current="page">{{ subject.name_kurdish if get_locale().language == 'ku' and subject.name_kurdish else subject.name }}</li>
         </ol>
     </nav>
-    <h1 class="display-5 fw-bold">{{ subject.name_kurdish if get_locale().language == 'ku' and subject.name_kurdish else subject.name }}</h1>
-    <p class="lead text-muted">{{ subject.description_kurdish if get_locale().language == 'ku' and subject.description_kurdish else subject.description }}</p>
-    {% if subject.teacher.show_name_on_subject %}
-    <p class="text-muted small">
-        <i class="fas fa-chalkboard-teacher me-1"></i>
-        {{ _('Taught by') }}: <span class="fw-bold">{{ subject.teacher.username_kurdish if get_locale().language == 'ku' and subject.teacher.username_kurdish else subject.teacher.username }}</span>
-    </p>
-    {% endif %}
+    <div class="d-flex justify-content-between align-items-start">
+        <div class="flex-grow-1">
+            <h1 class="display-5 fw-bold">{{ subject.name_kurdish if get_locale().language == 'ku' and subject.name_kurdish else subject.name }}</h1>
+            <p class="lead text-muted">{{ subject.description_kurdish if get_locale().language == 'ku' and subject.description_kurdish else subject.description }}</p>
+            <!-- v0.5.0: Multi-Teacher Support - Show all assigned teachers -->
+            {% if subject.teacher_assignments %}
+            <p class="text-muted small">
+                <i class="fas fa-chalkboard-teacher me-1"></i>
+                {{ _('Taught by') }}:
+                {% for assignment in subject.teacher_assignments %}
+                {% if assignment.show_name %}
+                <span class="fw-bold">
+                    {% if get_locale().language == 'ku' and assignment.teacher.username_kurdish %}
+                    {{ assignment.teacher.username_kurdish }}
+                    {% else %}
+                    {{ assignment.teacher.username }}
+                    {% endif %}
+                </span>{% if not loop.last %}, {% endif %}
+                {% endif %}
+                {% endfor %}
+            </p>
+            {% endif %}
+        </div>
+        <!-- PIN BUTTON FOR STUDENTS -->
+        {% if session.get('student_id') %}
+        <button id="pinSubjectBtn" class="btn btn-outline-primary ms-3" data-slug="{{ subject.slug }}"
+            data-pinned="{{ 'true' if is_pinned else 'false' }}" style="min-width: 120px;">
+            <i class="fas fa-thumbtack me-2" id="pinIcon"></i>
+            <span id="pinText">{{ _('Unpin') if is_pinned else _('Pin') }}</span>
+        </button>
+        {% endif %}
+    </div>
 </div>
 
 <div class="row g-4">
@@ -153,4 +177,55 @@
 
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+{% if session.get('student_id') %}
+<script>
+    // Pin/Unpin functionality for students
+    document.addEventListener('DOMContentLoaded', function() {
+        const pinBtn = document.getElementById('pinSubjectBtn');
+        if (!pinBtn) return;
+
+        const pinIcon = document.getElementById('pinIcon');
+        const pinText = document.getElementById('pinText');
+        const slug = pinBtn.dataset.slug;
+
+        pinBtn.addEventListener('click', async function() {
+            pinBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/subject/' + slug + '/pin', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    if (data.pinned) {
+                        pinBtn.classList.remove('btn-outline-primary');
+                        pinBtn.classList.add('btn-primary');
+                        pinText.textContent = "{{ _('Unpin') }}";
+                        pinBtn.dataset.pinned = 'true';
+                    } else {
+                        pinBtn.classList.remove('btn-primary');
+                        pinBtn.classList.add('btn-outline-primary');
+                        pinText.textContent = "{{ _('Pin Subject') }}";
+                        pinBtn.dataset.pinned = 'false';
+                    }
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error toggling pin:', error);
+                alert('{{ _('Network error. Please try again.') }}');
+            } finally {
+                pinBtn.disabled = false;
+            }
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}

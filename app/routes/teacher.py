@@ -3,8 +3,9 @@ from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
 from app import db, bcrypt
-from app.models import User, Subject, Page, Question, ExamResult, StudentAnswer, Student
+from app.models import User, Subject, Page, Question, ExamResult, StudentAnswer, Student, SubjectTeacher, AdminNotification
 from app.forms import SubjectForm, TeacherSignupForm, TeacherEditForm
+from app.routes.helpers import can_edit_subject
 
 teacher = Blueprint('teacher', __name__)
 
@@ -24,6 +25,15 @@ def teacher_dashboard():
     """
     # 1. Administrator Context
     if current_user.is_admin:
+        # v0.5.0 - Admin Notification Cleanup (Delete > 3 days old)
+        from datetime import timedelta
+        cutoff_date = datetime.utcnow() - timedelta(days=3)
+        AdminNotification.query.filter(AdminNotification.created_at < cutoff_date).delete()
+        db.session.commit()
+
+        # Fetch Notifications
+        notifications = AdminNotification.query.order_by(AdminNotification.created_at.desc()).all()
+
         # Fetch the complete subject roster
         all_global_subjects = Subject.query.all()
         # Fetch the complete staff roster
@@ -44,26 +54,31 @@ def teacher_dashboard():
             subjects=all_global_subjects,
             teachers=all_staff_members,
             subject_form=subject_creation_form,
-            teacher_form=new_teacher_form
+            teacher_form=new_teacher_form,
+            notifications=notifications
         )
 
-    # 2. Standard Teacher Context
+    # 2. Standard Teacher Context (v0.5.0 - Multi-Teacher Support)
     else:
-        # Fetch only subjects assigned to this specific teacher
-        assigned_subjects = Subject.query.filter_by(
-            teacher_id=current_user.id
+        # Fetch subjects assigned to this teacher via SubjectTeacher association
+        assigned_subjects = db.session.query(Subject).join(
+            SubjectTeacher
+        ).filter(
+            SubjectTeacher.teacher_id == current_user.id
         ).all()
+
+        # Get subject IDs for filtering results
+        assigned_subject_ids = [s.id for s in assigned_subjects]
 
         # Calculate performance metrics for the teacher's classroom
-        # Joins ExamResults with Subjects to filter by teacher_id
-        aggregate_results_count = ExamResult.query.join(Subject).filter(
-            Subject.teacher_id == current_user.id
-        ).count()
+        aggregate_results_count = ExamResult.query.filter(
+            ExamResult.subject_id.in_(assigned_subject_ids)
+        ).count() if assigned_subject_ids else 0
 
         # Student Rankings
-        set_results = ExamResult.query.join(Subject).filter(
-            Subject.teacher_id == current_user.id
-        ).all()
+        set_results = ExamResult.query.filter(
+            ExamResult.subject_id.in_(assigned_subject_ids)
+        ).all() if assigned_subject_ids else []
         unique_student_ids = set(result.student_id for result in set_results)
         students_active = Student.query.filter(Student.id.in_(unique_student_ids)).all()
         student_metric_data = []
@@ -131,8 +146,8 @@ def toggle_visibility(subject_id):
     """
     subject = Subject.query.get_or_404(subject_id)
 
-    # Permission Check: Must be Admin OR Owner
-    if not current_user.is_admin and subject.teacher_id != current_user.id:
+    # Permission Check: Must be Admin OR Assigned Teacher (v0.5.0 - Multi-Teacher)
+    if not can_edit_subject(subject):
         abort(403)
 
     try:

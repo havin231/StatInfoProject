@@ -345,16 +345,7 @@ Whenever a change or new feature is added, append a new version block following 
   - `subject.html`: Displays Kurdish teacher name when locale is 'ku' and `username_kurdish` is set
 - **Translation Update**: Added Kurdish translation "ناوی مامۆستا (کوردی)" for the new form label.
 - **SKILL.md Update**: Updated database schema documentation and version history.
-
-### Files Modified:
-- `app/models.py` - Added `username_kurdish` column to User model
-- `app/forms.py` - Added `username_kurdish` fields to TeacherSignupForm and TeacherEditForm
-- `app/routes/teacher.py` - Updated add_teacher() and edit_teacher() routes
-- `app/templates/admin/edit_teacher.html` - Added Kurdish name input field
-- `app/templates/subject.html` - Updated teacher name display for bilingual support
-- `app/translations/ku/LC_MESSAGES/messages.po` - Added Kurdish translation for form label
-- `SKILL.md` - Updated version and database schema documentation
-- `VersionDetails.txt` - This changelog
+- **VersionDetails.txt**: This changelog
 
 ### Next Steps:
 - Run database migration to add username_kurdish column (if using existing database)
@@ -362,3 +353,18 @@ Whenever a change or new feature is added, append a new version block following 
 - Git commit and push
 
 ---
+
+## Version 0.5.0
+**Date:** 2026-04-16
+**Summary:** Major feature release - Student pinning, lesson progress, progressive exams, multi-teacher support, admin notifications, and conditional homepage.
+
+### Changes & Improvements:
+- **Feature 1 - Student Pinned Subjects**: Students can now pin subjects for quick access. New `StudentPinnedSubject` model with API endpoints for pin/unpin. Pin button added to subject pages. New profile page with pinned subjects tab.
+- **Feature 2 - Lesson Progress Tracking**: Students can mark lessons as completed. New `LessonProgress` model with completion checkbox on lesson pages. Visual feedback with progress indicators.
+- **Feature 3 - Admin Notifications**: System now automatically generates notifications for admins when students sign up or submit exams. Notifications are automatically deleted after 3 days via background cleanup logic. Added notification center UI for admins.
+- **Feature 4 - Progressive Exam Submission**: Students can save exam progress and continue later. New `ExamProgress` model tracking submitted answers per question. Grayed-out questions show previous answers. "Save Progress" and "Retake Exam" buttons. Progress bar shows completion status.
+- **Feature 5 - Profile Tabs**: New student profile page with two tabs: Pinned Subjects and Exam History. Overall performance score displayed at top. Direct links to review past exams.
+- **Feature 6 - Multi-Teacher Subjects**: New `SubjectTeacher` association table allowing multiple teachers per subject. Updated `can_edit_subject()` helper function for permission checks. All content routes now support co-teachers. Subject page displays all assigned teachers.
+- **Feature 7 - Conditional Homepage Text**: Welcome text on homepage now hidden for logged-in users. "Available Subjects" heading shown instead for authenticated users.
+- **Database**: Created `update_db_v050.py` migration script adding 5 new tables: `student_pinned_subject`, `lesson_progress`, `admin_notification`, `subject_teacher`, `exam_progress`.
+- **Translations**: Added 40+ new Kurdish translations for all v0.5.0 features. Compiled with `pybabel compile`.

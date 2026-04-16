@@ -3,7 +3,7 @@ from flask_babel import gettext as _
 from flask_login import login_user, current_user, logout_user
 
 from app import db, bcrypt, limiter
-from app.models import Student
+from app.models import Student, AdminNotification
 from app.forms import LoginForm, StudentSignupForm, StudentSettingsForm
 from app.models import User
 
@@ -115,6 +115,18 @@ def student_signup():
         try:
             db.session.add(new_student)
             db.session.commit()
+            
+            # v0.5.0 - Create Admin Notification for new signup
+            try:
+                signup_notif = AdminNotification(
+                    category='signup',
+                    content=f"New Student registered: {new_student.full_name} ({new_student.email})"
+                )
+                db.session.add(signup_notif)
+                db.session.commit()
+            except Exception as e_notif:
+                db.session.rollback()
+                print(f"Notification error: {e_notif}")
             
             # Auto-login
             session['student_id'] = new_student.id

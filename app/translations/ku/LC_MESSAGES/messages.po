@@ -2329,3 +2329,106 @@ msgstr "پرسیار، بژاردەی ئەی، بژاردەی بی، بژارد�
 #: app/templates/teacher/dashboard.html:25
 msgid "Preview Questions"
 msgstr "پێشبینینی پرسیارەکان"
+
+# --- v0.5.0 NEW TRANSLATIONS ---
+
+# Feature 7: Conditional homepage
+msgid "Available Subjects"
+msgstr "بابەتە بەردەستەکان"
+
+# Feature 1: Pinned Subjects
+msgid "Pin Subject"
+msgstr "بابەت بچسپینە"
+
+msgid "Unpin"
+msgstr "لابردن"
+
+msgid "Unpin Subject"
+msgstr "لابردنی بابەت"
+
+msgid "Pinned"
+msgstr "بچسپاوە"
+
+msgid "Pinned Subjects"
+msgstr "بابەتە بچسپراوەکان"
+
+msgid "Subject pinned successfully"
+msgstr "بابەت بە سەرکەوتوویی بچسپێنرا"
+
+msgid "Subject unpinned successfully"
+msgstr "بابەت بە سەرکەوتوویی لابرا"
+
+# Feature 2: Lesson Progress
+msgid "Mark lesson as completed"
+msgstr "نیشانکردنی وانە وەک تەواو بوو"
+
+msgid "Lesson completed"
+msgstr "وانە تەواو بوو"
+
+msgid "Lesson marked as completed"
+msgstr "وانە وەک تەواو نیشانکرا"
+
+msgid "Lesson marked as incomplete"
+msgstr "نیشانەی تەواوی لابرا"
+
+msgid "Progress"
+msgstr "پێشکەوتن"
+
+# Feature 4: Progressive Exam
+msgid "Answered"
+msgstr "وەڵامدراوە"
+
+msgid "Submitted"
+msgstr "نێردراوە"
+
+msgid "Your answer:"
+msgstr "وەڵامەکەت:"
+
+msgid "Save Progress"
+msgstr "پاشەکەوتی بکە"
+
+msgid "Saved!"
+msgstr "پاشەکەوتکرا!"
+
+msgid "Saving..."
+msgstr "پاشەکەوتکردن..."
+
+msgid "You have already completed this exam."
+msgstr "تۆ پێشتر ئەم تاقیکردنەوەیەت تەواو کردووە."
+
+msgid "Retake Exam"
+msgstr "دووبارە تاقیکردنەوە"
+
+msgid "Are you sure? This will clear all your answers."
+msgstr "دڵنیایت؟ ئەمە هەموو وەڵامەکانت دەسڕێتەوە."
+
+msgid "Exam progress has been reset. You can now retake the exam."
+msgstr "پێشکەوتنی تاقیکردنەوە ڕێکخرایەوە. ئێستا دەتوانی دووبارە تاقیکردنەوەکە بکەیت."
+
+msgid "Progress saved successfully"
+msgstr "پاشکەوت بە سەرکەوتوویی انجام بوو"
+
+# Feature 5: Profile
+msgid "My Profile"
+msgstr "پڕۆفایلی من"
+
+msgid "Overall Performance"
+msgstr "ئەنجامی گشتی"
+
+msgid "Average across %(count)s exams"
+msgstr "ڕێژەی تێکڕا لە %(count)s تاقیکردنەوە"
+
+msgid "No Pinned Subjects"
+msgstr "هیچ بابەتێکی بچسپراو نییە"
+
+msgid "Pin your favorite subjects here for quick access."
+msgstr "بابەتە دڵخوازەکانت لێرە بچسپینە بۆ دەستگەیشتنی خێرا."
+
+msgid "No Exams Yet"
+msgstr "هێشتا هیچ تاقیکردنەوەیەک نییە"
+
+msgid "Take your first exam to see your history here."
+msgstr "یەکەم تاقیکردنەوەکەت بکە بۆ بینینی مێژووەکەت لێرە."
+
+msgid "All Exam Attempts"
+msgstr "هەموو هەوڵەکانی تاقیکردنەوە"

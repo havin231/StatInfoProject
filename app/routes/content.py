@@ -7,9 +7,9 @@ import csv
 import io
 
 from app import db
-from app.models import User, Subject, Page, Question, Resource, StudentAnswer, SystemCommand
+from app.models import User, Subject, Page, Question, Resource, StudentAnswer, SystemCommand, SubjectTeacher
 from app.forms import SubjectForm, PageForm, QuestionForm, BulkImportForm, ResourceForm
-from app.routes.helpers import generate_access_code
+from app.routes.helpers import generate_access_code, can_edit_subject
 from app.models import Student
 
 content = Blueprint('content', __name__)
@@ -87,9 +87,9 @@ def import_questions_step1(subject_id):
     - Parses the question table.
     - Fetches current Subject Lectures to populate the Batch Settings dropdown.
     """
-    # 1. Permission and Context check
+    # 1. Permission and Context check (v0.5.0 - Multi-Teacher Support)
     target_subject = Subject.query.get_or_404(subject_id)
-    if not current_user.is_admin and target_subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_subject):
         abort(403)
 
     form = BulkImportForm()
@@ -196,7 +196,7 @@ def process_import_confirmation():
             subj_id_str = request.form.get('subject_id')
             subject_record = Subject.query.get_or_404(int(subj_id_str))
 
-            if not current_user.is_admin and subject_record.teacher_id != current_user.id:
+            if not can_edit_subject(subject_record):
                 abort(403)
 
             # --- EXTRACT BATCH SETTINGS FROM FORM ---
@@ -297,7 +297,7 @@ def edit_subject(subject_id):
     """Edits subject metadata."""
     subj_record = Subject.query.get_or_404(subject_id)
 
-    if not current_user.is_admin and subj_record.teacher_id != current_user.id:
+    if not can_edit_subject(subj_record):
         abort(403)
 
     form = SubjectForm(obj=subj_record)
@@ -341,7 +341,7 @@ def delete_subject(subject_id):
     from app.models import ExamResult
     subj_record = Subject.query.get_or_404(subject_id)
 
-    if not current_user.is_admin and subj_record.teacher_id != current_user.id:
+    if not can_edit_subject(subj_record):
         abort(403)
 
     try:
@@ -379,7 +379,7 @@ def builder_info():
     sid_param = request.args.get('subject')
     subj_record = Subject.query.get_or_404(sid_param)
 
-    if not current_user.is_admin and subj_record.teacher_id != current_user.id:
+    if not can_edit_subject(subj_record):
         abort(403)
 
     form = PageForm()
@@ -409,7 +409,7 @@ def edit_page(page_id):
     """Route to edit lecture content and manage multiple resources."""
     target_page = Page.query.get_or_404(page_id)
 
-    if not current_user.is_admin and target_page.subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_page.subject):
         abort(403)
 
     form = PageForm(obj=target_page)
@@ -442,7 +442,7 @@ def delete_page(page_id):
     """Purges a single lecture."""
     target_page = Page.query.get_or_404(page_id)
 
-    if not current_user.is_admin and target_page.subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_page.subject):
         abort(403)
 
     subject_slug_ref = target_page.subject.slug
@@ -459,7 +459,7 @@ def add_resource(page_id):
     """Logic to attach a link to a lecture."""
     target_page = Page.query.get_or_404(page_id)
 
-    if not current_user.is_admin and target_page.subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_page.subject):
         abort(403)
 
     form = ResourceForm()
@@ -486,7 +486,7 @@ def delete_resource(resource_id):
     target_res = Resource.query.get_or_404(resource_id)
     parent_page_id = target_res.page_id
 
-    if not current_user.is_admin and target_res.page.subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_res.page.subject):
         abort(403)
 
     db.session.delete(target_res)
@@ -506,7 +506,7 @@ def builder_exam():
     sid_param = request.args.get('subject')
     target_subject = Subject.query.get_or_404(sid_param)
 
-    if not current_user.is_admin and target_subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_subject):
         abort(403)
 
     form = QuestionForm()
@@ -547,7 +547,7 @@ def builder_exam():
 def save_questions_api(subject_id):
     """The AJAX backend that saves the Bulk Editor grid data."""
     target_subject = Subject.query.get_or_404(subject_id)
-    if not current_user.is_admin and target_subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_subject):
         return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
 
     incoming_json_data = request.get_json()
@@ -619,7 +619,7 @@ def save_questions_api(subject_id):
 def export_questions_csv(subject_id):
     """Exports Question Bank for a subject. Uses strict quoting and BOM."""
     target_subject = Subject.query.get_or_404(subject_id)
-    if not current_user.is_admin and target_subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_subject):
         abort(403)
 
     string_io_obj = io.StringIO()
@@ -645,7 +645,7 @@ def export_questions_csv(subject_id):
 def edit_question(question_id):
     """Edit a single question manually."""
     target_q = Question.query.get_or_404(question_id)
-    if not current_user.is_admin and target_q.subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_q.subject):
         abort(403)
 
     form = QuestionForm(obj=target_q)
@@ -681,7 +681,7 @@ def edit_question(question_id):
 def delete_question(question_id):
     """Single question deletion logic."""
     target_q = Question.query.get_or_404(question_id)
-    if not current_user.is_admin and target_q.subject.teacher_id != current_user.id:
+    if not can_edit_subject(target_q.subject):
         abort(403)
 
     subject_slug_ref = target_q.subject.slug

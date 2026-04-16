@@ -57,6 +57,27 @@
             </div>
 
             <!--
+                v0.5.0 FEATURE 2: LESSON PROGRESS CHECKBOX
+                Visible only to logged-in students.
+            -->
+            {% if session.get('student_id') %}
+            <div class="card-footer bg-body-tertiary p-4 border-top">
+                <div class="form-check d-flex align-items-center">
+                    <input class="form-check-input me-3" type="checkbox" id="lessonCompleteCheckbox"
+                        data-page-id="{{ page.id }}" {% if is_completed %}checked{% endif %}
+                        style="width: 1.5rem; height: 1.5rem; cursor: pointer;">
+                    <label class="form-check-label fw-bold" for="lessonCompleteCheckbox" style="cursor: pointer; font-size: 1.1rem;">
+                        {% if is_completed %}
+                            <span class="text-success"><i class="fas fa-check-circle me-2"></i>{{ _('Lesson completed') }}</span>
+                        {% else %}
+                            <span class="text-body-secondary"><i class="far fa-circle me-2"></i>{{ _('Mark lesson as completed') }}</span>
+                        {% endif %}
+                    </label>
+                </div>
+            </div>
+            {% endif %}
+
+            <!--
                 NEW: MULTIPLE RESOURCES FOOTER
                 Loops through all resources attached to this page.
             -->
@@ -216,4 +237,52 @@
         }
     }
 </style>
+{% endblock %}
+
+{% block scripts %}
+{% if session.get('student_id') %}
+<script>
+    // Lesson progress checkbox functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkbox = document.getElementById('lessonCompleteCheckbox');
+        if (!checkbox) return;
+
+        const label = checkbox.nextElementSibling;
+        const pageId = checkbox.dataset.pageId;
+
+        checkbox.addEventListener('change', async function() {
+            checkbox.disabled = true;
+
+            try {
+                const response = await fetch('/api/page/' + pageId + '/progress', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update label text and styling
+                    if (data.is_completed) {
+                        label.innerHTML = '<span class="text-success"><i class="fas fa-check-circle me-2"></i>{{ _('Lesson completed') }}</span>';
+                    } else {
+                        label.innerHTML = '<span class="text-body-secondary"><i class="far fa-circle me-2"></i>{{ _('Mark lesson as completed') }}</span>';
+                    }
+                } else {
+                    // Revert checkbox if error
+                    checkbox.checked = !checkbox.checked;
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error updating progress:', error);
+                checkbox.checked = !checkbox.checked;
+                alert('{{ _('Network error. Please try again.') }}');
+            } finally {
+                checkbox.disabled = false;
+            }
+        });
+    });
+</script>
+{% endif %}
 {% endblock %}

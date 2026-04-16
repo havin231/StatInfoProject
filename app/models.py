@@ -278,3 +278,164 @@ class Tool(db.Model):
 
     def __repr__(self):
         return f"Tool('{self.title}')"
+
+
+# ==========================================
+# 12. STUDENT PINNED SUBJECT MODEL (v0.5.0)
+# ==========================================
+class StudentPinnedSubject(db.Model):
+    """
+    Represents subjects pinned by students for quick access.
+    Added in v0.5.0 - Feature 1: Student Pinned Subjects.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
+    pinned_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    student = db.relationship('Student', backref='pinned_subjects')
+    subject = db.relationship('Subject', backref='pinned_by_students')
+
+    # Unique constraint to prevent duplicate pins
+    __table_args__ = (db.UniqueConstraint('student_id', 'subject_id'),)
+
+    def __repr__(self):
+        return f"PinnedSubject(Student: {self.student_id}, Subject: {self.subject_id})"
+
+
+# ==========================================
+# 13. LESSON PROGRESS MODEL (v0.5.0)
+# ==========================================
+class LessonProgress(db.Model):
+    """
+    Tracks student progress through lessons/pages.
+    Added in v0.5.0 - Feature 2: Lesson Progress Tracking.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=False)
+    is_completed = db.Column(db.Boolean, default=False)
+    completed_at = db.Column(db.DateTime, nullable=True)
+
+    # Relationships
+    student = db.relationship('Student', backref='lesson_progress')
+    page = db.relationship('Page', backref='student_progress')
+
+    # Unique constraint - one progress record per student per page
+    __table_args__ = (db.UniqueConstraint('student_id', 'page_id'),)
+
+    def __repr__(self):
+        return f"LessonProgress(Student: {self.student_id}, Page: {self.page_id}, Completed: {self.is_completed})"
+
+
+# ==========================================
+# 14. ADMIN NOTIFICATION MODEL (v0.5.0)
+# ==========================================
+class AdminNotification(db.Model):
+    """
+    Stores notifications for admin about system activity.
+    Added in v0.5.0 - Feature 3: Admin Notifications.
+    """
+    NOTIFICATION_TYPES = [
+        'question_added', 'question_edited',
+        'page_added', 'page_edited',
+        'student_login', 'student_signup', 'student_deleted'
+    ]
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Notification content
+    notification_type = db.Column(db.String(50), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+
+    # Actor information (who triggered the notification)
+    actor_type = db.Column(db.String(20))  # 'teacher', 'student', 'system'
+    actor_id = db.Column(db.Integer)
+    actor_name = db.Column(db.String(100))
+
+    # Related objects (for linking)
+    related_subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=True)
+    related_page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=True)
+    related_question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=True)
+
+    # Status and deletion timer
+    is_checked = db.Column(db.Boolean, default=False)
+    checked_at = db.Column(db.DateTime, nullable=True)
+    delete_scheduled_at = db.Column(db.DateTime, nullable=True)
+    is_deleted = db.Column(db.Boolean, default=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    related_subject = db.relationship('Subject', foreign_keys=[related_subject_id])
+    related_page = db.relationship('Page', foreign_keys=[related_page_id])
+    related_question = db.relationship('Question', foreign_keys=[related_question_id])
+
+    def __repr__(self):
+        return f"AdminNotification({self.notification_type}: {self.title})"
+
+
+# ==========================================
+# 15. SUBJECT TEACHER MODEL (v0.5.0)
+# ==========================================
+class SubjectTeacher(db.Model):
+    """
+    Association table linking subjects to multiple teachers.
+    Added in v0.5.0 - Feature 6: Multi-Teacher Subjects.
+    Replaces the single teacher_id foreign key on Subject.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_primary = db.Column(db.Boolean, default=False)  # Original creator
+    show_name = db.Column(db.Boolean, default=True)    # Per-subject visibility
+    added_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    subject = db.relationship('Subject', backref='teacher_assignments')
+    teacher = db.relationship('User', backref='subject_assignments')
+
+    # Unique constraint - one assignment per teacher per subject
+    __table_args__ = (db.UniqueConstraint('subject_id', 'teacher_id'),)
+
+    def __repr__(self):
+        return f"SubjectTeacher(Subject: {self.subject_id}, Teacher: {self.teacher_id}, Primary: {self.is_primary})"
+
+
+# ==========================================
+# 16. EXAM PROGRESS MODEL (v0.5.0)
+# ==========================================
+class ExamProgress(db.Model):
+    """
+    Tracks student progress through an exam, allowing partial submissions.
+    Added in v0.5.0 - Feature 4: Progressive Exam Submission.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
+    page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=True)  # NULL = final exam
+
+    # JSON field storing submitted answers: {"question_id": "selected_option", ...}
+    submitted_answers = db.Column(db.JSON, default=dict)
+
+    # JSON field tracking locked (submitted) questions: [question_id, ...]
+    locked_questions = db.Column(db.JSON, default=list)
+
+    is_completed = db.Column(db.Boolean, default=False)
+    completed_at = db.Column(db.DateTime, nullable=True)
+
+    started_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_activity = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    student = db.relationship('Student', backref='exam_progress')
+    subject = db.relationship('Subject', backref='exam_progress')
+    page = db.relationship('Page', backref='exam_progress')
+
+    # Unique constraint - one progress record per exam attempt
+    __table_args__ = (db.UniqueConstraint('student_id', 'subject_id', 'page_id'),)
+
+    def __repr__(self):
+        return f"ExamProgress(Student: {self.student_id}, Subject: {self.subject_id}, Completed: {self.is_completed})"

@@ -18,6 +18,38 @@
             </a>
         </div>
 
+        <!-- ADMIN NOTIFICATIONS CARD (v0.5.0) -->
+        <div class="card mb-4 shadow-sm border-0 bg-light">
+            <div class="card-header bg-transparent fw-bold text-muted text-uppercase small border-bottom-0 pb-0">
+                <i class="fas fa-bell me-2 text-primary"></i>{{ _('Admin Notifications') }}
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush small" style="max-height: 250px; overflow-y: auto;">
+                    {% for notif in notifications %}
+                    <div class="list-group-item bg-transparent border-0 px-0 py-2">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="badge {% if notif.category == 'signup' %}bg-info{% else %}bg-success{% endif %} text-uppercase" style="font-size: 0.6rem;">
+                                {{ notif.category }}
+                            </span>
+                            <small class="text-muted" style="font-size: 0.7rem;">{{ notif.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <p class="mb-0 text-dark" style="line-height: 1.3;">{{ notif.content }}</p>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-3 text-muted">
+                        <i class="fas fa-check-circle mb-2 d-block"></i>
+                        {{ _('No new notifications') }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if notifications %}
+                <div class="text-center mt-2 border-top pt-2">
+                    <small class="text-muted fst-italic" style="font-size: 0.7rem;">{{ _('Auto-deleted after 3 days') }}</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
         <!-- GLOBAL ACTIONS CARD -->
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-transparent fw-bold text-muted text-uppercase small border-bottom-0">

@@ -9,16 +9,28 @@
     Centered text with responsive padding.
 -->
 <div class="text-center py-5">
-    <p class="lead text-main mx-auto mb-3" style="max-width: 600px;">
-        {{ _('this website is still under construction.') }}<br>
-    </p>
+    <!-- Welcome text shown only to non-authenticated users -->
+    {% if not current_user.is_authenticated and not session.get('student_id') %}
+        {% if not search_query %}
+        <p class="lead text-main mx-auto mb-3" style="max-width: 600px;">
+            {{ _('this website is still under construction.') }}<br>
+        </p>
+        {% endif %}
+    {% endif %}
+
     {% if search_query %}
         <h1 class="display-4 fw-bold mb-3">{{ _('Search Results for') }} <span class="text-highlight">'{{ search_query }}'</span></h1>
     {% else %}
+        <!-- Welcome heading shown only to guests -->
+        {% if not current_user.is_authenticated and not session.get('student_id') %}
         <h1 class="display-4 fw-bold mb-3">{{ _('Welcome to') }} <span class="text-highlight">StatInfoProject</span></h1>
         <p class="lead text-muted mx-auto mb-4" style="max-width: 600px;">
             {{ _('A place to learn') }}
         </p>
+        {% else %}
+        <!-- Logged-in users see a simpler heading -->
+        <h1 class="display-5 fw-bold mb-3">{{ _('Available Subjects') }}</h1>
+        {% endif %}
     {% endif %}
 
     <!-- Global Search Bar -->

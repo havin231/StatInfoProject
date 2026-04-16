@@ -26,7 +26,7 @@ def teacher_dashboard():
     # 1. Administrator Context
     if current_user.is_admin:
         # v0.5.0 - Admin Notification Cleanup (Delete > 3 days old)
-        from datetime import timedelta
+        from datetime import datetime, timedelta
         cutoff_date = datetime.utcnow() - timedelta(days=3)
         AdminNotification.query.filter(AdminNotification.created_at < cutoff_date).delete()
         db.session.commit()

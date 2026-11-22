@@ -9,73 +9,13 @@ import io
 from app import db
 from app.models import User, Subject, Page, Question, Resource, StudentAnswer, SystemCommand, SubjectTeacher
 from app.forms import SubjectForm, PageForm, QuestionForm, BulkImportForm, ResourceForm
-from app.routes.helpers import generate_access_code, can_edit_subject
-from app.models import Student
+from app.routes.helpers import can_edit_subject
 
 content = Blueprint('content', __name__)
 
 # ==============================================================================
 # SECTION 8: BULK IMPORT ENGINE (WITH LANGUAGE & LECTURE LOGIC)
 # ==============================================================================
-
-@content.route('/admin/import/students', methods=['POST'])
-@login_required
-def import_students_step1():
-    """
-    BULK STUDENT IMPORT (STEP 1: PARSING)
-
-    Logic:
-    - Reads Excel or CSV into a Pandas DataFrame.
-    - Validates presence of 'Name' and 'Group' columns.
-    - Generates temporary preview data with auto-generated codes.
-    """
-    if not current_user.is_admin:
-        abort(403)
-
-    form = BulkImportForm()
-
-    if form.validate_on_submit():
-        uploaded_file = form.file.data
-        file_extension = uploaded_file.filename.lower()
-
-        try:
-            # Read file using Pandas
-            if file_extension.endswith('.csv'):
-                data_frame = pd.read_csv(uploaded_file)
-            else:
-                data_frame = pd.read_excel(uploaded_file)
-
-            # Normalize column names to lowercase for robust matching
-            data_frame.columns = [col_name.lower().strip() for col_name in data_frame.columns]
-
-            # Validate required columns
-            if 'name' not in data_frame.columns:
-                flash(_('Import Error: Your file must contain a column named "Name".'), 'danger')
-                return redirect(url_for('admin.admin_students'))
-
-            # Construct the preview list
-            batch_preview_list = []
-            for index, row in data_frame.iterrows():
-                batch_preview_list.append({
-                    'full_name': str(row['name']),
-                    'access_code': generate_access_code()
-                })
-
-            # Render the intermediate preview page
-            return render_template(
-                'admin/import_preview.html',
-                data=batch_preview_list,
-                import_type='student',
-                title="Verify Student Batch"
-            )
-
-        except Exception as e:
-            flash(_('An error occurred while reading the file: %(error)s', error=str(e)), 'danger')
-            return redirect(url_for('admin.admin_students'))
-
-    flash(_('File upload failed. Please ensure you selected a valid CSV or Excel file.'), 'danger')
-    return redirect(url_for('admin.admin_students'))
-
 
 @content.route('/teacher/import/questions/<int:subject_id>', methods=['POST'])
 @login_required
@@ -169,30 +109,8 @@ def process_import_confirmation():
         import_category = request.form.get('import_type')
         parsed_data = json.loads(raw_json_data)
 
-        # 2. Handle Student Commit
-        if import_category == 'student':
-            if not current_user.is_admin:
-                abort(403)
-
-            save_count = 0
-            for student_row in parsed_data:
-                # Resolve potential access code collisions
-                final_code = student_row['access_code']
-                while Student.query.filter_by(access_code=final_code).first():
-                    final_code = generate_access_code()
-
-                db.session.add(Student(
-                    full_name=student_row['full_name'],
-                    access_code=final_code
-                ))
-                save_count += 1
-
-            db.session.commit()
-            flash(_('Batch Processed: %(count)s students added.', count=save_count), 'success')
-            return redirect(url_for('admin.admin_students'))
-
-        # 3. Handle Question Commit (Includes Batch Language and Lecture)
-        elif import_category == 'question':
+        # 2. Handle Question Commit (Includes Batch Language and Lecture)
+        if import_category == 'question':
             subj_id_str = request.form.get('subject_id')
             subject_record = Subject.query.get_or_404(int(subj_id_str))
 

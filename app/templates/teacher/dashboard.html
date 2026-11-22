@@ -19,31 +19,6 @@
             </a>
         </div>
 
-        <!-- ANALYTICS & TOOLS CARD -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Class Insights') }}</h6>
-                <div class="d-grid gap-2">
-                    <!-- Logic: Check if an Admin is viewing this teacher's profile -->
-                    {% if view_as_admin %}
-                    <div class="alert alert-warning py-2 small mb-2 text-center">
-                        <i class="fas fa-eye me-1"></i> {{ _('Viewing as:') }} <strong>{{ teacher_name }}</strong>
-                    </div>
-                    <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Admin') }}
-                    </a>
-                    {% else %}
-                    <a href="/teacher/analytics" class="btn btn-lime">
-                        <i class="fas fa-chart-pie me-2"></i>{{ _('View Analytics') }}
-                    </a>
-                    <a href="/teacher/export/grades" class="btn btn-outline btn-sm">
-                        <i class="fas fa-file-csv me-2"></i>{{ _('Export Grades') }}
-                    </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
         <!-- THEME SETTINGS CARD -->
         <div class="card mb-4">
             <div class="card-body">
@@ -101,10 +76,6 @@
             <div>
                 <h1 class="h3 mb-1">{{ _('My Classroom') }}</h1>
                 <p class="text-muted small mb-0">{{ subjects|length }} {{ _('Subjects Assigned') }}</p>
-            </div>
-            <!-- Stats Badge (Hidden on very small screens) -->
-            <div class="d-none d-md-block text-muted small">
-                {{ _('Total Exams Taken:') }} <span class="fw-bold text-highlight">{{ total_results }}</span>
             </div>
         </div>
 

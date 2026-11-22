@@ -37,14 +37,6 @@
             </p>
             {% endif %}
         </div>
-        <!-- PIN BUTTON FOR STUDENTS -->
-        {% if session.get('student_id') %}
-        <button id="pinSubjectBtn" class="btn btn-outline-primary ms-3" data-slug="{{ subject.slug }}"
-            data-pinned="{{ 'true' if is_pinned else 'false' }}" style="min-width: 120px;">
-            <i class="fas fa-thumbtack me-2" id="pinIcon"></i>
-            <span id="pinText">{{ _('Unpin') if is_pinned else _('Pin') }}</span>
-        </button>
-        {% endif %}
     </div>
 </div>
 
@@ -177,55 +169,4 @@
 
     </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-{% if session.get('student_id') %}
-<script>
-    // Pin/Unpin functionality for students
-    document.addEventListener('DOMContentLoaded', function() {
-        const pinBtn = document.getElementById('pinSubjectBtn');
-        if (!pinBtn) return;
-
-        const pinIcon = document.getElementById('pinIcon');
-        const pinText = document.getElementById('pinText');
-        const slug = pinBtn.dataset.slug;
-
-        pinBtn.addEventListener('click', async function() {
-            pinBtn.disabled = true;
-
-            try {
-                const response = await fetch('/api/subject/' + slug + '/pin', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-                const data = await response.json();
-
-                if (data.success) {
-                    if (data.pinned) {
-                        pinBtn.classList.remove('btn-outline-primary');
-                        pinBtn.classList.add('btn-primary');
-                        pinText.textContent = "{{ _('Unpin') }}";
-                        pinBtn.dataset.pinned = 'true';
-                    } else {
-                        pinBtn.classList.remove('btn-primary');
-                        pinBtn.classList.add('btn-outline-primary');
-                        pinText.textContent = "{{ _('Pin Subject') }}";
-                        pinBtn.dataset.pinned = 'false';
-                    }
-                } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
-                }
-            } catch (error) {
-                console.error('Error toggling pin:', error);
-                alert('{{ _('Network error. Please try again.') }}');
-            } finally {
-                pinBtn.disabled = false;
-            }
-        });
-    });
-</script>
-{% endif %}
 {% endblock %}

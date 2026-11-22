@@ -10,11 +10,32 @@
 
 ## 1. PROJECT IDENTITY & CONTEXT
 - **System Name:** StatInfoProject (StatInfoPRO)
-- **Current Version:** 0.4.4 (2026-04-06)
+- **Current Version:** 0.6.0 (2026-11-22)
 - **Deployment:** PythonAnywhere (Linux/Bash/MySQL).
 - **Primary Language:** Python 3.10 / Flask 3.0.0.
 - **Frontend:** HTML5, Bootstrap 5.3, Jinja2, Custom CSS Variables.
 - **Context:** A bilingual (English/Kurdish) Learning Management System for the University of Sulaimani.
+
+## RECENT CHANGES (v0.6.0)
+- **Student Accounts & Management Removal**:
+  - Removed student sign-up page (`student_signup.html`) and registration route (`/student/signup`).
+  - Removed student login page (`student_login.html`) and route (`/student/login`). Deprecated student endpoints gracefully redirect to staff login (`/login`).
+  - Removed student management system in Admin HQ: `/admin/students`, `/admin/edit/student/<id>`, `/admin/delete/student/<id>`, `/admin/delete/all/students`, and bulk student CSV import.
+  - Removed `StudentForm`, `StudentSignupForm`, `StudentSettingsForm`, and `StudentEditForm` from `app/forms.py`.
+  - Removed student analysis in teacher and admin pages: removed `/teacher/analytics`, `/teacher/analytics/student/<id>`, `/teacher/export/grades`, and `/teacher/export/student/answers/<id>`.
+  - Removed "Class Insights" card, student ranking, and at-risk calculations from Teacher Dashboard.
+  - Removed "Manage Students" and "Global Analytics" buttons from Admin HQ (`admin_dashboard.html`).
+  - Removed "Total Students" metric from public stats (`stats.html`), replaced with Total Subjects count.
+  - Removed student pinning and lesson progress tracking.
+  - Updated exam engine: quizzes and exams can now be taken by visitors/learners without accounts, with instant grade calculation and flash notification feedback.
+  - Cleaned up templates: deleted deprecated `app/templates/student/` directory, `student_signup.html`, `student_login.html`, `admin/students.html`, `admin/edit_student.html`, `teacher/analytics.html`, and `teacher/student_detail.html`.
+  - Updated and verified test suite: 20/20 tests passing (100% pass rate).
+
+## RECENT CHANGES (v0.5.0)
+- **Multi-Teacher & Platform Features**:
+  - Multi-teacher support for subjects via `SubjectTeacher` association model.
+  - Admin notification system for system operations.
+  - Responsive video embedding and mobile optimization.
 
 ## RECENT CHANGES (v0.4.4)
 - **Teacher Kurdish Name Support**: Added `username_kurdish` field to User model for bilingual teacher name display:
@@ -98,27 +119,19 @@ StatInfoProject_PlayGround (Project Root)
     └── templates/
         ├── base.html         # Master Layout (MathJax, Navbar, Flash, Favicon)
         ├── login.html        # Staff Login
-        ├── student_login.html# Student Access Code Login
         ├── index.html        # Public Homepage
         ├── about.html        # Editable CMS Page
         ├── stats.html        # Public Analytics
         ├── subject.html      # Subject Overview
         ├── page.html         # Lecture View (Video/Resources/Text)
-        ├── exam.html         # Taking Exam Interface
+        ├── exam.html         # Taking Exam / Quiz Interface
         ├── admin/
         │   ├── admin_dashboard.html # Main HQ (Buttons for Backup, Commands)
-        │   ├── students.html        # Roster + Batch Operations
-        │   ├── edit_student.html    # Safe Edit Form
         │   ├── commands.html        # System Documentation Hub
         │   └── import_preview.html  # Batch Import Confirmation UI
-        ├── teacher/
-        │   ├── dashboard.html       # Teacher View
-        │   ├── builder.html         # Multi-tool: Page Editor & Question Bank Spreadsheet
-        │   ├── analytics.html       # Charts & Data Tables
-        │   └── student_detail.html  # Individual History (Grouped by Attempt)
-        └── student/
-            ├── dashboard.html       # Student Stats & Mastery
-            └── review_exam.html     # Read-only Result View (Red/Green feedback)
+        └── teacher/
+            ├── dashboard.html       # Teacher View
+            └── builder.html         # Multi-tool: Page Editor & Question Bank Spreadsheet
 3. DATABASE SCHEMA (STRICT RULES)
 
 Database Engine: MySQL (Production) / SQLite (Dev).

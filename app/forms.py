@@ -54,44 +54,6 @@ class TeacherEditForm(FlaskForm):
     show_name_on_subject = BooleanField(_l('Show my name on subject pages'))
     submit = SubmitField(_l('Update Account'))
 
-class StudentForm(FlaskForm):
-    """
-    Form for registering new students.
-    """
-    full_name = StringField(_l('Full Name'), validators=[DataRequired()])
-    email = StringField(_l('Email Address'), validators=[Optional(), Email()])
-    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
-    submit = SubmitField(_l('Add Student'))
-
-class StudentSignupForm(FlaskForm):
-    """
-    Form for students to sign up themselves.
-    """
-    full_name = StringField(_l('Full Name'), validators=[DataRequired()])
-    email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
-    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField(_l('Confirm Password'), validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField(_l('Register Account'))
-
-class StudentSettingsForm(FlaskForm):
-    """
-    Form for students to update their profile (email and password).
-    """
-    email = StringField(_l('Email Address'), validators=[DataRequired(), Email()])
-    current_password = PasswordField(_l('Current Password'), validators=[Optional()])
-    new_password = PasswordField(_l('New Password'), validators=[Optional(), Length(min=6)])
-    confirm_new_password = PasswordField(_l('Confirm New Password'), validators=[EqualTo('new_password')])
-    submit = SubmitField(_l('Save Changes'))
-
-class StudentEditForm(FlaskForm):
-    """
-    Form for editing existing student details.
-    """
-    full_name = StringField(_l('Full Name'), validators=[DataRequired()])
-    email = StringField(_l('Email Address'), validators=[Optional(), Email()])
-    password = PasswordField(_l('Password'), validators=[Optional(), Length(min=6)])
-    submit = SubmitField(_l('Update Student Details'))
-
 # ==========================================
 # 3. SITE CONTENT (CMS)
 # ==========================================

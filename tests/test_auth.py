@@ -1,7 +1,6 @@
 """
-Tests for authentication: staff login/logout and student access codes.
+Tests for authentication: staff login/logout and deprecated student redirects.
 """
-from app.models import Student
 
 
 def test_staff_login_success(client, admin_user):
@@ -26,25 +25,15 @@ def test_staff_login_failure(client, admin_user):
     assert b'Authentication failed' in response.data
 
 
-def test_student_login_success(client, sample_student):
-    """Student can login with valid access code."""
-    with client.session_transaction() as sess:
-        sess.clear()
-        
-    response = client.post('/student/login', data={
-        'access_code': 'ABC123'
-    }, follow_redirects=True)
-    assert response.status_code == 200
-    assert b'Welcome, Test Student' in response.data
+def test_deprecated_student_routes_redirect(client):
+    """Accessing deprecated student login/signup redirects to staff login."""
+    response = client.get('/student/login')
+    assert response.status_code == 302
+    assert '/login' in response.location
 
-
-def test_student_login_failure(client):
-    """Student login fails with invalid access code."""
-    response = client.post('/student/login', data={
-        'access_code': 'INVALID123'
-    }, follow_redirects=True)
-    assert response.status_code == 200
-    assert b'Access Code provided is invalid' in response.data
+    response_signup = client.get('/student/signup')
+    assert response_signup.status_code == 302
+    assert '/login' in response_signup.location
 
 
 def test_protected_route_redirects(client):

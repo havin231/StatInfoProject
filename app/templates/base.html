@@ -174,24 +174,11 @@
                     <!-- Logged in as Teacher/Admin -->
                     <li class="nav-item"><a class="nav-link fw-bold" href="/teacher/dashboard">{{ _('Teacher Dash')
                             }}</a></li>
-
-
-
-
-                    <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">{{ _('Logout') }}</a>
-                    </li>
-                    {% elif session.get('student_id') %}
-                    <!-- Logged in as Student -->
-                    <!-- Logged in as Student -->
-                    <li class="nav-item"><a class="nav-link fw-bold text-highlight" href="/student/dashboard">{{
-                            _('Student Dash') }}</a></li>
-
                     <li class="nav-item"><a class="btn btn-sm btn-outline-danger" href="/logout">{{ _('Logout') }}</a>
                     </li>
                     {% else %}
                     <!-- Guest -->
-                    <li class="nav-item"><a class="nav-link" href="/student/login">{{ _('Student') }}</a></li>
-                    <li class="nav-item"><a class="btn btn-primary px-4 btn-sm" href="/login">{{ _('Teacher') }}</a>
+                    <li class="nav-item"><a class="btn btn-primary px-4 btn-sm" href="/login">{{ _('Login') }}</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -330,15 +317,9 @@
             <i
                 class="fa-solid fa-user-tie fa-2x {{ 'text-highlight' if 'teacher' in request.endpoint else 'text-muted' }}"></i>
         </a>
-        {% elif session.get('student_id') %}
-        <!-- Logged in as Student -->
-        <a href="/student/dashboard" class="text-reset text-decoration-none text-center flex-grow-1">
-            <i
-                class="fa-solid fa-user-graduate fa-2x {{ 'text-highlight' if 'student' in request.endpoint else 'text-muted' }}"></i>
-        </a>
         {% else %}
         <!-- Guest -> Login -->
-        <a href="/student/login" class="text-reset text-decoration-none text-center flex-grow-1">
+        <a href="/login" class="text-reset text-decoration-none text-center flex-grow-1">
             <i
                 class="fa-solid fa-right-to-bracket fa-2x {{ 'text-highlight' if 'login' in request.endpoint else 'text-muted' }}"></i>
         </a>

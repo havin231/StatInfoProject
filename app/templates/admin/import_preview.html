@@ -82,10 +82,7 @@
                             <thead class="bg-body-secondary sticky-top" style="z-index: 5;">
                                 <tr>
                                     <th class="ps-4">#</th>
-                                    {% if import_type == 'student' %}
-                                    <th>{{ _('Full Name') }}</th>
-                                    <th>{{ _('Generated Access Code') }}</th>
-                                    {% elif import_type == 'question' %}
+                                    {% if import_type == 'question' %}
                                     <th style="width: 40%;">{{ _('Question') }}</th>
                                     <th>{{ _('Options (A / B / C / D)') }}</th>
                                     <th>{{ _('Answer') }}</th>
@@ -101,11 +98,7 @@
                                 <tr>
                                     <td class="ps-4 text-muted">{{ loop.index }}</td>
 
-                                    {% if import_type == 'student' %}
-                                    <td class="fw-bold">{{ row.full_name }}</td>
-                                    <td><code class="text-primary fw-bold">{{ row.access_code }}</code></td>
-
-                                    {% elif import_type == 'question' %}
+                                    {% if import_type == 'question' %}
                                     <!-- Added class 'preview-text' for JS targeting -->
                                     <td class="preview-text">{{ row.question_text | truncate(100) }}</td>
                                     <td class="small text-muted preview-text">

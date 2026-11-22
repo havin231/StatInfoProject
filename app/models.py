@@ -403,7 +403,6 @@ class SubjectTeacher(db.Model):
     def __repr__(self):
         return f"SubjectTeacher(Subject: {self.subject_id}, Teacher: {self.teacher_id}, Primary: {self.is_primary})"
 
-
 # ==========================================
 # 16. EXAM PROGRESS MODEL (v0.5.0)
 # ==========================================

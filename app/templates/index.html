@@ -10,7 +10,7 @@
 -->
 <div class="text-center py-5">
     <!-- Welcome text shown only to non-authenticated users -->
-    {% if not current_user.is_authenticated and not session.get('student_id') %}
+    {% if not current_user.is_authenticated %}
         {% if not search_query %}
         <p class="lead text-main mx-auto mb-3" style="max-width: 600px;">
             {{ _('this website is still under construction.') }}<br>
@@ -22,7 +22,7 @@
         <h1 class="display-4 fw-bold mb-3">{{ _('Search Results for') }} <span class="text-highlight">'{{ search_query }}'</span></h1>
     {% else %}
         <!-- Welcome heading shown only to guests -->
-        {% if not current_user.is_authenticated and not session.get('student_id') %}
+        {% if not current_user.is_authenticated %}
         <h1 class="display-4 fw-bold mb-3">{{ _('Welcome to') }} <span class="text-highlight">StatInfoProject</span></h1>
         <p class="lead text-muted mx-auto mb-4" style="max-width: 600px;">
             {{ _('A place to learn') }}
@@ -45,10 +45,9 @@
     </form>
 
     <!-- Show Login Buttons only to Guests -->
-    {% if not current_user.is_authenticated and not session.get('student_id') %}
+    {% if not current_user.is_authenticated %}
     <div class="d-flex gap-3 justify-content-center">
-        <a href="/student/login" class="btn btn-primary btn-lg px-4">{{ _('Student Portal') }}</a>
-        <a href="/login" class="btn btn-outline btn-lg px-4">{{ _('Teacher Access') }}</a>
+        <a href="/login" class="btn btn-outline btn-lg px-4">{{ _('Staff Login') }}</a>
     </div>
     {% endif %}
 </div>

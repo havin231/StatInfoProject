@@ -5,7 +5,7 @@ from flask_login import current_user
 from sqlalchemy import func, or_
 
 from app import db, bcrypt, limiter
-from app.models import User, Student, Subject, ExamResult, SiteInfo, Page
+from app.models import User, Subject, ExamResult, SiteInfo, Page
 from app.forms import SetupForm
 
 public = Blueprint('public', __name__)
@@ -153,7 +153,7 @@ def public_stats():
 
     # 3. Global counters
     total_completed_exams = ExamResult.query.count()
-    total_registered_students = Student.query.count()
+    total_subjects_count = Subject.query.count()
 
     # 4. Global Average score
     avg_aggregate = db.session.query(func.avg(ExamResult.score)).scalar()
@@ -168,7 +168,7 @@ def public_stats():
         labels=chart_labels,
         values=chart_values,
         total_exams=total_completed_exams,
-        total_students=total_registered_students,
+        total_subjects=total_subjects_count,
         global_average=global_average_percent,
         pass_count=passing_grade_count,
         fail_count=failing_grade_count
@@ -236,19 +236,6 @@ def set_lang(lang):
         except Exception as e:
             db.session.rollback()
             current_app.logger.error(f"set_lang: Failed to update user preferred_lang: {e}")
-    else:
-        # Check student session
-        student_id = session.get('student_id')
-        if student_id:
-            try:
-                student = db.session.get(Student, student_id)
-                if student:
-                    student.preferred_lang = lang
-                    db.session.commit()
-                    current_app.logger.info(f"set_lang: Student {student_id} preferred_lang updated to '{lang}'")
-            except Exception as e:
-                db.session.rollback()
-                current_app.logger.error(f"set_lang: Failed to update student preferred_lang: {e}")
     
     # 3. FORCE REFRESH BABEL CACHE - This is the key fix!
     try:

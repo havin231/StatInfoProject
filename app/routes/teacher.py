@@ -3,7 +3,7 @@ from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
 from app import db, bcrypt
-from app.models import User, Subject, Page, Question, ExamResult, StudentAnswer, Student, SubjectTeacher, AdminNotification
+from app.models import User, Subject, Page, Question, SubjectTeacher, AdminNotification
 from app.forms import SubjectForm, TeacherSignupForm, TeacherEditForm
 from app.routes.helpers import can_edit_subject
 
@@ -67,48 +67,9 @@ def teacher_dashboard():
             SubjectTeacher.teacher_id == current_user.id
         ).all()
 
-        # Get subject IDs for filtering results
-        assigned_subject_ids = [s.id for s in assigned_subjects]
-
-        # Calculate performance metrics for the teacher's classroom
-        aggregate_results_count = ExamResult.query.filter(
-            ExamResult.subject_id.in_(assigned_subject_ids)
-        ).count() if assigned_subject_ids else 0
-
-        # Student Rankings
-        set_results = ExamResult.query.filter(
-            ExamResult.subject_id.in_(assigned_subject_ids)
-        ).all() if assigned_subject_ids else []
-        unique_student_ids = set(result.student_id for result in set_results)
-        students_active = Student.query.filter(Student.id.in_(unique_student_ids)).all()
-        student_metric_data = []
-        at_risk_student_list = []
-
-        for active_student in students_active:
-            personal_scores = [r.score for r in set_results if r.student_id == active_student.id]
-            personal_average = round(sum(personal_scores)/len(personal_scores), 1) if personal_scores else 0
-
-            # Anonymize student names for teachers (only admins see real names)
-            if current_user.is_admin:
-                display_name = active_student.full_name
-            else:
-                display_name = f"Student #{active_student.id}"
-
-            student_obj = {
-                'id': active_student.id,
-                'name': display_name,
-                'avg_score': personal_average
-            }
-            student_metric_data.append(student_obj)
-            if personal_average < 50:
-                at_risk_student_list.append(student_obj)
-
         return render_template(
             'teacher/dashboard.html',
-            subjects=assigned_subjects,
-            total_results=aggregate_results_count,
-            student_metric_data=student_metric_data,
-            at_risk_student_list=at_risk_student_list
+            subjects=assigned_subjects
         )
 
 

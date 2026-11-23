@@ -5,7 +5,10 @@ from flask_login import current_user, login_required
 from sqlalchemy import func, or_
 
 from app import db, bcrypt, limiter
-from app.models import User, Subject, ExamResult, SiteInfo, Page, Question, PageComment
+from app.models import (
+    User, Subject, ExamResult, SiteInfo, Page, Question,
+    PageComment, AdminNotification, TeacherNotification, SubjectTeacher, calculate_age
+)
 from app.forms import SetupForm, CommentForm
 
 public = Blueprint('public', __name__)
@@ -328,7 +331,9 @@ def add_page_comment(slug, page_id):
     PUBLIC LECTURE COMMENT SUBMISSION
 
     Allows any visitor to post a comment on a lecture after providing their
-    name, age, optional personality/about-you info, and comment text.
+    name, birth date, optional personality/about-you info, and comment text.
+    Also dispatches rich notifications to Admins and all Teachers assigned to
+    the subject.
     """
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
     target_lecture = Page.query.get_or_404(page_id)
@@ -341,15 +346,62 @@ def add_page_comment(slug, page_id):
 
     form = CommentForm()
     if form.validate_on_submit():
+        author_name = form.author_name.data.strip()
+        birth_date = form.author_birth_date.data
+        computed_age = calculate_age(birth_date)
+        personality_info = form.personality_info.data.strip() if form.personality_info.data else None
+        comment_text = form.comment_text.data.strip()
+
         new_comment = PageComment(
             page_id=target_lecture.id,
-            author_name=form.author_name.data.strip(),
-            author_age=form.author_age.data,
-            personality_info=form.personality_info.data.strip() if form.personality_info.data else None,
-            comment_text=form.comment_text.data.strip()
+            author_name=author_name,
+            author_birth_date=birth_date,
+            author_age=computed_age,
+            personality_info=personality_info,
+            comment_text=comment_text
         )
+
+        # Build detailed notification payload (subject, lesson, commenter info, extra bio, comment)
+        detail_lines = [
+            f"Subject: {target_subject.name} | Lesson: {target_lecture.title}",
+            f"By: {author_name} (Born: {birth_date.strftime('%Y-%m-%d')}, Age: {computed_age})"
+        ]
+        if personality_info:
+            detail_lines.append(f"About: {personality_info}")
+        detail_lines.append(f"Comment: {comment_text}")
+        notif_title = f"{target_subject.name} — {target_lecture.title}"
+        notif_body = "\n".join(detail_lines)
+
         try:
             db.session.add(new_comment)
+
+            # 1. Notify Admins
+            db.session.add(AdminNotification(
+                notification_type='comment_added',
+                title=notif_title,
+                message=notif_body,
+                actor_type='visitor',
+                actor_name=author_name,
+                related_subject_id=target_subject.id,
+                related_page_id=target_lecture.id
+            ))
+
+            # 2. Notify all currently assigned teachers for this subject
+            assignments = SubjectTeacher.query.filter_by(subject_id=target_subject.id).all()
+            recipient_teacher_ids = {a.teacher_id for a in assignments}
+            if not recipient_teacher_ids and target_subject.teacher_id:
+                recipient_teacher_ids.add(target_subject.teacher_id)
+
+            for tid in recipient_teacher_ids:
+                db.session.add(TeacherNotification(
+                    teacher_id=tid,
+                    notification_type='comment',
+                    title=notif_title,
+                    message=notif_body,
+                    related_subject_id=target_subject.id,
+                    related_page_id=target_lecture.id
+                ))
+
             db.session.commit()
             flash(_('Your comment has been posted!'), 'success')
         except Exception as e:

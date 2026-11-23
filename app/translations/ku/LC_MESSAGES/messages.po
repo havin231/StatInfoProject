@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-01 01:09+0300\n"
+"POT-Creation-Date: 2026-11-23 23:06+0300\n"
 "PO-Revision-Date: 2026-04-01 00:38+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ku\n"
@@ -18,844 +18,1061 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/forms.py:15 app/forms.py:39 app/forms.py:49
-#: app/templates/admin/students.html:112 app/templates/admin_dashboard.html:187
+#: app/forms.py:15
+msgid "Birth date cannot be in the future."
+msgstr "بەرواری لەدایکبوون ناتوانێت لە داهاتوودا بێت."
+
+#: app/forms.py:18
+msgid "Please enter a valid birth date (age must be between 5 and 120)."
+msgstr ""
+"تکایە بەرواری لەدایکبوونی دروست بنووسە (تەمەن دەبێت لە نێوان ٥ بۆ ١٢٠ ساڵ"
+" بێت)."
+
+#: app/forms.py:28 app/forms.py:53 app/forms.py:66
+#: app/templates/admin_dashboard.html:375
 msgid "Email"
 msgstr "ئیمەیڵ"
 
-#: app/forms.py:16 app/forms.py:26 app/forms.py:40 app/templates/login.html:42
+#: app/forms.py:29 app/forms.py:39 app/forms.py:54 app/templates/login.html:42
 msgid "Password"
 msgstr "وشەی نهێنی"
 
-#: app/forms.py:17
+#: app/forms.py:30
 msgid "Remember Me"
 msgstr "لەبیرم بکە"
 
-#: app/forms.py:18
+#: app/forms.py:31 app/templates/base.html:179
 msgid "Login"
 msgstr "چوونەژوورەوە"
 
-#: app/forms.py:24
+#: app/forms.py:37
 msgid "Headmaster Name"
 msgstr "ناوی بەڕێوەبەر"
 
-#: app/forms.py:25 app/forms.py:59 app/forms.py:68 app/forms.py:75
-#: app/forms.py:84 app/templates/admin/edit_student.html:25
-#: app/templates/login.html:31
+#: app/forms.py:38 app/templates/login.html:31
 msgid "Email Address"
 msgstr "ناونیشانی ئیمەیڵ"
 
-#: app/forms.py:27
+#: app/forms.py:40
 msgid "Confirm Password"
 msgstr "دڵنیابوونەوەی وشەی نهێنی"
 
-#: app/forms.py:28
+#: app/forms.py:41
 msgid "Create System Admin"
 msgstr "دروستکردنی بەڕێوەبەری سیستەم"
 
-#: app/forms.py:38 app/forms.py:48
+#: app/forms.py:51 app/forms.py:64
 msgid "Teacher Name"
 msgstr "ناوی مامۆستا"
 
-#: app/forms.py:39 app/forms.py:49
+#: app/forms.py:52 app/forms.py:65
 msgid "Teacher Name (Kurdish)"
 msgstr "ناوی مامۆستا (کوردی)"
 
-#: app/forms.py:41 app/forms.py:51
+#: app/forms.py:55 app/forms.py:68 app/forms.py:80
+#: app/templates/admin_dashboard.html:126
+#: app/templates/admin_dashboard.html:465
+#: app/templates/teacher/dashboard.html:75
+msgid "Birth Date (Optional)"
+msgstr "بەرواری لەدایکبوون (ئارەزوومەندانە)"
+
+#: app/forms.py:56 app/forms.py:69 app/forms.py:81
+#: app/templates/admin_dashboard.html:130
+#: app/templates/admin_dashboard.html:469
+#: app/templates/teacher/dashboard.html:79
+msgid "Bio (Optional)"
+msgstr "ژیاننامە (ئارەزوومەندانە)"
+
+#: app/forms.py:57 app/forms.py:70
 msgid "Grant Admin Access"
 msgstr "پێدانی دەسەڵاتی بەڕێوەبەر"
 
-#: app/forms.py:42
+#: app/forms.py:58
 msgid "Create Account"
 msgstr "دروستکردنی هەژمار"
 
-#: app/forms.py:50
+#: app/forms.py:67
 msgid "Reset Password (Optional)"
 msgstr "گەڕاندنەوەی وشەی نهێنی (ئارەزوومەندانە)"
 
-#: app/forms.py:52
+#: app/forms.py:71
+msgid "Show my name on subject pages"
+msgstr "ناوەکەم لە پەڕەی بابەتەکان پیشان بدە"
+
+#: app/forms.py:72
 msgid "Update Account"
 msgstr "نوێکردنەوەی هەژمار"
 
-#: app/forms.py:58 app/forms.py:67 app/forms.py:83
-#: app/templates/admin/edit_student.html:17
-#: app/templates/admin/import_preview.html:86
-#: app/templates/admin/students.html:56 app/templates/admin/students.html:111
+#: app/forms.py:78 app/templates/admin_dashboard.html:118
+#: app/templates/teacher/dashboard.html:67
 msgid "Full Name"
 msgstr "ناوی تەواو"
 
-#: app/forms.py:60
-msgid "Access Code (Unique)"
-msgstr "کۆدی چوونەژوورەوە (بێهاوتا)"
+#: app/forms.py:79 app/templates/admin_dashboard.html:122
+#: app/templates/teacher/dashboard.html:71
+msgid "Full Name (Kurdish)"
+msgstr "ناوی تەواو (کوردی)"
 
-#: app/forms.py:61
-msgid "Add Student"
-msgstr "زیادکردنی قوتابی"
+#: app/forms.py:82 app/templates/admin_dashboard.html:134
+#: app/templates/teacher/dashboard.html:83
+msgid "New Password (Optional)"
+msgstr "تێپەڕەوشەی نوێ (ئارەزوومەندانە)"
 
-#: app/forms.py:69
-msgid "Register Account"
-msgstr "تۆمارکردنی هەژمار"
+#: app/forms.py:84 app/templates/admin_dashboard.html:138
+#: app/templates/teacher/dashboard.html:87
+msgid "Confirm New Password"
+msgstr "دووپاتکردنەوەی تێپەڕەوشەی نوێ"
 
-#: app/forms.py:76
-msgid "Change Access Code"
-msgstr "گۆڕینی کۆدی چوونەژوورەوە"
+#: app/forms.py:85
+msgid "Passwords must match."
+msgstr "تێپەڕەوشەکان دەبێت هاوشێوە بن."
 
-#: app/forms.py:77
-msgid "Save Changes"
-msgstr "پاشەکەوتکردنی گۆڕانکارییەکان"
+#: app/forms.py:87 app/templates/admin_dashboard.html:142
+#: app/templates/teacher/dashboard.html:92
+msgid "Save Profile"
+msgstr "پاشەکەوتکردنی پرۆفایل"
 
-#: app/forms.py:85 app/templates/admin/edit_student.html:21
-#: app/templates/admin/students.html:61 app/templates/admin/students.html:113
-#: app/templates/student_login.html:33
-msgid "Access Code"
-msgstr "کۆدی چوونەژوورەوە"
+#: app/forms.py:93 app/templates/admin_dashboard.html:86
+msgid "Send To"
+msgstr "ناردن بۆ"
 
-#: app/forms.py:86
-msgid "Update Student Details"
-msgstr "نوێکردنەوەی زانیارییەکانی قوتابی"
+#: app/forms.py:94 app/templates/admin_dashboard.html:90
+msgid "Message Subject"
+msgstr "ناونیشانی پەیام"
 
-#: app/forms.py:96 app/forms.py:119
+#: app/forms.py:95 app/templates/admin_dashboard.html:94
+msgid "Message"
+msgstr "پەیام"
+
+#: app/forms.py:96 app/templates/admin_dashboard.html:99
+msgid "Send Message"
+msgstr "ناردنی پەیام"
+
+#: app/forms.py:106 app/forms.py:133
 msgid "Page Title"
 msgstr "سەردێڕی پەڕە"
 
-#: app/forms.py:97
-msgid "Page Content"
-msgstr "ناوەڕۆکی پەڕە"
+#: app/forms.py:107 app/forms.py:134
+msgid "Page Title (Kurdish)"
+msgstr "ناونیشانی پەڕە (کوردی)"
 
-#: app/forms.py:98
+#: app/forms.py:108
+msgid "Page Content (English)"
+msgstr "ناوەڕۆکی پەڕە (ئینگلیزی)"
+
+#: app/forms.py:109
+msgid "Page Content (Kurdish)"
+msgstr "ناوەڕۆکی پەڕە (کوردی)"
+
+#: app/forms.py:110
 msgid "Save Page"
 msgstr "پاشەکەوتکردنی پەڕە"
 
-#: app/forms.py:108 app/templates/admin_dashboard.html:68
+#: app/forms.py:120 app/templates/admin_dashboard.html:190
+#: app/templates/teacher/builder.html:272
 msgid "Subject Name"
 msgstr "ناوی بابەت"
 
-#: app/forms.py:109
+#: app/forms.py:121 app/templates/admin_dashboard.html:194
+#: app/templates/teacher/builder.html:276
+msgid "Subject Name (Kurdish)"
+msgstr "ناوی بابەت (کوردی)"
+
+#: app/forms.py:122
 msgid "Unique Slug (e.g. math-101)"
 msgstr "سلەگی بێهاوتا (بۆ نموونە math-101)"
 
-#: app/forms.py:110 app/forms.py:196 app/templates/admin_dashboard.html:81
+#: app/forms.py:123 app/forms.py:223 app/templates/admin/import_preview.html:92
+#: app/templates/admin_dashboard.html:218
 msgid "Description"
 msgstr "وەسف"
 
-#: app/forms.py:111 app/templates/admin_dashboard.html:77
+#: app/forms.py:124 app/forms.py:193 app/forms.py:224
+#: app/templates/admin_dashboard.html:223 app/templates/toolbase.html:54
+msgid "Description (Kurdish)"
+msgstr "وەسف (کوردی)"
+
+#: app/forms.py:125
 msgid "Assign Teacher"
 msgstr "دیاریکردنی مامۆستا"
 
-#: app/forms.py:112
+#: app/forms.py:126
 msgid "Create Subject"
 msgstr "دروستکردنی بابەت"
 
-#: app/forms.py:118
+#: app/forms.py:132
 msgid "Select Subject"
 msgstr "هەڵبژاردنی بابەت"
 
-#: app/forms.py:120
+#: app/forms.py:135
 msgid "Content (English)"
 msgstr "ناوەڕۆک (ئینگلیزی)"
 
-#: app/forms.py:121
+#: app/forms.py:136
 msgid "Content (Kurdish)"
 msgstr "ناوەڕۆک (کوردی)"
 
-#: app/forms.py:122
+#: app/forms.py:137
 msgid "Publish Content"
 msgstr "بڵاوکردنەوەی ناوەڕۆک"
 
-#: app/forms.py:128 app/templates/stats.html:72
-#: app/templates/student/dashboard.html:132
+#: app/forms.py:143 app/templates/stats.html:72
 msgid "Subject"
 msgstr "بابەت"
 
-#: app/forms.py:129
+#: app/forms.py:144
 msgid "Link to Specific Lecture (Optional)"
 msgstr "بەستەر بۆ وانەیەکی دیاریکراو (ئارەزوومەندانە)"
 
-#: app/forms.py:131 app/templates/admin/import_preview.html:89
-#: app/templates/teacher/student_detail.html:60
+#: app/forms.py:146 app/templates/admin/import_preview.html:86
 msgid "Question"
 msgstr "پرسیار"
 
-#: app/forms.py:132
+#: app/forms.py:147
 msgid "Option A"
 msgstr "هەڵبژاردەی A"
 
-#: app/forms.py:133
+#: app/forms.py:148
 msgid "Option B"
 msgstr "هەڵبژاردەی B"
 
-#: app/forms.py:134
+#: app/forms.py:149
 msgid "Option C"
 msgstr "هەڵبژاردەی C"
 
-#: app/forms.py:135
+#: app/forms.py:150
 msgid "Option D"
 msgstr "هەڵبژاردەی D"
 
-#: app/forms.py:136
+#: app/forms.py:151
 msgid "Correct Answer"
 msgstr "وەڵامی ڕاست"
 
-#: app/forms.py:139
+#: app/forms.py:154
 msgid "Is Kurdish? (Right-to-Left)"
 msgstr "کوردییە؟ (ڕاست-بۆ-چەپ)"
 
-#: app/forms.py:141
+#: app/forms.py:156
 msgid "Save Question"
 msgstr "پاشەکەوتکردنی پرسیار"
 
-#: app/forms.py:151
+#: app/forms.py:166 app/templates/admin/commands.html:84
 msgid "Upload File (CSV or Excel)"
 msgstr "بارکردنی پەڕگە (CSV یان Excel)"
 
-#: app/forms.py:153
+#: app/forms.py:168
 msgid "Tables only!"
 msgstr "تەنها خشتەکان!"
 
-#: app/forms.py:155 app/templates/admin/students.html:197
+#: app/forms.py:170
 msgid "Preview Data"
 msgstr "پێشبینینی داتا"
 
-#: app/forms.py:161
+#: app/forms.py:176
 msgid "Resource Title (e.g. Watch Video)"
 msgstr "سەردێڕی سەرچاوە (بۆ نموونە سەیرکردنی ڤیدیۆ)"
 
-#: app/forms.py:162
+#: app/forms.py:177
+msgid "Resource Title (Kurdish)"
+msgstr "ناونیشانی سەرچاوە (کوردی)"
+
+#: app/forms.py:178
 msgid "URL (Link)"
 msgstr "بەستەر (URL)"
 
-#: app/forms.py:163
+#: app/forms.py:179
 msgid "Add Resource"
 msgstr "زیادکردنی سەرچاوە"
 
-#: app/forms.py:173
+#: app/forms.py:189
 msgid "Command Title (e.g. Reset DB)"
 msgstr "سەردێڕی فەرمان (بۆ نموونە ڕیسێتکردنی داتابەیس)"
 
-#: app/forms.py:174
+#: app/forms.py:190
+msgid "Command Title (Kurdish)"
+msgstr "ناونیشانی فەرمان (کوردی)"
+
+#: app/forms.py:191
 msgid "Command Code"
 msgstr "کۆدی فەرمان"
 
-#: app/forms.py:175
+#: app/forms.py:192
 msgid "Description / When to use"
 msgstr "وەسف / کەی بەکاربهێنرێت"
 
-#: app/forms.py:176
+#: app/forms.py:194
 msgid "Save Command"
 msgstr "پاشەکەوتکردنی فەرمان"
 
-#: app/forms.py:183
+#: app/forms.py:201
 msgid "Select Backup File (.zip)"
 msgstr "هەڵبژاردنی پەڕگەی پاڵپشتی (.zip)"
 
-#: app/forms.py:185
+#: app/forms.py:203
 msgid "ZIP Archives Only!"
 msgstr "تەنها ئەرشیفی ZIP!"
 
-#: app/forms.py:187
+#: app/forms.py:205
 msgid "I understand this will DELETE ALL CURRENT DATA"
 msgstr "تێدەگەم کە ئەمە هەموو داتا هەنووکەییەکان دەسڕێتەوە"
 
-#: app/forms.py:188
+#: app/forms.py:206
 msgid "PERFORM FULL RESTORE"
 msgstr "ئەنجامدانی گەڕاندنەوەی تەواو"
 
-#: app/forms.py:194 app/templates/toolbase.html:38
+#: app/forms.py:212
+msgid "I understand this will DELETE ALL DATA permanently"
+msgstr "تێدەگەم کە ئەمە بە هەمیشەیی هەموو داتا دەسڕێتەوە"
+
+#: app/forms.py:213
+msgid "WIPE EVERYTHING & START FRESH"
+msgstr "سڕینەوەی هەموو شتێک & دەستپێکردنەوەی نوێ"
+
+#: app/forms.py:220 app/templates/toolbase.html:38
 msgid "Tool Name"
 msgstr "ناوی ئامراز"
 
-#: app/forms.py:195
+#: app/forms.py:221 app/templates/toolbase.html:42
+msgid "Tool Name (Kurdish)"
+msgstr "ناوی ئامراز (کوردی)"
+
+#: app/forms.py:222
 msgid "Tool URL (https://...)"
 msgstr "بەستەری ئامراز (https://...)"
 
-#: app/forms.py:197
+#: app/forms.py:225
 msgid "Add Tool"
 msgstr "زیادکردنی ئامراز"
 
-#: app/routes/admin.py:41
-msgid "Error: This Access Code is already in use."
-msgstr "هەڵە: ئەم کۆدی چوونەژوورەوەیە پێشتر بەکارهاتووە."
+#: app/forms.py:233 app/templates/page.html:157
+msgid "Your Name"
+msgstr "ناوەکەت"
 
-#: app/routes/admin.py:43
-msgid "Error: This Email is already in use."
-msgstr "هەڵە: ئەم ئیمەیڵە پێشتر بەکارهاتووە."
+#: app/forms.py:234 app/templates/page.html:163
+msgid "Your Birth Date"
+msgstr "بەرواری لەدایکبوونت"
 
-#: app/routes/admin.py:52
-#, python-format
-msgid "Student \"%(name)s\" registered successfully."
-msgstr "قوتابی \"%(name)s\" بە سەرکەوتوویی تۆمارکرا."
+#: app/forms.py:235
+msgid "About You / Personality (Optional)"
+msgstr "دەربارەی خۆت / کەسایەتی (ئارەزوومەندانە)"
 
-#: app/routes/admin.py:87
-msgid "Critical Error: The new access code is already assigned to someone else."
-msgstr "هەڵەی مەترسیدار: کۆدە نوێیەکەی چوونەژوورەوە پێشتر دراوە بە کەسێکی تر."
+#: app/forms.py:236 app/templates/page.html:179
+msgid "Your Comment"
+msgstr "لێدوانەکەت"
 
-#: app/routes/admin.py:94
-msgid "Critical Error: The new email is already assigned to someone else."
-msgstr "هەڵەی مەترسیدار: ئیمەیڵە نوێیەکە پێشتر دراوە بە کەسێکی تر."
+#: app/forms.py:237 app/templates/page.html:186
+msgid "Post Comment"
+msgstr "بڵاوکردنەوەی لێدوان"
 
-#: app/routes/admin.py:104
-msgid "Student profile updated. All grades and history remain linked."
-msgstr "پرۆفایلی قوتابی نوێکرایەوە. هەموو نمرەکان و مێژووەکەی وەک خۆیان دەمێننەوە."
-
-#: app/routes/admin.py:108
-#, python-format
-msgid "Database Error: %(error)s"
-msgstr "هەڵەی داتابەیس: %(error)s"
-
-#: app/routes/admin.py:135
-#, python-format
-msgid "Student \"%(name)s\" and all their records have been removed."
-msgstr "قوتابی \"%(name)s\" و هەموو تۆمارەکانی سڕدرانەوە."
-
-#: app/routes/admin.py:138
-#, python-format
-msgid "Failed to delete student: %(error)s"
-msgstr "سڕینەوەی قوتابی سەرکەوتوو نەبوو: %(error)s"
-
-#: app/routes/admin.py:167
-#, python-format
-msgid ""
-"Database Wipe Successful: %(students)s students, %(results)s exams, and "
-"%(answers)s choices deleted."
-msgstr "سڕینەوەی داتابەیس سەرکەوتوو بوو: %(students)s قوتابی، %(results)s تاقیکردنەوە، و %(answers)s هەڵبژاردە سڕدرانەوە."
-
-#: app/routes/admin.py:171
-#, python-format
-msgid "CRITICAL SYSTEM ERROR during batch wipe: %(error)s"
-msgstr "هەڵەی مەترسیداری سیستەم لە کاتی سڕینەوەی بەکۆمەڵ: %(error)s"
-
-#: app/routes/admin.py:220
+#: app/routes/admin.py:60
 msgid "Maintenance script documented successfully."
 msgstr "سکریپتی چاککردنەوە بە سەرکەوتوویی بەڵگەنامە کرا."
 
-#: app/routes/admin.py:223 app/routes/admin.py:243
+#: app/routes/admin.py:63 app/routes/admin.py:83
 #, python-format
 msgid "Error: %(error)s"
 msgstr "هەڵە: %(error)s"
 
-#: app/routes/admin.py:240
+#: app/routes/admin.py:80
 msgid "Documentation entry removed."
 msgstr "تۆماری بەڵگەنامە سڕدرایەوە."
 
-#: app/routes/analytics.py:350
-msgid "No file provided."
-msgstr "هیچ پەڕگەیەک دابین نەکراوە."
-
-#: app/routes/analytics.py:363
-msgid "Invalid Backup Format. Missing core CSV files."
-msgstr "فۆرماتی پاڵپشتییەکە نادروستە. پەڕگەی بنەڕەتی CSV بوونی نییە."
-
-#: app/routes/analytics.py:381
+#: app/routes/admin.py:123
 #, python-format
-msgid "Pre-Restore Wipe Failed: %(error)s"
-msgstr "سڕینەوەی پێش-گەڕاندنەوە سەرکەوتوو نەبوو: %(error)s"
+msgid "Import Error: Missing required columns: %(fields)s"
+msgstr "هەڵەی هێنانەناوەوە: ستوونی پێویست کەمە: %(fields)s"
 
-#: app/routes/analytics.py:613
-msgid "SYSTEM RESTORE COMPLETED. Database re-hydrated successfully."
-msgstr "گەڕاندنەوەی سیستەم تەواو بوو. داتابەیسەکە بە سەرکەوتوویی گەڕێندرایەوە."
-
-#: app/routes/analytics.py:618
-#, python-format
-msgid "CRITICAL RESTORE FAILURE: %(error)s"
-msgstr "شکستهێنانی مەترسیداری گەڕاندنەوە: %(error)s"
-
-#: app/routes/analytics.py:643
-msgid "Public Information Page Updated."
-msgstr "پەڕەی زانیارییە گشتییەکان نوێکرایەوە."
-
-#: app/routes/auth.py:36
-msgid "Logged in successfully."
-msgstr "بە سەرکەوتوویی چوویتە ژوورەوە."
-
-#: app/routes/auth.py:39
-msgid "Authentication failed. Check credentials."
-msgstr "چوونەژوورەوە سەرکەوتوو نەبوو. زانیارییەکانت بپشکنە."
-
-#: app/routes/auth.py:60
-#, python-format
-msgid "Welcome, %(name)s."
-msgstr "بەخێربێیت، %(name)s."
-
-#: app/routes/auth.py:69
-msgid "The Access Code provided is invalid."
-msgstr "ئەو کۆدەی چوونەژوورەوەی کە داوتە نادروستە."
-
-#: app/routes/auth.py:83
-msgid "Session ended."
-msgstr "دانیشتن کۆتایی هات."
-
-#: app/routes/auth.py:103
-msgid "Error: This email is already registered."
-msgstr "هەڵە: ئەم ئیمەیڵە پێشتر تۆمارکراوە."
-
-#: app/routes/auth.py:123
-#, python-format
-msgid "Account created! Your Access Code is: %(code)s. Please save it!"
-msgstr "هەژمار دروستکرا! کۆدی چوونەژوورەوەکەت بریتییە لە: %(code)s. تکایە پاشەکەوتی بکە!"
-
-#: app/routes/auth.py:128
-#, python-format
-msgid "Error creating account: %(error)s"
-msgstr "هەڵە لە دروستکردنی هەژمار: %(error)s"
-
-#: app/routes/auth.py:152
-msgid "Error: Email already in use by another student."
-msgstr "هەڵە: ئیمەیڵەکە پێشتر لەلایەن قوتابییەکی ترەوە بەکارهاتووە."
-
-#: app/routes/auth.py:158
-msgid "Error: Access code already taken."
-msgstr "هەڵە: کۆدی چوونەژوورەوە پێشتر گیراوە."
-
-#: app/routes/auth.py:166
-msgid "Settings updated successfully."
-msgstr "ڕێکخستنەکان بە سەرکەوتوویی نوێکرانەوە."
-
-#: app/routes/auth.py:170
-#, python-format
-msgid "Error updating settings: %(error)s"
-msgstr "هەڵە لە نوێکردنەوەی ڕێکخستنەکان: %(error)s"
-
-#: app/routes/content.py:53
-msgid "Import Error: Your file must contain a column named \"Name\"."
-msgstr "هەڵەی هاوردەکردن: پەڕگەکەت دەبێت ستوونێکی تێدابێت بە ناوی \"Name\"."
-
-#: app/routes/content.py:73
+#: app/routes/admin.py:144
 #, python-format
 msgid "An error occurred while reading the file: %(error)s"
 msgstr "هەڵەیەک ڕوویدا لە کاتی خوێندنەوەی پەڕگەکە: %(error)s"
 
-#: app/routes/content.py:76
+#: app/routes/admin.py:147
 msgid "File upload failed. Please ensure you selected a valid CSV or Excel file."
-msgstr "بارکردنی پەڕگەکە سەرکەوتوو نەبوو. تکایە دڵنیابە لە هەڵبژاردنی پەڕگەیەکی دروستی CSV یان Excel."
+msgstr ""
+"بارکردنی پەڕگەکە سەرکەوتوو نەبوو. تکایە دڵنیابە لە هەڵبژاردنی پەڕگەیەکی "
+"دروستی CSV یان Excel."
 
-#: app/routes/content.py:123
+#: app/routes/analytics.py:155
+msgid "No file provided."
+msgstr "هیچ پەڕگەیەک دابین نەکراوە."
+
+#: app/routes/analytics.py:168
+msgid "Invalid Backup Format. Missing core CSV files."
+msgstr "فۆرماتی پاڵپشتییەکە نادروستە. پەڕگەی بنەڕەتی CSV بوونی نییە."
+
+#: app/routes/analytics.py:188
+#, python-format
+msgid "Pre-Restore Wipe Failed: %(error)s"
+msgstr "سڕینەوەی پێش-گەڕاندنەوە سەرکەوتوو نەبوو: %(error)s"
+
+#: app/routes/analytics.py:362
+msgid "SYSTEM RESTORE COMPLETED. Database re-hydrated successfully."
+msgstr "گەڕاندنەوەی سیستەم تەواو بوو. داتابەیسەکە بە سەرکەوتوویی گەڕێندرایەوە."
+
+#: app/routes/analytics.py:367
+#, python-format
+msgid "CRITICAL RESTORE FAILURE: %(error)s"
+msgstr "شکستهێنانی مەترسیداری گەڕاندنەوە: %(error)s"
+
+#: app/routes/analytics.py:404
+msgid "System wiped clean. Please create a new administrator account."
+msgstr "سیستەمەکە بە تەواوی سڕایەوە. تکایە ئەژمارێکی نوێی بەڕێوەبەر دروست بکە."
+
+#: app/routes/analytics.py:409
+#, python-format
+msgid "CRITICAL WIPE FAILURE: %(error)s"
+msgstr "شکستی کوشندە لە سڕینەوە: %(error)s"
+
+#: app/routes/analytics.py:412
+msgid "Invalid form submission."
+msgstr "ناردنی فۆرمەکە نادروستە."
+
+#: app/routes/analytics.py:436
+msgid "Public Information Page Updated."
+msgstr "پەڕەی زانیارییە گشتییەکان نوێکرایەوە."
+
+#: app/routes/auth.py:34
+msgid "Logged in successfully."
+msgstr "بە سەرکەوتوویی چوویتە ژوورەوە."
+
+#: app/routes/auth.py:37
+msgid "Authentication failed. Check credentials."
+msgstr "چوونەژوورەوە سەرکەوتوو نەبوو. زانیارییەکانت بپشکنە."
+
+#: app/routes/auth.py:51
+msgid "Session ended."
+msgstr "دانیشتن کۆتایی هات."
+
+#: app/routes/content.py:66
 #, python-format
 msgid "Import Error: Missing columns: %(fields)s"
 msgstr "هەڵەی هاوردەکردن: ئەم ستوونانە بوونیان نییە: %(fields)s"
 
-#: app/routes/content.py:148
+#: app/routes/content.py:93
 #, python-format
 msgid "Processing Error: %(error)s"
 msgstr "هەڵەی پرۆسەکردن: %(error)s"
 
-#: app/routes/content.py:151
+#: app/routes/content.py:96
 msgid "Invalid request or file format."
 msgstr "داواکاری یان فۆرماتی پەڕگەکە نادروستە."
 
-#: app/routes/content.py:191
-#, python-format
-msgid "Batch Processed: %(count)s students added."
-msgstr "بەکۆمەڵ پرۆسە کرا: %(count)s قوتابی زیادکران."
-
-#: app/routes/content.py:230
+#: app/routes/content.py:153
 #, python-format
 msgid "Batch Processed: %(count)s questions assigned to bank."
 msgstr "بەکۆمەڵ پرۆسە کرا: %(count)s پرسیار بۆ بانکی پرسیارەکان دیاریکران."
 
-#: app/routes/content.py:235
+#: app/routes/content.py:171
+#, python-format
+msgid "Batch Processed: %(count)s system commands documented."
+msgstr "بە کۆمەڵ جێبەجێکرا: %(count)s فرمانی سیستەم تۆمارکرا."
+
+#: app/routes/content.py:176
 #, python-format
 msgid "Critical Commit Failure: %(error)s"
 msgstr "شکستهێنانی مەترسیدار لە جێبەجێکردندا: %(error)s"
 
-#: app/routes/content.py:259
+#: app/routes/content.py:200
 msgid "Error: The URL Slug must be unique across all subjects."
 msgstr "هەڵە: دەبێت سلەگی URL بێهاوتا بێت لە نێوان هەموو بابەتەکاندا."
 
-#: app/routes/content.py:269
+#: app/routes/content.py:243
 #, python-format
 msgid "Subject \"%(name)s\" created successfully."
 msgstr "بابەتی \"%(name)s\" بە سەرکەوتوویی دروستکرا."
 
-#: app/routes/content.py:300
+#: app/routes/content.py:246
+#, python-format
+msgid "Error creating subject: %(error)s"
+msgstr "هەڵە لە دروستکردنی بابەتدا: %(error)s"
+
+#: app/routes/content.py:294
 msgid "Subject information updated."
 msgstr "زانیارییەکانی بابەت نوێکرایەوە."
 
-#: app/routes/content.py:344
+#: app/routes/content.py:343
 #, python-format
 msgid "Subject \"%(name)s\" and all internal content has been deleted."
 msgstr "بابەتی \"%(name)s\" و هەموو ناوەڕۆکە ناوخۆییەکانی سڕدرانەوە."
 
-#: app/routes/content.py:348
+#: app/routes/content.py:347
 #, python-format
 msgid "Deletion failed: %(error)s"
 msgstr "سڕینەوە سەرکەوتوو نەبوو: %(error)s"
 
-#: app/routes/content.py:378
+#: app/routes/content.py:379
 msgid "Lecture content published."
 msgstr "ناوەڕۆکی وانە بڵاوکرایەوە."
 
-#: app/routes/content.py:404
+#: app/routes/content.py:405
 msgid "Changes saved."
 msgstr "گۆڕانکارییەکان پاشەکەوت کران."
 
-#: app/routes/content.py:430
+#: app/routes/content.py:436
 msgid "Lecture deleted."
 msgstr "وانەکە سڕدرایەوە."
 
-#: app/routes/content.py:452
+#: app/routes/content.py:439
+#, python-format
+msgid "Error deleting lecture: %(error)s"
+msgstr "هەڵە لە سڕینەوەی وانەدا: %(error)s"
+
+#: app/routes/content.py:461
+msgid "Comment deleted."
+msgstr "لێدوانەکە سڕایەوە."
+
+#: app/routes/content.py:464
+#, python-format
+msgid "Error deleting comment: %(error)s"
+msgstr "هەڵە لە سڕینەوەی لێدواندا: %(error)s"
+
+#: app/routes/content.py:488
 msgid "Learning resource attached."
 msgstr "سەرچاوەی فێربوون هاوپێچ کرا."
 
-#: app/routes/content.py:454
+#: app/routes/content.py:490
 msgid "Attachment Error: Title and Link are required."
 msgstr "هەڵەی هاوپێچکردن: سەردێڕ و بەستەر داواکراون."
 
-#: app/routes/content.py:471
+#: app/routes/content.py:507
 msgid "Resource removed."
 msgstr "سەرچاوە سڕدرایەوە."
 
-#: app/routes/content.py:650
+#: app/routes/content.py:686
 msgid "Question updated."
 msgstr "پرسیارەکە نوێکرایەوە."
 
-#: app/routes/content.py:669
+#: app/routes/content.py:704
 msgid "Question removed from bank."
 msgstr "پرسیارەکە لە بانک سڕدرایەوە."
 
-#: app/routes/content.py:672
+#: app/routes/content.py:707
 #, python-format
 msgid "Error during question deletion: %(error)s"
 msgstr "هەڵە لە کاتی سڕینەوەی پرسیارەکە: %(error)s"
 
-#: app/routes/public.py:51
+#: app/routes/public.py:54
 msgid "System is already initialized. Access to setup is restricted."
 msgstr "سیستەم پێشتر ئامادەکراوە. چوونەناو ڕێکخستنەکان سنووردارکراوە."
 
-#: app/routes/public.py:63
+#: app/routes/public.py:66
 msgid "Error: This email is already registered in our systems."
 msgstr "هەڵە: ئەم ئیمەیڵە پێشتر لە سیستەمەکانمان تۆمارکراوە."
 
-#: app/routes/public.py:80
+#: app/routes/public.py:83
 msgid "Admin Account Created! Please login to begin managing the school."
-msgstr "هەژماری بەڕێوەبەر دروستکرا! تکایە بچۆ ژوورەوە بۆ دەستپێکردنی بەڕێوەبردنی قوتابخانەکە."
+msgstr ""
+"هەژماری بەڕێوەبەر دروستکرا! تکایە بچۆ ژوورەوە بۆ دەستپێکردنی بەڕێوەبردنی "
+"قوتابخانەکە."
 
-#: app/routes/public.py:84
+#: app/routes/public.py:87
 #, python-format
 msgid "Critical Database Error: %(error)s"
 msgstr "هەڵەی مەترسیداری داتابەیس: %(error)s"
 
-#: app/routes/public.py:188
+#: app/routes/public.py:199 app/templates/base.html:13
+msgid "Welcome"
+msgstr "بەخێربێن"
+
+#: app/routes/public.py:200 app/templates/base.html:154
+#: app/templates/page.html:249
+msgid "Toggle Language"
+msgstr "گۆڕینی زمان"
+
+#: app/routes/public.py:201 app/templates/base.html:146
+#: app/templates/subject.html:13
+msgid "Home"
+msgstr "ماڵەوە"
+
+#: app/routes/public.py:202 app/templates/about.html:12
+#: app/templates/base.html:133 app/templates/base.html:148
+msgid "About Us"
+msgstr "دەربارەی ئێمە"
+
+#: app/routes/public.py:228
 msgid "Invalid language selected."
 msgstr "زمانێکی نادروست هەڵبژێردراوە."
 
-#: app/routes/public.py:218
+#: app/routes/public.py:254
 msgid "Language changed successfully."
 msgstr "زمانەکە بە سەرکەوتوویی گۆڕدرا."
 
-#: app/routes/student.py:116
-msgid "Access Denied: You do not have permission to view this record."
-msgstr "چوونەژوورەوە ڕەتکرایەوە: دەسەڵاتت نییە بۆ بینینی ئەم تۆمارە."
+#: app/routes/public.py:406
+msgid "Your comment has been posted!"
+msgstr "لێدوانەکەت بە سەرکەوتوویی بڵاوکرایەوە!"
 
-#: app/routes/student.py:302
+#: app/routes/public.py:409
+#, python-format
+msgid "Error posting comment: %(error)s"
+msgstr "هەڵە لە بڵاوکردنەوەی لێدواندا: %(error)s"
+
+#: app/routes/public.py:497
 #, python-format
 msgid "Examination Submitted. Final Grade: %(grade)s%%"
 msgstr "تاقیکردنەوە نێردرا. نمرەی کۆتایی: %(grade)s%%"
 
-#: app/routes/student.py:306
-#, python-format
-msgid "Critical system error during submission: %(error)s"
-msgstr "هەڵەی مەترسیداری سیستەم لە کاتی ناردندا: %(error)s"
+#: app/routes/teacher.py:65 app/routes/teacher.py:167
+msgid "All Teachers"
+msgstr "هەموو مامۆستایان"
 
-#: app/routes/teacher.py:88
-msgid "visible"
-msgstr "دیار"
-
-#: app/routes/teacher.py:88
-msgid "hidden"
-msgstr "شاراوە"
-
-#: app/routes/teacher.py:89
-#, python-format
-msgid "Subject \"%(name)s\" is now %(status)s on the public homepage."
-msgstr "بابەتی \"%(name)s\" ئێستا %(status)s لە پەڕەی سەرەکی گشتیدا."
-
-#: app/routes/teacher.py:92
-#, python-format
-msgid "Error updating visibility: %(error)s"
-msgstr "هەڵە لە نوێکردنەوەی بینین: %(error)s"
-
-#: app/routes/teacher.py:118
-#, python-format
-msgid "Error: The email address \"%(email)s\" is already in use."
-msgstr "هەڵە: ناونیشانی ئیمەیڵی \"%(email)s\" پێشتر بەکارهاتووە."
-
-#: app/routes/teacher.py:124
+#: app/routes/teacher.py:126 app/routes/teacher.py:369
 #, python-format
 msgid "Error: The name \"%(username)s\" is already taken."
 msgstr "هەڵە: ناوی \"%(username)s\" پێشتر گیراوە."
 
-#: app/routes/teacher.py:144
+#: app/routes/teacher.py:139
+msgid "Your profile has been updated successfully."
+msgstr "پرۆفایلەکەت بە سەرکەوتوویی نوێکرایەوە."
+
+#: app/routes/teacher.py:142
+#, python-format
+msgid "Error updating profile: %(error)s"
+msgstr "هەڵە لە نوێکردنەوەی پرۆفایلدا: %(error)s"
+
+#: app/routes/teacher.py:177
+msgid "No teachers available to message."
+msgstr "هیچ مامۆستایەک بەردەست نییە بۆ ناردنی پەیام."
+
+#: app/routes/teacher.py:182 app/routes/teacher.py:616
+msgid "Error: Selected teacher not found."
+msgstr "هەڵە: مامۆستای هەڵبژێردراو نەدۆزرایەوە."
+
+#: app/routes/teacher.py:197
+#, python-format
+msgid "Announcement sent to %(count)s teacher(s)."
+msgstr "ئاگادارکردنەوە نێردرا بۆ %(count)s مامۆستا."
+
+#: app/routes/teacher.py:199
+#, python-format
+msgid "Message sent to %(username)s."
+msgstr "پەیامەکە نێردرا بۆ %(username)s."
+
+#: app/routes/teacher.py:202
+#, python-format
+msgid "Error sending message: %(error)s"
+msgstr "هەڵە لە ناردنی پەیامدا: %(error)s"
+
+#: app/routes/teacher.py:236 app/routes/teacher.py:253
+msgid "Notification dismissed."
+msgstr "ئاگادارکردنەوەکە لابرا."
+
+#: app/routes/teacher.py:239 app/routes/teacher.py:256
+#, python-format
+msgid "Error dismissing notification: %(error)s"
+msgstr "هەڵە لە لابردنی ئاگادارکردنەوەدا: %(error)s"
+
+#: app/routes/teacher.py:276 app/routes/teacher.py:306
+msgid "shown"
+msgstr "پیشاندراو"
+
+#: app/routes/teacher.py:276 app/routes/teacher.py:306
+#: app/routes/teacher.py:333
+msgid "hidden"
+msgstr "شاراوە"
+
+#: app/routes/teacher.py:277
+#, python-format
+msgid "Your name will be %(status)s on all your subject pages."
+msgstr "ناوەکەت لە هەموو پەڕەی بابەتەکانتدا %(status)s دەبێت."
+
+#: app/routes/teacher.py:280 app/routes/teacher.py:310
+#, python-format
+msgid "Error updating setting: %(error)s"
+msgstr "هەڵە لە نوێکردنەوەی ڕێکخستن: %(error)s"
+
+#: app/routes/teacher.py:307
+#, python-format
+msgid "Your name is now %(status)s on \"%(subject)s\"."
+msgstr "ناوەکەت ئێستا لە \"%(subject)s\" %(status)sە."
+
+#: app/routes/teacher.py:333
+msgid "visible"
+msgstr "دیار"
+
+#: app/routes/teacher.py:334
+#, python-format
+msgid "Subject \"%(name)s\" is now %(status)s on the public homepage."
+msgstr "بابەتی \"%(name)s\" ئێستا %(status)s لە پەڕەی سەرەکی گشتیدا."
+
+#: app/routes/teacher.py:337
+#, python-format
+msgid "Error updating visibility: %(error)s"
+msgstr "هەڵە لە نوێکردنەوەی بینین: %(error)s"
+
+#: app/routes/teacher.py:363
+#, python-format
+msgid "Error: The email address \"%(email)s\" is already in use."
+msgstr "هەڵە: ناونیشانی ئیمەیڵی \"%(email)s\" پێشتر بەکارهاتووە."
+
+#: app/routes/teacher.py:392
 msgid "Administrator"
 msgstr "بەڕێوەبەر"
 
-#: app/routes/teacher.py:144 app/templates/base.html:194
+#: app/routes/teacher.py:392
 msgid "Teacher"
 msgstr "مامۆستا"
 
-#: app/routes/teacher.py:145
+#: app/routes/teacher.py:393
 #, python-format
 msgid "Success: %(role)s account created for %(username)s."
 msgstr "سەرکەوتوو بوو: هەژماری %(role)s دروستکرا بۆ %(username)s."
 
-#: app/routes/teacher.py:148
+#: app/routes/teacher.py:396
 #, python-format
 msgid "Database Error during staff creation: %(error)s"
 msgstr "هەڵەی داتابەیس لە کاتی دروستکردنی ستافدا: %(error)s"
 
-#: app/routes/teacher.py:172
+#: app/routes/teacher.py:420
 msgid "Error: The new username is already taken."
 msgstr "هەڵە: ناوی بەکارهێنەرە نوێیەکە پێشتر گیراوە."
 
-#: app/routes/teacher.py:177
+#: app/routes/teacher.py:425
 msgid "Error: The new email is already in use."
 msgstr "هەڵە: ئیمەیڵە نوێیەکە پێشتر بەکارهاتووە."
 
-#: app/routes/teacher.py:194
+#: app/routes/teacher.py:446
 msgid "Password has been reset."
 msgstr "وشەی نهێنی گەڕێنرایەوە."
 
-#: app/routes/teacher.py:197
+#: app/routes/teacher.py:449
 msgid "Staff profile updated."
 msgstr "پرۆفایلی ستاف نوێکرایەوە."
 
-#: app/routes/teacher.py:220
+#: app/routes/teacher.py:472
 msgid "Security Violation: You cannot delete your own account."
 msgstr "پێشێلکاری ئاسایش: ناتوانیت هەژمارەکەی خۆت بسڕیتەوە."
 
-#: app/routes/teacher.py:253
+#: app/routes/teacher.py:513
 #, python-format
 msgid "Account for %(username)s and all associated course data have been purged."
-msgstr "هەژماری %(username)s و هەموو داتایەکی پەیوەندیدار بە کۆرسەکانییەوە سڕدرانەوە."
+msgstr ""
+"هەژماری %(username)s و هەموو داتایەکی پەیوەندیدار بە کۆرسەکانییەوە "
+"سڕدرانەوە."
 
-#: app/routes/teacher.py:257
+#: app/routes/teacher.py:517
 #, python-format
 msgid "Integrity Error during deletion: %(error)s"
 msgstr "هەڵەی یەکپارچەیی لە کاتی سڕینەوەدا: %(error)s"
 
-#: app/routes/toolbase.py:48
+#: app/routes/teacher.py:547
+msgid "Error: At least one teacher must be assigned to a subject."
+msgstr "هەڵە: پێویستە لانیکەم مامۆستایەک بۆ بابەتەکە دیاری بکرێت."
+
+#: app/routes/teacher.py:555
+msgid "Error: No valid teachers selected."
+msgstr "هەڵە: هیچ مامۆستایەکی دروست هەڵنەبژێردراوە."
+
+#: app/routes/teacher.py:586
+#, python-format
+msgid "Assigned teachers for \"%(subject)s\" updated successfully."
+msgstr "مامۆستا دیاریکراوەکان بۆ \"%(subject)s\" بە سەرکەوتوویی نوێکرانەوە."
+
+#: app/routes/teacher.py:589
+#, python-format
+msgid "Error updating subject teachers: %(error)s"
+msgstr "هەڵە لە نوێکردنەوەی مامۆستایانی بابەت: %(error)s"
+
+#: app/routes/teacher.py:611
+msgid "Error: Please select a new teacher."
+msgstr "هەڵە: تکایە مامۆستایەکی نوێ هەڵبژێرە."
+
+#: app/routes/teacher.py:641
+#, python-format
+msgid "Subject \"%(subject)s\" transferred from %(old)s to %(new)s."
+msgstr "بابەتی \"%(subject)s\" گوازرایەوە لە %(old)s بۆ %(new)s."
+
+#: app/routes/teacher.py:645
+#, python-format
+msgid "Error transferring subject: %(error)s"
+msgstr "هەڵە لە گواستنەوەی بابەت: %(error)s"
+
+#: app/routes/toolbase.py:50
 msgid "New tool added successfully."
 msgstr "ئامرازی نوێ بە سەرکەوتوویی زیادکرا."
 
-#: app/routes/toolbase.py:52
+#: app/routes/toolbase.py:54
 #, python-format
 msgid "Error adding tool: %(error)s"
 msgstr "هەڵە لە زیادکردنی ئامراز: %(error)s"
 
-#: app/routes/toolbase.py:71
+#: app/routes/toolbase.py:73
 msgid "Import Error: CSV must have \"Name\" and \"Link\" columns."
-msgstr "هەڵەی هاوردەکردن: دەبێت پەڕگەی CSV ستوونەکانی \"Name\" و \"Link\"ی تێدابێت."
+msgstr ""
+"هەڵەی هاوردەکردن: دەبێت پەڕگەی CSV ستوونەکانی \"Name\" و \"Link\"ی "
+"تێدابێت."
 
-#: app/routes/toolbase.py:91
+#: app/routes/toolbase.py:93
 #, python-format
 msgid "Success! Imported %(count)s tools from file."
 msgstr "سەرکەوتوو بوو! %(count)s ئامراز لە پەڕگەکەوە هاوردە کران."
 
-#: app/routes/toolbase.py:96
+#: app/routes/toolbase.py:98
 #, python-format
 msgid "Import Failed: %(error)s"
 msgstr "هاوردەکردن سەرکەوتوو نەبوو: %(error)s"
 
-#: app/routes/toolbase.py:111
+#: app/routes/toolbase.py:113
 msgid "Tool deleted."
 msgstr "ئامرازەکە سڕدرایەوە."
 
-#: app/routes/toolbase.py:114
+#: app/routes/toolbase.py:116
 msgid "Error deleting tool."
 msgstr "هەڵە لە سڕینەوەی ئامرازەکە."
 
-#: app/routes/toolbase.py:131
+#: app/routes/toolbase.py:133
 #, python-format
 msgid "All tools deleted! (%(count)s removed)"
 msgstr "هەموو ئامرازەکان سڕدرانەوە! (%(count)s سڕدرانەوە)"
 
-#: app/routes/toolbase.py:134
+#: app/routes/toolbase.py:136
 #, python-format
 msgid "Error deleting all tools: %(error)s"
 msgstr "هەڵە لە سڕینەوەی هەموو ئامرازەکان: %(error)s"
 
-#: app/templates/about.html:12 app/templates/base.html:135
-#: app/templates/base.html:150
-msgid "About Us"
-msgstr "دەربارەی ئێمە"
-
-#: app/templates/about.html:32
+#: app/templates/about.html:36
 msgid "Information Coming Soon"
 msgstr "زانیارییەکان بەم زووانە بەردەست دەبن"
 
-#: app/templates/about.html:33
+#: app/templates/about.html:37
 msgid "The administration is currently updating this page."
 msgstr "بەڕێوەبەرایەتی لە ئێستادا ئەم پەڕەیە نوێ دەکاتەوە."
 
-#: app/templates/about.html:34 app/templates/login.html:70
-#: app/templates/student_login.html:67
+#: app/templates/about.html:38 app/templates/login.html:67
 msgid "Return Home"
 msgstr "گەڕانەوە بۆ ماڵەوە"
 
-#: app/templates/about.html:45
+#: app/templates/about.html:49
 msgid "Edit This Page (Admin Only)"
 msgstr "دەستکاریکردنی ئەم پەڕەیە (تەنها بۆ بەڕێوەبەر)"
 
-#: app/templates/admin_dashboard.html:17 app/templates/base.html:181
-#: app/templates/base.html:189 app/templates/teacher/dashboard.html:18
-#: app/templates/teacher/dashboard.html:62
+#: app/templates/admin_dashboard.html:17 app/templates/base.html:175
+#: app/templates/teacher/dashboard.html:18
+#: app/templates/teacher/dashboard.html:107
 msgid "Logout"
 msgstr "چوونە دەرەوە"
 
 #: app/templates/admin_dashboard.html:24
+msgid "Admin Notifications"
+msgstr "ئاگادارکردنەوەکانی بەڕێوەبەر"
+
+#: app/templates/admin_dashboard.html:36
+msgid "New Comment"
+msgstr "لێدوانی نوێ"
+
+#: app/templates/admin_dashboard.html:45
+#: app/templates/teacher/dashboard.html:173
+#: app/templates/teacher/dashboard.html:206
+msgid "Dismiss"
+msgstr "لابردن"
+
+#: app/templates/admin_dashboard.html:58 app/templates/index.html:114
+#: app/templates/teacher/dashboard.html:217
+msgid "View Lesson"
+msgstr "بینینی وانە"
+
+#: app/templates/admin_dashboard.html:65
+#: app/templates/teacher/dashboard.html:226
+msgid "No new notifications"
+msgstr "هیچ ئاگادارکردنەوەیەکی نوێ نییە"
+
+#: app/templates/admin_dashboard.html:71
+msgid "Auto-deleted after 3 days"
+msgstr "پاش ٣ ڕۆژ خۆکارانە دەسڕێتەوە"
+
+#: app/templates/admin_dashboard.html:80
+msgid "Message Teachers"
+msgstr "پەیام ناردن بۆ مامۆستایان"
+
+#: app/templates/admin_dashboard.html:91
+msgid "e.g., Schedule Update"
+msgstr "نموونە: نوێکردنەوەی خشتە"
+
+#: app/templates/admin_dashboard.html:95
+msgid "Write your message to the teacher(s)..."
+msgstr "پەیامەکەت بۆ مامۆستا(یان) بنووسە..."
+
+#: app/templates/admin_dashboard.html:111
+#: app/templates/teacher/dashboard.html:60
+msgid "Edit My Profile"
+msgstr "دەستکاریکردنی پرۆفایلەکەم"
+
+#: app/templates/admin/edit_teacher.html:41
+#: app/templates/admin_dashboard.html:131
+#: app/templates/admin_dashboard.html:470
+#: app/templates/teacher/dashboard.html:80
+msgid "Optional short bio..."
+msgstr "ژیاننامەیەکی کورت (ئارەزوومەندانە)..."
+
+#: app/templates/admin_dashboard.html:135
+#: app/templates/teacher/dashboard.html:84
+msgid "Leave empty to keep current"
+msgstr "بە بەتاڵی جێیبهێڵە بۆ هێشتنەوەی ئێستا"
+
+#: app/templates/admin_dashboard.html:152
 msgid "System Management"
 msgstr "بەڕێوەبردنی سیستەم"
 
-#: app/templates/admin_dashboard.html:28
-msgid "Manage Students"
-msgstr "بەڕێوەبردنی قوتابیان"
-
-#: app/templates/admin_dashboard.html:31
-msgid "Global Analytics"
-msgstr "شیکارییە گشتییەکان"
-
-#: app/templates/admin_dashboard.html:34
+#: app/templates/admin_dashboard.html:156
 msgid "System Commands"
 msgstr "فەرمانەکانی سیستەم"
 
-#: app/templates/admin_dashboard.html:37 app/templates/toolbase.html:17
+#: app/templates/admin_dashboard.html:159 app/templates/toolbase.html:17
 msgid "Tool Base"
 msgstr "بنکەی ئامرازەکان"
 
-#: app/templates/admin_dashboard.html:40
+#: app/templates/admin_dashboard.html:162
 msgid "Edit \"About Us\""
 msgstr "دەستکاریکردنی \"دەربارەی ئێمە\""
 
-#: app/templates/admin_dashboard.html:47
+#: app/templates/admin_dashboard.html:169
 msgid "Download Full Backup (.zip)"
 msgstr "داگرتنی پاڵپشتی تەواو (.zip)"
 
-#: app/templates/admin_dashboard.html:54
+#: app/templates/admin_dashboard.html:176
 msgid "Restore System"
 msgstr "گەڕاندنەوەی سیستەم"
 
-#: app/templates/admin_dashboard.html:63
+#: app/templates/admin_dashboard.html:185
 msgid "Create New Subject"
 msgstr "دروستکردنی بابەتی نوێ"
 
-#: app/templates/admin_dashboard.html:72
+#: app/templates/admin_dashboard.html:198
 msgid "URL Slug"
 msgstr "سلەگی بەستەر (URL)"
 
-#: app/templates/admin_dashboard.html:87
+#: app/templates/admin_dashboard.html:203
+msgid "Primary Teacher"
+msgstr "مامۆستای سەرەکی"
+
+#: app/templates/admin_dashboard.html:207
+msgid "Additional Teachers (Optional)"
+msgstr "مامۆستایانی تر (ئارەزوومەندانە)"
+
+#: app/templates/admin_dashboard.html:228
 msgid "Initialize Subject"
 msgstr "ئامادەکردنی بابەت"
 
-#: app/templates/admin_dashboard.html:96
-#: app/templates/teacher/dashboard.html:50
-msgid "Interface Theme"
-msgstr "سیمای ڕووکار"
-
-#: app/templates/admin_dashboard.html:99 app/templates/student/settings.html:50
-#: app/templates/teacher/dashboard.html:53
-msgid "Academic Glass"
-msgstr "شووشەی ئەکادیمی"
-
-#: app/templates/admin_dashboard.html:102
-#: app/templates/student/settings.html:54
-#: app/templates/teacher/dashboard.html:56
-msgid "Cyber Command"
-msgstr "فەرماندەیی سایبەر"
-
-#: app/templates/admin_dashboard.html:117
+#: app/templates/admin_dashboard.html:243
 msgid "Global Subject Control"
 msgstr "کۆنتڕۆڵکردنی بابەتی گشتی"
 
-#: app/templates/admin_dashboard.html:139
-#: app/templates/teacher/dashboard.html:136
+#: app/templates/admin_dashboard.html:273
+#: app/templates/teacher/dashboard.html:282
 msgid "Public"
 msgstr "گشتی"
 
-#: app/templates/admin_dashboard.html:141
-#: app/templates/teacher/dashboard.html:138
+#: app/templates/admin_dashboard.html:275
+#: app/templates/teacher/dashboard.html:284
 msgid "Hidden"
 msgstr "شاراوە"
 
-#: app/templates/admin_dashboard.html:147
-#: app/templates/teacher/dashboard.html:144
+#: app/templates/admin_dashboard.html:281
+#: app/templates/teacher/dashboard.html:290
 msgid "Hide"
 msgstr "شاردنەوە"
 
-#: app/templates/admin_dashboard.html:149
-#: app/templates/teacher/dashboard.html:146
+#: app/templates/admin_dashboard.html:283
+#: app/templates/teacher/dashboard.html:292
 msgid "Show"
 msgstr "پیشاندان"
 
-#: app/templates/admin_dashboard.html:156
+#: app/templates/admin_dashboard.html:294
+msgid "Assign Teachers"
+msgstr "دیاریکردنی مامۆستایان"
+
+#: app/templates/admin_dashboard.html:313
+msgid "Save Teachers"
+msgstr "پاشەکەوتکردنی مامۆستایان"
+
+#: app/templates/admin_dashboard.html:324
+msgid "Transfer to..."
+msgstr "گواستنەوە بۆ..."
+
+#: app/templates/admin_dashboard.html:332
+msgid "Transfer this subject to another teacher?"
+msgstr "ئەم بابەتە دەگوازیتەوە بۆ مامۆستایەکی تر؟"
+
+#: app/templates/admin_dashboard.html:340
 msgid "Open"
 msgstr "کردنەوە"
 
-#: app/templates/admin_dashboard.html:167
+# Feature 1: Pinned Subjects
+#: app/templates/admin_dashboard.html:343
+msgid "Edit Subject"
+msgstr "دەستکاریکردنی بابەت"
+
+#: app/templates/admin_dashboard.html:344 app/templates/subject.html:80
+msgid "Edit"
+msgstr "دەستکاریکردن"
+
+#: app/templates/admin_dashboard.html:355
 msgid "Admin Headquarters"
 msgstr "بنکەی سەرەکی بەڕێوەبەر"
 
-#: app/templates/admin_dashboard.html:171
+#: app/templates/admin_dashboard.html:359
 msgid "Print Staff Roster"
 msgstr "چاپکردنی لیستی ستاف"
 
-#: app/templates/admin_dashboard.html:179
+#: app/templates/admin_dashboard.html:367
 msgid "Teaching Staff"
 msgstr "ستافی وانەوتنەوە"
 
-#: app/templates/admin/students.html:186 app/templates/admin_dashboard.html:186
-#: app/templates/teacher/analytics.html:72
+#: app/templates/admin_dashboard.html:374
 msgid "Name"
 msgstr "ناو"
 
-#: app/templates/admin_dashboard.html:188
-#: app/templates/teacher/dashboard.html:79
+#: app/templates/admin_dashboard.html:376
+#: app/templates/teacher/dashboard.html:124
 msgid "Subjects Assigned"
 msgstr "بابەتە دیاریکراوەکان"
 
-#: app/templates/admin_dashboard.html:191
+#: app/templates/admin_dashboard.html:379
 msgid "Manual Password"
 msgstr "وشەی نهێنی دەستی"
 
-#: app/templates/admin_dashboard.html:194
-#: app/templates/student/dashboard.html:135
+#: app/templates/admin_dashboard.html:382
 msgid "Actions"
 msgstr "کردارەکان"
 
-#: app/templates/admin_dashboard.html:215
+#: app/templates/admin_dashboard.html:403
 msgid "None"
 msgstr "هیچیان"
 
-#: app/templates/admin_dashboard.html:229
+#: app/templates/admin_dashboard.html:417
 msgid "Edit Profile"
 msgstr "دەستکاریکردنی پرۆفایل"
 
-#: app/templates/admin_dashboard.html:234
+#: app/templates/admin_dashboard.html:422
 msgid "View Dashboard As..."
 msgstr "بینینی داشبۆرد وەک..."
 
-#: app/templates/admin/students.html:147 app/templates/admin_dashboard.html:239
-#: app/templates/subject.html:63 app/templates/teacher/dashboard.html:116
+#: app/templates/admin_dashboard.html:427 app/templates/subject.html:83
+#: app/templates/teacher/dashboard.html:262
 msgid "Delete"
 msgstr "سڕینەوە"
 
-#: app/templates/admin_dashboard.html:239
+#: app/templates/admin_dashboard.html:427
 msgid "This removes all their subjects and questions!"
 msgstr "ئەمە هەموو بابەت و پرسیارەکانیان دەسڕێتەوە!"
 
-#: app/templates/admin_dashboard.html:240
+#: app/templates/admin_dashboard.html:428
 msgid "Delete Account"
 msgstr "سڕینەوەی هەژمار"
 
-#: app/templates/admin_dashboard.html:248
+#: app/templates/admin_dashboard.html:436
 msgid ""
 "No staff members found. Use the\n"
 "                                form below to add the first teacher."
-msgstr "هیچ ئەندامێکی ستاف نەدۆزرایەوە. فۆڕمەکەی خوارەوە بەکاربهێنە بۆ زیادکردنی یەکەم مامۆستا."
+msgstr ""
+"هیچ ئەندامێکی ستاف نەدۆزرایەوە. فۆڕمەکەی خوارەوە بەکاربهێنە بۆ زیادکردنی "
+"یەکەم مامۆستا."
 
-#: app/templates/admin_dashboard.html:260
+#: app/templates/admin_dashboard.html:448
 msgid "Quick Register Staff"
 msgstr "تۆمارکردنی خێرای ستاف"
 
-#: app/templates/admin_dashboard.html:276
+#: app/templates/admin_dashboard.html:476
 msgid "Admin?"
 msgstr "بەڕێوەبەرە؟"
 
@@ -863,141 +1080,119 @@ msgstr "بەڕێوەبەرە؟"
 msgid "StatInfoPRO"
 msgstr "ئامارزانیارپرۆ"
 
-#: app/templates/base.html:13
-msgid "Welcome"
-msgstr "بەخێربێن"
-
-#: app/templates/base.html:148 app/templates/subject.html:13
-msgid "Home"
-msgstr "ماڵەوە"
-
-#: app/templates/base.html:149
+#: app/templates/base.html:147
 msgid "Tools"
 msgstr "ئامرازەکان"
 
-#: app/templates/base.html:151
+#: app/templates/base.html:149
 msgid "Stats"
 msgstr "ئامارەکان"
 
-#: app/templates/base.html:156
-msgid "Toggle Language"
-msgstr "گۆڕینی زمان"
-
-#: app/templates/base.html:175
+#: app/templates/base.html:173
 msgid "Teacher Dash"
 msgstr "داشبۆردی مامۆستا"
 
-#: app/templates/base.html:187
-msgid "Student Dash"
-msgstr "داشبۆردی قوتابی"
-
-#: app/templates/base.html:193
-msgid "Student"
-msgstr "قوتابی"
-
-#: app/templates/exam.html:18
+#: app/templates/exam.html:14
 msgid "Select the best answer for each question below."
 msgstr "باشترین وەڵام بۆ هەر پرسیارێکی خوارەوە هەڵبژێرە."
 
-#: app/templates/exam.html:87
+#: app/templates/exam.html:86
 msgid "No Questions Found"
 msgstr "هیچ پرسیارێک نەدۆزرایەوە"
 
-#: app/templates/exam.html:88
+#: app/templates/exam.html:87
 msgid "There are no questions assigned to this exam/lecture yet."
 msgstr "هیچ پرسیارێک بۆ ئەم تاقیکردنەوەیە/وانەیە دیاری نەکراوە هێشتا."
 
-#: app/templates/exam.html:89
+#: app/templates/exam.html:88
 msgid "Go Back"
 msgstr "گەڕانەوە بۆ دواوە"
 
-#: app/templates/exam.html:96
+#: app/templates/exam.html:95
 msgid "Submit Exam"
 msgstr "ناردنی تاقیکردنەوە"
 
-#: app/templates/exam.html:108
+#: app/templates/exam.html:107
 msgid "Submitting Exam..."
 msgstr "ناردنی تاقیکردنەوە..."
 
-#: app/templates/exam.html:109
+#: app/templates/exam.html:108
 msgid "Connecting to server..."
 msgstr "پەیوەندیکردن بە سێرڤەرەوە..."
 
-#: app/templates/exam.html:111
+#: app/templates/exam.html:110
 msgid "DO NOT REFRESH THE PAGE"
 msgstr "پەڕەکە نوێ مەکەرەوە"
 
-#: app/templates/exam.html:118
+#: app/templates/exam.html:120
 msgid "Are you sure you want to submit your answers?"
 msgstr "دڵنیایت دەتەوێت وەڵامەکانت بنێریت؟"
 
-#: app/templates/exam.html:135
+#: app/templates/exam.html:138
 msgid "Server verified. Uploading answers..."
 msgstr "سێرڤەر پشتڕاستکرایەوە. وەڵامەکان باردەکرێن..."
 
-#: app/templates/exam.html:140
+#: app/templates/exam.html:143
 msgid "Waking up server (this may take 20s)..."
 msgstr "بەخەبەر هێنانی سێرڤەر (لەوانەیە 20 چرکە بخایەنێت)..."
 
-#: app/templates/index.html:13
+#: app/templates/index.html:16
 msgid "this website is still under construction."
 msgstr "ئەم ماڵپەڕە هێشتا لە ژێر دروستکردندایە."
 
-#: app/templates/index.html:16
+#: app/templates/index.html:22
 msgid "Search Results for"
 msgstr "ئەنجامەکانی گەڕان بۆ"
 
-#: app/templates/index.html:18
+#: app/templates/index.html:26
 msgid "Welcome to"
 msgstr "بەخێربێیت بۆ"
 
-#: app/templates/index.html:20
+#: app/templates/index.html:28
 msgid "A place to learn"
 msgstr "شوێنێک بۆ فێربوون"
 
-#: app/templates/index.html:27
+# --- v0.5.0 NEW TRANSLATIONS ---
+# Feature 7: Conditional homepage
+#: app/templates/index.html:32
+msgid "Available Subjects"
+msgstr "بابەتە بەردەستەکان"
+
+#: app/templates/index.html:39
 msgid "Search subjects and lessons..."
 msgstr "گەڕان بۆ بابەتەکان و وانەکان..."
 
-#: app/templates/index.html:38 app/templates/student_login.html:19
-msgid "Student Portal"
-msgstr "دەروازەی قوتابی"
+#: app/templates/index.html:50
+msgid "Staff Login"
+msgstr "چوونەژوورەوەی ستاف"
 
-#: app/templates/index.html:39 app/templates/login.html:21
-msgid "Teacher Access"
-msgstr "چوونەژوورەوەی مامۆستا"
-
-#: app/templates/index.html:68 app/templates/student_login.html:52
+#: app/templates/index.html:79
 msgid "Enter Classroom"
 msgstr "چوونە ناو پۆل"
 
-#: app/templates/index.html:80
+#: app/templates/index.html:91
 msgid "No Subjects Yet"
 msgstr "هێشتا هیچ بابەتێک نییە"
 
-#: app/templates/index.html:81
+#: app/templates/index.html:92
 msgid "Teachers have not added any courses yet. Please check back later."
 msgstr "هێشتا مامۆستایان هیچ کۆرسێکیان زیاد نەکردووە. تکایە دواتر سەردان بکەرەوە."
 
-#: app/templates/index.html:91
+#: app/templates/index.html:102
 msgid "Matching Lessons"
 msgstr "وانە هاوتاکان"
 
-#: app/templates/index.html:103
-msgid "View Lesson"
-msgstr "بینینی وانە"
-
-#: app/templates/index.html:110
+#: app/templates/index.html:121
 msgid "No individual lessons found matching your query."
 msgstr "هیچ وانەیەکی تاکەکەسی نەدۆزرایەوە کە لەگەڵ گەڕانەکەتدا یەکبگرێتەوە."
+
+#: app/templates/login.html:21
+msgid "Teacher Access"
+msgstr "چوونەژوورەوەی مامۆستا"
 
 #: app/templates/login.html:22
 msgid "Secure Staff Portal"
 msgstr "دەروازەی پارێزراوی ستاف"
-
-#: app/templates/login.html:68
-msgid "Login as Student"
-msgstr "چوونەژوورەوە وەک قوتابی"
 
 #: app/templates/page.html:15
 msgid "Back to Subject"
@@ -1011,13 +1206,53 @@ msgstr "ئەنجامدانی کویزی وانەکە"
 msgid "Learning Resources"
 msgstr "سەرچاوەکانی فێربوون"
 
-#: app/templates/page.html:105 app/templates/page.html:129
-msgid "Read in Kurdish / وەرگێڕان"
-msgstr "خوێندنەوە بە کوردی / وەرگێڕان"
+#: app/templates/page.html:114 app/templates/teacher/builder.html:331
+msgid "Open in New Tab"
+msgstr "لە تابێکی نوێ بیکەرەوە"
 
-#: app/templates/page.html:135
-msgid "Read in English"
-msgstr "خوێندنەوە بە ئینگلیزی"
+#: app/templates/page.html:146
+msgid "Lecture Discussion"
+msgstr "گفتوگۆی وانە"
+
+#: app/templates/page.html:159
+msgid "Enter your name"
+msgstr "ناوەکەت بنووسە"
+
+#: app/templates/page.html:171
+msgid "About You / Personality"
+msgstr "دەربارەی خۆت / کەسایەتی"
+
+#: app/templates/page.html:172
+msgid "Optional"
+msgstr "ئارەزوومەندانە"
+
+#: app/templates/page.html:174
+msgid "Optional: share your interests, hobbies, or personality..."
+msgstr "ئارەزوومەندانە: حەز و خولیا یان تایبەتمەندییەکانی کەسایەتیت هاوبەش بکە..."
+
+#: app/templates/page.html:181
+msgid "Write your question or thoughts about this lecture..."
+msgstr "پرسیار یان بۆچوونەکەت دەربارەی ئەم وانەیە بنووسە..."
+
+#: app/templates/page.html:201
+msgid "Born"
+msgstr "لەدایکبوون"
+
+#: app/templates/page.html:205
+msgid "Age"
+msgstr "تەمەن"
+
+#: app/templates/page.html:214
+msgid "Delete this comment?"
+msgstr "ئەم لێدوانە بسڕێتەوە؟"
+
+#: app/templates/page.html:216
+msgid "Delete Comment"
+msgstr "سڕینەوەی لێدوان"
+
+#: app/templates/page.html:236
+msgid "No comments yet. Be the first to share your thoughts!"
+msgstr "هێشتا هیچ لێدوانێک نییە. ببە بە یەکەم کەس بۆ هاوبەشکردنی بۆچوونەکەت!"
 
 #: app/templates/setup.html:16
 msgid "System Initialization"
@@ -1051,13 +1286,13 @@ msgstr "شیکارییەکانی کاتی ڕاستەقینە و پێوەرەکا
 msgid "Total Exams"
 msgstr "کۆی تاقیکردنەوەکان"
 
-#: app/templates/stats.html:24 app/templates/student/dashboard.html:82
+#: app/templates/stats.html:24
 msgid "Global Average"
 msgstr "تێکڕای گشتی"
 
 #: app/templates/stats.html:31
-msgid "Total Students"
-msgstr "کۆی قوتابیان"
+msgid "Total Subjects"
+msgstr "کۆی بابەتەکان"
 
 #: app/templates/stats.html:43
 msgid "Subject Performance"
@@ -1079,111 +1314,81 @@ msgstr "تێکڕای نمرە"
 msgid "No exam data available yet."
 msgstr "هێشتا هیچ داتایەکی تاقیکردنەوە بەردەست نییە."
 
-#: app/templates/student_login.html:20
-msgid "Enter your unique access code to continue."
-msgstr "کۆدی چوونەژوورەوە بێهاوتاکەت بنووسە بۆ بەردەوامبوون."
+#: app/templates/subject.html:25
+msgid "Taught by"
+msgstr "لەلایەن"
 
-#: app/templates/student_login.html:62
-msgid "Register New Student"
-msgstr "تۆمارکردنی قوتابی نوێ"
-
-#: app/templates/student_login.html:65
-msgid "Login as Teacher"
-msgstr "چوونەژوورەوە وەک مامۆستا"
-
-#: app/templates/student_signup.html:12
-msgid "Student Registration"
-msgstr "تۆمارکردنی قوتابی"
-
-#: app/templates/student_signup.html:13
-msgid "Create your account to access exams and study materials."
-msgstr "هەژمارەکەت دروست بکە بۆ دەستگەیشتن بە تاقیکردنەوەکان و کەرەستەکانی خوێندن."
-
-#: app/templates/student_signup.html:45
-msgid "Already have an account?"
-msgstr "پێشتر هەژمارت هەیە؟"
-
-#: app/templates/student_signup.html:46
-msgid ""
-"Login\n"
-"                            here"
-msgstr "لێرە\n                            بچۆ ژوورەوە"
-
-#: app/templates/subject.html:27
+#: app/templates/subject.html:47
 msgid "Study Materials"
 msgstr "کەرەستەکانی خوێندن"
 
-#: app/templates/subject.html:47
+#: app/templates/subject.html:67
 msgid "Resource(s)"
 msgstr "سەرچاوە(کان)"
 
-#: app/templates/subject.html:59
+#: app/templates/subject.html:79
 msgid "Instructor Controls:"
 msgstr "کۆنتڕۆڵەکانی مامۆستا:"
 
-#: app/templates/subject.html:60
-msgid "Edit"
-msgstr "دەستکاریکردن"
-
-#: app/templates/subject.html:63
+#: app/templates/subject.html:83
 msgid "Delete this page?"
 msgstr "ئەم پەڕەیە دەسڕیتەوە؟"
 
-#: app/templates/subject.html:73
+#: app/templates/subject.html:93
 msgid "No study materials available yet."
 msgstr "هێشتا هیچ کەرەستەیەکی خوێندن بەردەست نییە."
 
-#: app/templates/subject.html:85
+#: app/templates/subject.html:105
 msgid "Class Exam"
 msgstr "تاقیکردنەوەی پۆل"
 
-#: app/templates/subject.html:88
+#: app/templates/subject.html:108
 msgid ""
 "The exam is active. You will be graded immediately upon\n"
 "                    submission."
 msgstr "تاقیکردنەوەکە چالاکە. ڕاستەوخۆ دوای ناردن نمرەکەت وەردەگریت."
 
-#: app/templates/subject.html:92
+#: app/templates/subject.html:112
 msgid "Take Final Exam"
 msgstr "ئەنجامدانی تاقیکردنەوەی کۆتایی"
 
-#: app/templates/subject.html:96
+#: app/templates/subject.html:116
 msgid "No exams available yet."
 msgstr "هێشتا هیچ تاقیکردنەوەیەک بەردەست نییە."
 
-#: app/templates/subject.html:97
+#: app/templates/subject.html:117
 msgid "Exam Closed"
 msgstr "تاقیکردنەوە داخراوە"
 
-#: app/templates/subject.html:106
+#: app/templates/subject.html:126
 msgid "Question Bank"
 msgstr "بانکی پرسیارەکان"
 
-#: app/templates/subject.html:117
+#: app/templates/subject.html:137
 msgid "Lecture Specific"
 msgstr "تایبەت بە وانە"
 
-#: app/templates/subject.html:118
+#: app/templates/subject.html:138
 msgid "Lec"
 msgstr "وانە"
 
-#: app/templates/subject.html:125
+#: app/templates/subject.html:145
 msgid "Delete?"
 msgstr "دەیسڕیتەوە؟"
 
-#: app/templates/subject.html:130
+#: app/templates/subject.html:150
 msgid "No questions yet."
 msgstr "هێشتا هیچ پرسیارێک نییە."
 
-#: app/templates/subject.html:135
+#: app/templates/subject.html:155
 msgid "and"
 msgstr "و"
 
-#: app/templates/subject.html:135
+#: app/templates/subject.html:155
 msgid "more"
 msgstr "زیاتر"
 
-#: app/templates/subject.html:142
+#: app/templates/subject.html:162
 msgid "Manage Questions (Bulk Editor)"
 msgstr "بەڕێوەبردنی پرسیارەکان (دەستکاریکردنی بەکۆمەڵ)"
 
@@ -1191,7 +1396,6 @@ msgstr "بەڕێوەبردنی پرسیارەکان (دەستکاریکردنی 
 msgid "External Links & Tools"
 msgstr "بەستەر و ئامرازە دەرەکییەکان"
 
-#: app/templates/admin/students.html:95 app/templates/teacher/analytics.html:17
 #: app/templates/toolbase.html:23
 msgid "Dashboard"
 msgstr "داشبۆرد"
@@ -1200,51 +1404,53 @@ msgstr "داشبۆرد"
 msgid "Add New Tool"
 msgstr "زیادکردنی ئامرازی نوێ"
 
-#: app/templates/toolbase.html:42
+#: app/templates/toolbase.html:46
 msgid "URL / Link"
 msgstr "بەستەر / URL"
 
-#: app/templates/toolbase.html:46
+#: app/templates/toolbase.html:50
 msgid "Description (Optional)"
 msgstr "وەسف (ئارەزوومەندانە)"
 
-#: app/templates/toolbase.html:51
+#: app/templates/toolbase.html:59
 msgid "Add to Library"
 msgstr "زیادکردن بۆ کتێبخانە"
 
-#: app/templates/toolbase.html:65
+#: app/templates/toolbase.html:73
 msgid "Bulk Import Tools"
 msgstr "هاوردەکردنی ئامرازەکان بەکۆمەڵ"
 
-#: app/templates/toolbase.html:70
+#: app/templates/toolbase.html:78
 msgid "Upload a CSV or Excel file with columns:"
 msgstr "پەڕگەیەکی CSV یان Excel باربکە کە ئەم ستوونانەی تێدابێت:"
 
-#: app/templates/toolbase.html:71
+#: app/templates/toolbase.html:79
 msgid "Name, Link, Description"
 msgstr "ناو، بەستەر، وەسف"
 
-#: app/templates/toolbase.html:82
+#: app/templates/toolbase.html:90
 msgid "Import"
 msgstr "هاوردەکردن"
 
-#: app/templates/toolbase.html:97
+#: app/templates/toolbase.html:105
 msgid "Existing Tools"
 msgstr "ئامرازە بەردەستەکان"
 
-#: app/templates/toolbase.html:100
+#: app/templates/toolbase.html:108
 msgid "WARNING: Are you sure you want to delete ALL tools? This cannot be undone."
-msgstr "ئاگاداری: دڵنیایت دەتەوێت هەموو ئامرازەکان بسڕیتەوە؟ ئەمە پاشگەزبوونەوەی بۆ نییە."
+msgstr ""
+"ئاگاداری: دڵنیایت دەتەوێت هەموو ئامرازەکان بسڕیتەوە؟ ئەمە پاشگەزبوونەوەی "
+"بۆ نییە."
 
-#: app/templates/toolbase.html:104
+#: app/templates/toolbase.html:112
 msgid "Delete All"
 msgstr "سڕینەوەی هەمووی"
 
-#: app/templates/toolbase.html:138
+#: app/templates/toolbase.html:146
 msgid "Delete this tool?"
 msgstr "ئەم ئامرازە دەسڕیتەوە؟"
 
-#: app/templates/toolbase.html:151
+#: app/templates/toolbase.html:159
 msgid "No tools added yet."
 msgstr "هێشتا هیچ ئامرازێک زیاد نەکراوە."
 
@@ -1256,7 +1462,7 @@ msgstr "سەنتەری فەرمانەکان"
 msgid "Documentation for server maintenance and emergency scripts."
 msgstr "بەڵگەنامە بۆ چاککردنەوەی سێرڤەر و سکریپتەکانی باری لەناکاو."
 
-#: app/templates/admin/commands.html:17
+#: app/templates/admin/commands.html:17 app/templates/teacher/builder.html:23
 msgid "Back to Dashboard"
 msgstr "گەڕانەوە بۆ داشبۆرد"
 
@@ -1264,27 +1470,47 @@ msgstr "گەڕانەوە بۆ داشبۆرد"
 msgid ""
 "Add New\n"
 "                    Command"
-msgstr "زیادکردنی فەرمانی\n                    نوێ"
+msgstr ""
+"زیادکردنی فەرمانی\n"
+"                    نوێ"
 
-#: app/templates/admin/commands.html:70
+#: app/templates/admin/commands.html:71
+msgid "Bulk Import Commands"
+msgstr "هێنانەناوەوەی فرمانەکان بە کۆمەڵ"
+
+#: app/templates/admin/commands.html:78
+msgid "CSV Format:"
+msgstr "فۆرماتی CSV:"
+
+#: app/templates/admin/commands.html:78
+msgid "Columns: Title, Command, Description (optional)"
+msgstr "ستوونەکان: ناونیشان، فرمان، وەسف (ئارەزوومەندانە)"
+
+#: app/templates/admin/commands.html:89
+msgid "Preview Import"
+msgstr "پێشبینینی هێنانەناوەوە"
+
+#: app/templates/admin/commands.html:109
 msgid "Delete this documentation?"
 msgstr "ئەم بەڵگەنامەیە دەسڕیتەوە؟"
 
-#: app/templates/admin/commands.html:84
+#: app/templates/admin/commands.html:123
 msgid "Copy"
 msgstr "لەبەرگرتنەوە"
 
-#: app/templates/admin/commands.html:95
+#: app/templates/admin/commands.html:134
 msgid "No Commands Saved"
 msgstr "هیچ فەرمانێک پاشەکەوت نەکراوە"
 
-#: app/templates/admin/commands.html:96
+#: app/templates/admin/commands.html:135
 msgid ""
 "Add common terminal commands here to keep a safe backup of your server "
 "knowledge."
-msgstr "لێرە فەرمانە باوەکانی تێرمیناڵ زیاد بکە بۆ ئەوەی پاڵپشتییەکی پارێزراو بۆ زانیارییەکانی سێرڤەرەکەت بهێڵیتەوە."
+msgstr ""
+"لێرە فەرمانە باوەکانی تێرمیناڵ زیاد بکە بۆ ئەوەی پاڵپشتییەکی پارێزراو بۆ "
+"زانیارییەکانی سێرڤەرەکەت بهێڵیتەوە."
 
-#: app/templates/admin/commands.html:110
+#: app/templates/admin/commands.html:149
 msgid "Copied!"
 msgstr "لەبەرگیراوەیە!"
 
@@ -1304,36 +1530,47 @@ msgstr "ئامۆژگاری پرۆ:"
 msgid ""
 "Click the \"Source\" button\n"
 "                    in the toolbar to write raw HTML/CSS."
-msgstr "کرتە لە دوگمەی \"Source\" بکە\n                    لە توولبارەکەدا بۆ نووسینی HTML/CSSی خاو."
+msgstr ""
+"کرتە لە دوگمەی \"Source\" بکە\n"
+"                    لە توولبارەکەدا بۆ نووسینی HTML/CSSی خاو."
 
-#: app/templates/admin/edit_about.html:46
-#: app/templates/admin/edit_student.html:30
-#: app/templates/admin/edit_teacher.html:56
-#: app/templates/admin/students.html:195 app/templates/student/settings.html:85
+#: app/templates/admin/edit_about.html:55
+msgid "Leave empty if Kurdish translation is not available."
+msgstr "بە بەتاڵی بەجێی بهێڵە ئەگەر وەرگێڕانی کوردی بەردەست نییە."
+
+#: app/templates/admin/edit_about.html:61
+#: app/templates/admin/edit_teacher.html:85
+#: app/templates/teacher/builder.html:304
 msgid "Cancel"
 msgstr "پاشگەزبوونەوە"
-
-#: app/templates/admin/edit_student.html:10
-msgid "Edit Student:"
-msgstr "دەستکاریکردنی قوتابی:"
 
 #: app/templates/admin/edit_teacher.html:11
 msgid "Edit Staff Profile"
 msgstr "دەستکاریکردنی پرۆفایلی ستاف"
 
-#: app/templates/admin/edit_teacher.html:44
+#: app/templates/admin/edit_teacher.html:59
 msgid "Grant System Administrator Access"
 msgstr "پێدانی دەسەڵاتی بەڕێوەبەری سیستەم"
 
-#: app/templates/admin/edit_teacher.html:49
+#: app/templates/admin/edit_teacher.html:64
 msgid "Warning:"
 msgstr "ئاگاداری:"
 
-#: app/templates/admin/edit_teacher.html:49
+#: app/templates/admin/edit_teacher.html:64
 msgid ""
 "Admins have full control, including deleting\n"
 "                            users and content."
-msgstr "بەڕێوەبەرەکان کۆنتڕۆڵی تەواویان هەیە، لەوانەش سڕینەوەی\n                            بەکارهێنەران و ناوەڕۆک."
+msgstr ""
+"بەڕێوەبەرەکان کۆنتڕۆڵی تەواویان هەیە، لەوانەش سڕینەوەی\n"
+"                            بەکارهێنەران و ناوەڕۆک."
+
+#: app/templates/admin/edit_teacher.html:74
+msgid "Show Name on Subject Pages"
+msgstr "پیشاندانی ناو لە لاپەڕەکانی بابەت"
+
+#: app/templates/admin/edit_teacher.html:79
+msgid "Display your name publicly on subject pages visitors view."
+msgstr "ناوەکەت بە گشتی لە پەڕەی بابەتەکان پیشان بدە کە سەردانکەران دەیبینن."
 
 #: app/templates/admin/import_preview.html:13
 msgid "Review Data Import"
@@ -1351,7 +1588,9 @@ msgstr "ڕیزە دۆزراوەکان"
 msgid ""
 "Batch\n"
 "                            Settings:"
-msgstr "ڕێکخستنەکانی\n                            بەکۆمەڵ:"
+msgstr ""
+"ڕێکخستنەکانی\n"
+"                            بەکۆمەڵ:"
 
 #: app/templates/admin/import_preview.html:47
 msgid "Assign to Lecture:"
@@ -1382,25 +1621,31 @@ msgid ""
 "be\n"
 "                                saved until you click\n"
 "                                \"Confirm Import\"."
-msgstr "تاوەکو کرتە نەکەیتە سەر\n                                \"پشتڕاستکردنەوەی هاوردەکردن\"."
+msgstr ""
+"تاوەکو کرتە نەکەیتە سەر\n"
+"                                \"پشتڕاستکردنەوەی هاوردەکردن\"."
 
 #: app/templates/admin/import_preview.html:87
-msgid "Generated Access Code"
-msgstr "کۆدی چوونەژوورەوەی دروستکراو"
-
-#: app/templates/admin/import_preview.html:90
 msgid "Options (A / B / C / D)"
 msgstr "هەڵبژاردەکان (A / B / C / D)"
 
-#: app/templates/admin/import_preview.html:91
+#: app/templates/admin/import_preview.html:88
 msgid "Answer"
 msgstr "وەڵام"
 
-#: app/templates/admin/import_preview.html:124
+#: app/templates/admin/import_preview.html:90
+msgid "Title"
+msgstr "ناونیشان"
+
+#: app/templates/admin/import_preview.html:91
+msgid "Command"
+msgstr "فرمان"
+
+#: app/templates/admin/import_preview.html:126
 msgid "Cancel & Discard"
 msgstr "پاشگەزبوونەوە و فڕێدان"
 
-#: app/templates/admin/import_preview.html:127
+#: app/templates/admin/import_preview.html:129
 msgid "Confirm Import"
 msgstr "پشتڕاستکردنەوەی هاوردەکردن"
 
@@ -1424,7 +1669,9 @@ msgstr "تەنها بۆ بەڕێوەبەر"
 msgid ""
 "WARNING: NUCLEAR\n"
 "                        OPTION"
-msgstr "ئاگاداری: بژاردەی\n                        لەناوبەر"
+msgstr ""
+"ئاگاداری: بژاردەی\n"
+"                        لەناوبەر"
 
 #: app/templates/admin/restore_center.html:28
 msgid "This process will"
@@ -1447,6 +1694,7 @@ msgid ""
 msgstr "دواتر هەوڵدەدات دۆخی سیستەمەکە لە پەڕگەی پاڵپشتییەکەتەوە دروست بکاتەوە."
 
 #: app/templates/admin/restore_center.html:31
+#: app/templates/admin/restore_center.html:73
 msgid "This action cannot be undone."
 msgstr "ئەم کردارە پاشگەزبوونەوەی بۆ نییە."
 
@@ -1466,7 +1714,9 @@ msgstr "پەڕگەیەک بێت کە لەلایەن تایبەتمەندی هە�
 msgid ""
 "I confirm that I want to DELETE all current data and restore from this "
 "file."
-msgstr "پشتڕاستی دەکەمەوە کە دەمەوێت هەموو داتا هەنووکەییەکان بسڕمەوە و لەم پەڕگەیەوە بیانگەڕێنمەوە."
+msgstr ""
+"پشتڕاستی دەکەمەوە کە دەمەوێت هەموو داتا هەنووکەییەکان بسڕمەوە و لەم "
+"پەڕگەیەوە بیانگەڕێنمەوە."
 
 #: app/templates/admin/restore_center.html:55
 msgid "FINAL WARNING: Are you absolutely sure?"
@@ -1480,433 +1730,6 @@ msgstr "دەستپێکردنی زنجیرەی گەڕاندنەوە"
 msgid "Cancel & Return to Safety"
 msgstr "پاشگەزبوونەوە و گەڕانەوە بۆ شوێنی پارێزراو"
 
-#: app/templates/admin/restore_center.html:66
-msgid "Protocol:"
-msgstr "پڕۆتۆکۆڵ:"
-
-#: app/templates/admin/restore_center.html:66
-msgid "Wipe-and-Replace Strategy."
-msgstr "ستراتیژی سڕینەوە-و-جێگرتنەوە."
-
-#: app/templates/admin/restore_center.html:67
-msgid "Security:"
-msgstr "ئاسایش:"
-
-#: app/templates/admin/restore_center.html:67
-msgid "All operations are logged."
-msgstr "هەموو کردارەکان تۆمارکراون."
-
-#: app/templates/admin/students.html:17
-msgid "Batch Operations"
-msgstr "کردارە بەکۆمەڵەکان"
-
-#: app/templates/admin/students.html:18
-msgid "Manage large groups of students efficiently."
-msgstr "بەڕێوەبردنی گرووپە گەورەکانی قوتابیان بە شێوەیەکی کارا."
-
-#: app/templates/admin/students.html:23
-msgid "Import Excel/CSV"
-msgstr "هاوردەکردنی Excel/CSV"
-
-#: app/templates/admin/students.html:28
-msgid "Export Roster"
-msgstr "هەناردەکردنی لیستی ناوەکان"
-
-#: app/templates/admin/students.html:35
-msgid "Danger Zone"
-msgstr "ناوچەی مەترسیدار"
-
-#: app/templates/admin/students.html:38
-msgid ""
-"⚠️ CRITICAL WARNING ⚠️\\n\\nAre you sure you want to delete ALL "
-"students?\\n\\nThis action will PERMANENTLY ERASE:\\n- All student "
-"accounts\\n- All exam results\\n- All detailed answer logs\\n\\nThis "
-"cannot be undone. Click OK to wipe the database."
-msgstr "⚠️ ئاگاداری مەترسیدار ⚠️\\n\\nئایا دڵنیایت دەتەوێت هەموو قوتابیان بسڕیتەوە؟\\n\\nئەم کردارە بە یەکجاری دەسڕێتەوە:\\n- هەموو هەژمارەکانی قوتابیان\\n- هەموو ئەنجامەکانی تاقیکردنەوە\\n- هەموو تۆمارە وردەکانی وەڵامەکان\\n\\nئەمە پاشگەزبوونەوەی بۆ نییە. کرتە لە OK بکە بۆ سڕینەوەی داتابەیسەکە."
-
-#: app/templates/admin/students.html:41
-msgid "Delete ALL Students"
-msgstr "سڕینەوەی هەموو قوتابیان"
-
-#: app/templates/admin/students.html:50
-msgid "Manual Registration"
-msgstr "تۆمارکردنی دەستی"
-
-#: app/templates/admin/students.html:64
-msgid "Auto-generated secure token."
-msgstr "تۆکنی پارێزراوی خۆکار-دروستکراو."
-
-#: app/templates/admin/students.html:71
-msgid "Register Student"
-msgstr "تۆمارکردنی قوتابی"
-
-#: app/templates/admin/students.html:88
-msgid "Active Roster"
-msgstr "لیستی ناوە چالاکەکان"
-
-#: app/templates/admin/students.html:92
-msgid "Print"
-msgstr "چاپکردن"
-
-#: app/templates/admin/students.html:102
-msgid "Student Access Roster"
-msgstr "لیستی چوونەژوورەوەی قوتابیان"
-
-#: app/templates/admin/students.html:103
-msgid "Confidential Login Credentials"
-msgstr "زانیارییە نهێنییەکانی چوونەژوورەوە"
-
-#: app/templates/admin/students.html:114
-msgid "Manage"
-msgstr "بەڕێوەبردن"
-
-#: app/templates/admin/students.html:129
-msgid "Missing"
-msgstr "دیارنییە"
-
-#: app/templates/admin/students.html:141
-msgid "Edit Details"
-msgstr "دەستکاریکردنی وردەکارییەکان"
-
-#: app/templates/admin/students.html:147
-msgid "This removes their exam history."
-msgstr "ئەمە مێژووی تاقیکردنەوەکانیان دەسڕێتەوە."
-
-#: app/templates/admin/students.html:148
-msgid "Delete Student"
-msgstr "سڕینەوەی قوتابی"
-
-#: app/templates/admin/students.html:158
-msgid "No students registered."
-msgstr "هیچ قوتابییەک تۆمار نەکراوە."
-
-#: app/templates/admin/students.html:159
-msgid "Use the form or import tool to add them."
-msgstr "فۆڕمەکە یان ئامرازی هاوردەکردن بەکاربهێنە بۆ زیادکردنیان."
-
-#: app/templates/admin/students.html:176
-msgid "Bulk Student Import"
-msgstr "هاوردەکردنی قوتابیان بەکۆمەڵ"
-
-#: app/templates/admin/students.html:185
-msgid "Format Requirement:"
-msgstr "پێداویستی فۆرمات:"
-
-#: app/templates/admin/students.html:186
-msgid "File must have a column:"
-msgstr "پەڕگە دەبێت ستوونێکی هەبێت بە ناوی:"
-
-#: app/templates/admin/students.html:187
-msgid "Access codes are generated automatically."
-msgstr "کۆدەکانی چوونەژوورەوە بە شێوەیەکی خۆکار دروست دەکرێن."
-
-#: app/templates/student/dashboard.html:20
-msgid "Member of Group:"
-msgstr "ئەندامی گرووپی:"
-
-#: app/templates/student/dashboard.html:26
-msgid "Browse Subjects"
-msgstr "گەڕان بەناو بابەتەکاندا"
-
-#: app/templates/student/dashboard.html:35
-msgid "Quick Actions"
-msgstr "کردارە خێراکان"
-
-#: app/templates/student/dashboard.html:40
-msgid "My Settings"
-msgstr "ڕێکخستنەکانم"
-
-#: app/templates/student/dashboard.html:43
-msgid "Sign Out"
-msgstr "چوونەدەرەوە"
-
-#: app/templates/student/dashboard.html:61
-msgid "Action Required"
-msgstr "کردار پێویستە"
-
-#: app/templates/student/dashboard.html:62
-msgid ""
-"Please add your email address to secure your account and receive\n"
-"                        notifications."
-msgstr "تکایە ناونیشانی ئیمەیڵەکەت زیاد بکە بۆ پاراستنی هەژمارەکەت و وەرگرتنی\n                        ئاگادارکردنەوەکان."
-
-#: app/templates/student/dashboard.html:66
-msgid "Add Email"
-msgstr "زیادکردنی ئیمەیڵ"
-
-#: app/templates/student/dashboard.html:76
-msgid "Exams Completed"
-msgstr "تاقیکردنەوە تەواوکراوەکان"
-
-#: app/templates/student/dashboard.html:82
-msgid "Global Average"
-msgstr "تێکڕای گشتی"
-
-#: app/templates/student/dashboard.html:91
-msgid "Subject Mastery"
-msgstr "شارەزایی بابەت"
-
-#: app/templates/student/dashboard.html:92
-msgid "Average Performance per Course"
-msgstr "تێکڕای ئاست بۆ هەر کۆرسێک"
-
-#: app/templates/student/dashboard.html:104
-msgid "Excellent"
-msgstr "نایاب"
-
-#: app/templates/student/dashboard.html:106
-msgid "Passing"
-msgstr "دەرچوون"
-
-#: app/templates/student/dashboard.html:108
-msgid "Needs Review"
-msgstr "پێویستی بە پێداچوونەوەیە"
-
-#: app/templates/student/dashboard.html:117
-msgid "No exams taken yet. Start a subject to track your mastery!"
-msgstr "هێشتا هیچ تاقیکردنەوەیەک ئەنجام نەدراوە. دەست بکە بە بابەتێک بۆ چاودێریکردنی شارەزاییەکەت!"
-
-#: app/templates/student/dashboard.html:126
-msgid "Recent Exam Activity"
-msgstr "چالاکییەکانی تاقیکردنەوەی ئەم دواییە"
-
-#: app/templates/student/dashboard.html:133
-msgid "Date Submitted"
-msgstr "بەرواری ناردن"
-
-#: app/templates/student/dashboard.html:134
-msgid "Score"
-msgstr "نمرە"
-
-#: app/templates/student/dashboard.html:162
-msgid "Review"
-msgstr "پێداچوونەوە"
-
-#: app/templates/student/dashboard.html:169
-msgid "Your exam history is currently empty."
-msgstr "مێژووی تاقیکردنەوەکانت لە ئێستادا بەتاڵە."
-
-#: app/templates/student/review_exam.html:11
-msgid "Exam Results:"
-msgstr "ئەنجامەکانی تاقیکردنەوە:"
-
-#: app/templates/student/review_exam.html:12
-msgid "Taken on"
-msgstr "ئەنجامدراوە لە"
-
-#: app/templates/student/review_exam.html:19
-msgid "Final Score"
-msgstr "نمرەی کۆتایی"
-
-#: app/templates/student/review_exam.html:24
-msgid "Return to Dashboard"
-msgstr "گەڕانەوە بۆ داشبۆرد"
-
-#: app/templates/student/review_exam.html:95
-msgid "The correct answer was"
-msgstr "وەڵامی ڕاست بریتی بوو لە"
-
-#: app/templates/student/settings.html:10
-msgid "Account Settings"
-msgstr "ڕێکخستنەکانی هەژمار"
-
-#: app/templates/student/settings.html:17
-msgid "Action Required:"
-msgstr "کردار پێویستە:"
-
-#: app/templates/student/settings.html:17
-msgid ""
-"Please add your email address to secure your\n"
-"                    account."
-msgstr "تکایە ناونیشانی ئیمەیڵەکەت زیاد بکە بۆ پاراستنی\n                    هەژمارەکەت."
-
-#: app/templates/student/settings.html:26
-msgid "Personal Information"
-msgstr "زانیارییە کەسییەکان"
-
-#: app/templates/student/settings.html:36
-msgid ""
-"We will use this for important notifications and\n"
-"                            account recovery."
-msgstr "ئێمە ئەمە بەکاردەهێنین بۆ ئاگادارکردنەوە گرنگەکان و\n                            گەڕاندنەوەی هەژمار."
-
-#: app/templates/student/settings.html:45
-msgid "Appearance"
-msgstr "ڕووکار"
-
-#: app/templates/student/settings.html:63
-msgid "Security"
-msgstr "ئاسایش"
-
-#: app/templates/student/settings.html:65
-msgid "My Access Code"
-msgstr "کۆدی چوونەژوورەوەم"
-
-#: app/templates/student/settings.html:78
-msgid "If you change this, you will need to use the new code to login next time."
-msgstr "ئەگەر ئەمە بگۆڕیت، پێویستە جاری داهاتوو کۆدە نوێیەکە بەکاربهێنیت بۆ چوونەژوورەوە."
-
-#: app/templates/teacher/analytics.html:9
-msgid "Analytics Hub"
-msgstr "سەنتەری شیکارییەکان"
-
-#: app/templates/teacher/analytics.html:10
-msgid "Executive overview of academic performance."
-msgstr "پوختەی گشتی لەسەر ئاستی ئەکادیمی."
-
-#: app/templates/teacher/analytics.html:14
-msgid "Export Grades (CSV)"
-msgstr "هەناردەکردنی نمرەکان (CSV)"
-
-#: app/templates/teacher/analytics.html:30
-msgid "Performance"
-msgstr "ئاست"
-
-#: app/templates/teacher/analytics.html:48
-msgid "Grade Distribution"
-msgstr "دابەشکردنی نمرەکان"
-
-#: app/templates/teacher/analytics.html:66
-msgid "Student Performance"
-msgstr "ئاستی قوتابی"
-
-#: app/templates/teacher/analytics.html:73
-msgid "Avg Score"
-msgstr "تێکڕای نمرە"
-
-#: app/templates/teacher/analytics.html:94
-msgid "No students found."
-msgstr "هیچ قوتابییەک نەدۆزرایەوە."
-
-#: app/templates/teacher/dashboard.html:25
-msgid "Class Insights"
-msgstr "زانیارییەکانی پۆل"
-
-#: app/templates/teacher/dashboard.html:30
-msgid "Viewing as:"
-msgstr "بینین وەک:"
-
-#: app/templates/teacher/dashboard.html:33
-msgid "Back to Admin"
-msgstr "گەڕانەوە بۆ بەڕێوەبەر"
-
-#: app/templates/teacher/dashboard.html:37
-msgid "View Analytics"
-msgstr "بینینی شیکارییەکان"
-
-#: app/templates/teacher/dashboard.html:40
-msgid "Export Grades"
-msgstr "هەناردەکردنی نمرەکان"
-
-#: app/templates/teacher/dashboard.html:78
-msgid "My Classroom"
-msgstr "پۆلەکەم"
-
-#: app/templates/teacher/dashboard.html:83
-msgid "Total Exams Taken:"
-msgstr "کۆی ئەو تاقیکردنەوانەی ئەنجامدراون:"
-
-#: app/templates/teacher/dashboard.html:107
-msgid "Settings"
-msgstr "ڕێکخستنەکان"
-
-#: app/templates/teacher/dashboard.html:110
-msgid "Edit Name"
-msgstr "دەستکاریکردنی ناو"
-
-#: app/templates/teacher/dashboard.html:116
-msgid "This cannot be undone."
-msgstr "ئەمە پاشگەزبوونەوەی بۆ نییە."
-
-#: app/templates/teacher/dashboard.html:117
-msgid "Delete Subject"
-msgstr "سڕینەوەی بابەت"
-
-#: app/templates/teacher/dashboard.html:155
-msgid "Manage Content"
-msgstr "بەڕێوەبردنی ناوەڕۆک"
-
-#: app/templates/teacher/dashboard.html:163
-msgid "Add Study Page"
-msgstr "زیادکردنی پەڕەی خوێندن"
-
-#: app/templates/teacher/dashboard.html:164
-msgid "Page"
-msgstr "پەڕە"
-
-#: app/templates/teacher/dashboard.html:169
-msgid "Add Quiz Question"
-msgstr "زیادکردنی پرسیاری کویز"
-
-#: app/templates/teacher/dashboard.html:170
-msgid "Quiz"
-msgstr "کویز"
-
-#: app/templates/teacher/dashboard.html:186
-msgid "No Subjects Assigned"
-msgstr "هیچ بابەتێک دیاری نەکراوە"
-
-#: app/templates/teacher/dashboard.html:187
-msgid ""
-"Please contact the Headmaster to have a subject assigned to your\n"
-"                account."
-msgstr "تکایە پەیوەندی بە بەڕێوەبەرەوە بکە بۆ ئەوەی بابەتێک بۆ هەژمارەکەت\n                دیاری بکرێت."
-
-#: app/templates/teacher/student_detail.html:15
-msgid "Access Code:"
-msgstr "کۆدی چوونەژوورەوە:"
-
-#: app/templates/teacher/student_detail.html:20
-msgid "Export Detailed Log"
-msgstr "هەناردەکردنی تۆماری ورد"
-
-#: app/templates/teacher/student_detail.html:23
-msgid "Back to Analytics"
-msgstr "گەڕانەوە بۆ شیکارییەکان"
-
-#: app/templates/teacher/student_detail.html:39
-msgid "Taken on:"
-msgstr "ئەنجامدراوە لە:"
-
-#: app/templates/teacher/student_detail.html:43
-#: app/templates/teacher/student_detail.html:47
-msgid "Score:"
-msgstr "نمرە:"
-
-#: app/templates/teacher/student_detail.html:61
-msgid "Selection"
-msgstr "هەڵبژاردن"
-
-#: app/templates/teacher/student_detail.html:62
-msgid "Correct Ans"
-msgstr "وەڵامی ڕاست"
-
-#: app/templates/teacher/student_detail.html:63
-msgid "Result"
-msgstr "ئەنجام"
-
-#: app/templates/teacher/student_detail.html:75
-msgid "Correct"
-msgstr "ڕاست"
-
-#: app/templates/teacher/student_detail.html:77
-msgid "Wrong"
-msgstr "هەڵە"
-
-#: app/templates/teacher/student_detail.html:83
-msgid ""
-"Answer log for this exam is\n"
-"                            unavailable."
-msgstr "تۆماری وەڵامەکان بۆ ئەم تاقیکردنەوەیە\n                            بەردەست نییە."
-
-#: app/templates/teacher/student_detail.html:97
-msgid "No Exam History Found"
-msgstr "هیچ مێژوویەکی تاقیکردنەوە نەدۆزرایەوە"
-
-#: app/templates/teacher/student_detail.html:98
-msgid "This student has not yet completed any exams."
-msgstr "ئەم قوتابییە هێشتا هیچ تاقیکردنەوەیەکی تەواو نەکردووە."
-
 # Factory Reset Translations
 #: app/templates/admin/restore_center.html:69
 msgid "FACTORY RESET"
@@ -1917,518 +1740,917 @@ msgid "Start completely fresh by wiping ALL data."
 msgstr "دەست بکە بە تەواوی نوێ بە سڕینەوەی هەموو داتا."
 
 #: app/templates/admin/restore_center.html:72
-msgid "This will delete everything including users, subjects, students, and all records."
-msgstr "ئەمە هەموو شتێک دەسڕێتەوە لەنێویشدا بەکارهێنەران، بابەتەکان، قوتابیان، و هەموو تۆمارەکان."
-
-#: app/templates/admin/restore_center.html:73
-msgid "This action cannot be undone."
-msgstr "ئەم کردارە ناتوانرێت بگەڕێنرێتەوە."
+msgid "This will delete everything including users, subjects, and all records."
+msgstr ""
+"ئەمە هەموو شتێک دەسڕێتەوە بە بەکارهێنەران و بابەتەکان و هەموو "
+"تۆمارەکانەوە."
 
 #: app/templates/admin/restore_center.html:83
 msgid "I understand this will PERMANENTLY DELETE ALL DATA and cannot be undone."
 msgstr "تێدەگەم کە ئەمە بە هەمیشەیی هەموو داتا دەسڕێتەوە و ناتوانرێت بگەڕێنرێتەوە."
 
-#: app/templates/admin/restore_center.html:90
-msgid "WIPE EVERYTHING & GO TO SETUP"
-msgstr "سڕینەوەی هەموو شتێک & چوون بۆ ڕێکخستن"
-
 #: app/templates/admin/restore_center.html:89
 msgid "FINAL WARNING: This will DELETE EVERYTHING. Are you absolutely sure?"
 msgstr "ئاگاداری کۆتایی: ئەمە هەموو شتێک دەسڕێتەوە. تۆ تەنها دڵنیایت؟"
 
-#: app/forms.py:194
-msgid "I understand this will DELETE ALL DATA permanently"
-msgstr "تێدەگەم کە ئەمە بە هەمیشەیی هەموو داتا دەسڕێتەوە"
-
-#: app/forms.py:195
-msgid "WIPE EVERYTHING & START FRESH"
-msgstr "سڕینەوەی هەموو شتێک & دەستپێکردنەوەی نوێ"
-
-#: app/routes/teacher.py:114
-msgid "shown"
-msgstr "پیشاندراو"
-
-#: app/routes/teacher.py:115
-msgid "Your name will be %(status)s on subject pages."
-msgstr "ناوەکەت %(status)s دەبێت لە لاپەڕەکانی بابەتەکان."
-
-#: app/routes/teacher.py:118
-msgid "Error updating setting: %(error)s"
-msgstr "هەڵە لە نوێکردنەوەی ڕێکخستن: %(error)s"
-
-#: app/templates/teacher/dashboard.html:65
-msgid "Profile Settings"
-msgstr "ڕێکخستنەکانی پڕۆفایل"
-
-#: app/templates/teacher/dashboard.html:71
-msgid "Name: Shown"
-msgstr "ناو: پیشاندراو"
-
-#: app/templates/teacher/dashboard.html:73
-msgid "Name: Hidden"
-msgstr "ناو: شاراوە"
-
-#: app/templates/teacher/dashboard.html:76
-msgid "Toggle whether students see your name on subject pages."
-msgstr "گۆڕینی ئەوەی کە ئایا قوتابیان ناوی تۆ ببینن لە لاپەڕەکانی بابەتەکان."
-
-#: app/templates/admin/edit_student.html:21
-msgid "Enter new password to reset (min 6 characters)."
-msgstr "تێپەڕەوشەیەکی نوێ بنووسە بۆ گۆڕین (کەمتر نەبێت لە ٦ پیت)."
-
-#: app/templates/admin/students.html:64
-msgid "Auto-generated secure password."
-msgstr "تێپەڕەوشەیەکی پارێزراو کە بە شێوەیەکی خۆکار دروستکراوە."
-
-#: app/routes/admin.py:92
-msgid "Student \"%(name)s\" registered successfully."
-msgstr "قوتابی \"%(name)s\" بە سەرکەوتوویی تۆمارکرا."
-
-#: app/routes/admin.py:107
-msgid "Password has been updated."
-msgstr "تێپەڕەوشە نوێکرایەوە."
-
-#: app/routes/admin.py:141
-msgid "Student \"%(name)s\" and all their records have been removed."
-msgstr "قوتابی \"%(name)s\" و هەموو تۆمارەکانی سڕانەوە."
-
-#: app/routes/admin.py:307 app/routes/content.py:73
-msgid "Import Error: Missing required columns: %(fields)s"
-msgstr "هەڵەی هێنانەناوەوە: ستوونی پێویست کەمە: %(fields)s"
-
-#: app/routes/analytics.py:679
-msgid "System wiped clean. Please create a new administrator account."
-msgstr "سیستەمەکە بە تەواوی سڕایەوە. تکایە ئەژمارێکی نوێی بەڕێوەبەر دروست بکە."
-
-#: app/routes/analytics.py:682
-msgid "CRITICAL WIPE FAILURE: %(error)s"
-msgstr "شکستی کوشندە لە سڕینەوە: %(error)s"
-
-#: app/routes/analytics.py:706
-msgid "Invalid form submission."
-msgstr "ناردنی فۆرمەکە نادروستە."
-
-#: app/routes/auth.py:83
-msgid "Invalid email or password."
-msgstr "ئیمەیڵ یان تێپەڕەوشە هەڵەیە."
-
-#: app/routes/auth.py:126
-msgid "Account created successfully! Welcome!"
-msgstr "ئەژمارەکە بە سەرکەوتوویی دروستکرا! بەخێربێیت!"
-
-#: app/routes/auth.py:161
-msgid "Please enter your current password to set a new password."
-msgstr "تکایە تێپەڕەوشەی ئێستات بنووسە بۆ دانانی تێپەڕەوشەیەکی نوێ."
-
-#: app/routes/auth.py:168
-msgid "Current password is incorrect."
-msgstr "تێپەڕەوشەی ئێستا هەڵەیە."
-
-#: app/routes/content.py:123
-msgid "Import Error: Your file must contain a column named \"Name\"."
-msgstr "هەڵەی هێنانەناوەوە: پێویستە فایلەکەت ستوونێکی تێدابێت بە ناوی \"Name\"."
-
-#: app/routes/content.py:253
-msgid "Batch Processed: %(count)s system commands documented."
-msgstr "بە کۆمەڵ جێبەجێکرا: %(count)s فرمانی سیستەم تۆمارکرا."
-
-#: app/routes/content.py:318
-msgid "Subject \"%(name)s\" created successfully."
-msgstr "بابەتی \"%(name)s\" بە سەرکەوتوویی دروستکرا."
-
-#: app/routes/content.py:366
-msgid "Subject \"%(name)s\" and all internal content has been deleted."
-msgstr "بابەتی \"%(name)s\" و تەواوی ناوەڕۆکەکانی سڕانەوە."
-
-#: app/routes/student.py:343
-msgid "Please confirm that you understand the consequences."
-msgstr "تکایە دووپاتی بکەرەوە کە لە دەرئەنجامەکان تێدەگەیت."
-
-#: app/routes/teacher.py:114
-msgid "Error deleting account: %(error)s"
-msgstr "هەڵە لە سڕینەوەی ئەژمار: %(error)s"
-
-#: app/routes/teacher.py:145
-msgid "Subject \"%(name)s\" is now %(status)s on the public homepage."
-msgstr "بابەتی \"%(name)s\" ئێستا %(status)s کرا لە پەڕەی سەرەکی گشتی."
-
-#: app/routes/teacher.py:177
-msgid "Error: The email address \"%(email)s\" is already in use."
-msgstr "هەڵە: ناونیشانی ئیمەیڵی \"%(email)s\" پێشتر بەکارهێنراوە."
-
-#: app/routes/teacher.py:197
-msgid "Error: The name \"%(username)s\" is already taken."
-msgstr "هەڵە: ناوی \"%(username)s\" پێشتر گیراوە."
-
-#: app/routes/teacher.py:336
-msgid "Error: Please select a new teacher."
-msgstr "هەڵە: تکایە مامۆستایەکی نوێ هەڵبژێرە."
-
-#: app/routes/teacher.py:344
-msgid "Error: Selected teacher not found."
-msgstr "هەڵە: مامۆستای هەڵبژێردراو نەدۆزرایەوە."
-
-#: app/routes/teacher.py:348
-msgid "Subject \"%(subject)s\" transferred from %(old)s to %(new)s."
-msgstr "بابەتی \"%(subject)s\" گوازرایەوە لە %(old)s بۆ %(new)s."
-
-#: app/routes/toolbase.py:48
-msgid "Error transferring subject: %(error)s"
-msgstr "هەڵە لە گواستنەوەی بابەت: %(error)s"
-
-#: app/routes/toolbase.py:91
-msgid "Import Error: CSV must have \"Name\" and \"Link\" columns."
-msgstr "هەڵەی هێنانەناوەوە: پێویستە فایلی CSV ستوونی \"Name\" و \"Link\"ی تێدابێت."
-
-#: app/templates/admin_dashboard.html:47
-msgid "Edit \"About Us\""
-msgstr "دەستکاری \"دەربارەی ئێمە\""
-
-#: app/templates/admin_dashboard.html:168
-msgid "Transfer to..."
-msgstr "گواستنەوە بۆ..."
-
-#: app/templates/admin_dashboard.html:175
-msgid "Transfer this subject to another teacher?"
-msgstr "ئەم بابەتە دەگوازیتەوە بۆ مامۆستایەکی تر؟"
-
-#: app/templates/setup.html:16
-msgid "Open in New Tab"
-msgstr "لە تابێکی نوێ بیکەرەوە"
-
-#: app/templates/student_login.html:66
-msgid "Enter your email and password to continue."
-msgstr "ئیمەیڵ و تێپەڕەوشەکەت بنووسە بۆ بەردەوامبوون."
-
-#: app/templates/subject.html:33
-msgid "Taught by"
-msgstr "لەلایەن"
-
-#: app/templates/admin/commands.html:70
-msgid "Bulk Import Commands"
-msgstr "هێنانەناوەوەی فرمانەکان بە کۆمەڵ"
-
-#: app/templates/admin/commands.html:70
-msgid "CSV Format:"
-msgstr "فۆرماتی CSV:"
-
-#: app/templates/admin/commands.html:76
-msgid "Columns: Title, Command, Description (optional)"
-msgstr "ستوونەکان: ناونیشان، فرمان، وەسف (ئارەزوومەندانە)"
-
-#: app/templates/admin/commands.html:101
-msgid "Preview Import"
-msgstr "پێشبینینی هێنانەناوەوە"
-
-#: app/templates/admin/edit_about.html:55
-#: app/templates/admin/edit_student.html:31
-#: app/templates/admin/edit_teacher.html:70
-#: app/templates/admin/students.html:198
-#: app/templates/student/settings.html:101
-#: app/templates/teacher/builder.html:285
-msgid "Leave empty if Kurdish translation is not available."
-msgstr "بە بەتاڵی بەجێی بهێڵە ئەگەر وەرگێڕانی کوردی بەردەست نییە."
-
-#: app/templates/admin/edit_teacher.html:64
-msgid "Show Name on Subject Pages"
-msgstr "پیشاندانی ناو لە لاپەڕەکانی بابەت"
-
-#: app/templates/admin/import_preview.html:13
-msgid "Display your name publicly on subject pages students view."
-msgstr "ناوەکەت بە گشتی پیشان بدە لەو لاپەڕانەی بابەت کە قوتابیان دەبینن."
-
-#: app/templates/admin/import_preview.html:94
-msgid "Title"
-msgstr "ناونیشان"
-
-#: app/templates/admin/import_preview.html:133
-msgid "Command"
-msgstr "فرمان"
-
-#: app/templates/admin/students.html:136
-msgid "Has Password"
-msgstr "تێپەڕەوشەی هەیە"
-
-#: app/templates/admin/students.html:144
-msgid "No Password"
-msgstr "تێپەڕەوشەی نییە"
-
-#: app/templates/student/delete_account.html:20
-msgid "This action cannot be undone. Please read carefully."
-msgstr "ئەم کردارە ناگەڕێتەوە. تکایە بە وریایی بیخوێنەرەوە."
-
-#: app/templates/student/delete_account.html:23
-msgid "What will happen:"
-msgstr "چی ڕوودەدات:"
-
-#: app/templates/student/delete_account.html:24
-msgid "Your personal information (name, email) will be permanently removed"
-msgstr "زانیارییە کەسییەکانت (ناو، ئیمەیڵ) بۆ هەمیشە دەسڕێنەوە"
-
-#: app/templates/student/delete_account.html:25
-msgid "Your exam scores and answers will be kept for analytics (anonymized)"
-msgstr "نمرەکانی تاقیکردنەوە و وەڵامەکانت بۆ شیکردنەوە دەمێننەوە (بەبێ ناو)"
-
-#: app/templates/student/delete_account.html:26
-msgid "You will lose access to all study materials and exam history"
-msgstr "دەستڕەسی بۆ هەموو ماددە خوێندنەکان و مێژووی تاقیکردنەوەکان لەدەست دەدەیت"
-
-#: app/templates/student/delete_account.html:38
-msgid "This action is irreversible"
-msgstr "ئەم کردارە ناگەڕێتەوە دواوە"
-
-#: app/templates/student/delete_account.html:48
-msgid "Permanently Delete My Account"
-msgstr "ئەژمارەکەم بۆ هەمیشە بسڕەوە"
-
-#: app/templates/student/review_exam.html:11
-msgid "Cancel - Keep My Account"
-msgstr "پاشگەزبوونەوە - هێشتنەوەی ئەژمارەکەم"
-
-#: app/templates/student/settings.html:66
-msgid "Change Password"
-msgstr "گۆڕینی تێپەڕەوشە"
-
-#: app/templates/student/settings.html:73
-msgid "Current Password"
-msgstr "تێپەڕەوشەی ئێستا"
-
-#: app/templates/student/settings.html:83
-msgid "New Password"
-msgstr "تێپەڕەوشەی نوێ"
-
-#: app/templates/student/settings.html:94
-msgid "Confirm New Password"
-msgstr "دووپاتکردنەوەی تێپەڕەوشەی نوێ"
-
-#: app/templates/teacher/analytics.html:9
-msgid "Leave password fields empty to keep your current password."
-msgstr "خانەکانی تێپەڕەوشە بە بەتاڵی جێبهێڵە بۆ هێشتنەوەی تێپەڕەوشەی ئێستات."
-
-#: app/templates/teacher/builder.html:46
+#: app/templates/admin/restore_center.html:90
+msgid "WIPE EVERYTHING & GO TO SETUP"
+msgstr "سڕینەوەی هەموو شتێک & چوون بۆ ڕێکخستن"
+
+#: app/templates/admin/restore_center.html:96
+msgid "Protocol:"
+msgstr "پڕۆتۆکۆڵ:"
+
+#: app/templates/admin/restore_center.html:96
+msgid "Wipe-and-Replace Strategy."
+msgstr "ستراتیژی سڕینەوە-و-جێگرتنەوە."
+
+#: app/templates/admin/restore_center.html:97
+msgid "Security:"
+msgstr "ئاسایش:"
+
+#: app/templates/admin/restore_center.html:97
+msgid "All operations are logged."
+msgstr "هەموو کردارەکان تۆمارکراون."
+
+#: app/templates/teacher/builder.html:17
 msgid "Subject Context:"
 msgstr "کۆنتێکستی بابەت:"
 
-#: app/templates/teacher/builder.html:57
+#: app/templates/teacher/builder.html:46
 msgid "Validation Error:"
 msgstr "هەڵەی پشتڕاستکردنەوە:"
 
-#: app/templates/teacher/builder.html:65
+#: app/templates/teacher/builder.html:57
 msgid "Lecture Title"
 msgstr "ناونیشانی وانە"
 
-#: app/templates/teacher/builder.html:91
+#: app/templates/teacher/builder.html:65
+msgid "Lecture Title (Kurdish)"
+msgstr "ناونیشانی وانە (کوردی)"
+
+#: app/templates/teacher/builder.html:72
+msgid ""
+"Lecture Content\n"
+"                            (English)"
+msgstr "ناوەڕۆکی وانە (ئینگلیزی)"
+
+#: app/templates/teacher/builder.html:81
+msgid ""
+"Bilingual\n"
+"                                    Support"
+msgstr "پشتگیری دووزمانە"
+
+#: app/templates/teacher/builder.html:83
+msgid ""
+"Optionally add a Kurdish translation for this\n"
+"                                    lecture."
+msgstr "بە ئارەزوومەندانە وەرگێڕانی کوردی بۆ ئەم وانەیە زیاد بکە."
+
+#: app/templates/teacher/builder.html:88
 msgid "Add / Edit Kurdish Section"
 msgstr "زیادکردن / دەستکاریکردنی بەشی کوردی"
 
-#: app/templates/teacher/builder.html:100
+#: app/templates/teacher/builder.html:98
 msgid "Discard Changes"
 msgstr "پاشگەزبوونەوە لە گۆڕانکارییەکان"
 
-#: app/templates/teacher/builder.html:115
+#: app/templates/teacher/builder.html:107
 msgid "Resource Manager"
 msgstr "بەڕێوەبەری سەرچاوەکان"
 
-#: app/templates/teacher/builder.html:122
+#: app/templates/teacher/builder.html:123
 msgid "Video"
 msgstr "ڤیدیۆ"
 
-#: app/templates/teacher/builder.html:124
+#: app/templates/teacher/builder.html:130
 msgid "YouTube"
 msgstr "YouTube"
 
-#: app/templates/teacher/builder.html:127
+#: app/templates/teacher/builder.html:132
 msgid "Vimeo"
 msgstr "Vimeo"
 
-#: app/templates/teacher/builder.html:131
+#: app/templates/teacher/builder.html:135
 msgid "Link"
 msgstr "بەستەر"
 
-#: app/templates/teacher/builder.html:138
+#: app/templates/teacher/builder.html:139
 msgid "Test"
 msgstr "تاقیکردنەوە"
 
-#: app/templates/teacher/builder.html:150
+#: app/templates/teacher/builder.html:146
 msgid "Preview"
 msgstr "پێشبینین"
 
-#: app/templates/teacher/builder.html:156
+#: app/templates/teacher/builder.html:158
 msgid "No resources attached yet. Add one below."
 msgstr "هیچ سەرچاوەیەک هاوپێچ نەکراوە. دانەیەک لە خوارەوە زیاد بکە."
 
-#: app/templates/teacher/builder.html:178
+#: app/templates/teacher/builder.html:164
 msgid "Add New Link"
 msgstr "زیادکردنی بەستەری نوێ"
 
-#: app/templates/teacher/builder.html:200
+#: app/templates/teacher/builder.html:189
+msgid ""
+"To add resource links (PDFs, Videos), please Save this\n"
+"                    lecture first. You can then add them in the Edit "
+"screen."
+msgstr ""
+"بۆ زیادکردنی بەستەری سەرچاوەکان (PDF، ڤیدیۆ)، تکایە سەرەتا ئەم وانەیە "
+"پاشەکەوت بکە. دواتر دەتوانیت لە پەڕەی دەستکاریکردندا زیادیان بکەیت."
+
+#: app/templates/teacher/builder.html:210
 msgid "Detailed Question Bank"
 msgstr "بانکی پرسیاری ورد"
 
-#: app/templates/teacher/builder.html:207
+#: app/templates/teacher/builder.html:211
 msgid "Manage questions, assign lectures, and set languages."
 msgstr "بەڕێوەبردنی پرسیارەکان، دیاریکردنی وانەکان، و ڕێکخستنی زمانەکان."
 
-#: app/templates/teacher/builder.html:211
+#: app/templates/teacher/builder.html:218
 msgid "Import Excel"
 msgstr "هێنانەناوەوەی ئێکسڵ"
 
-#: app/templates/teacher/builder.html:223
+#: app/templates/teacher/builder.html:222
 msgid "Save All Changes"
 msgstr "پاشەکەوتکردنی هەموو گۆڕانکارییەکان"
 
-#: app/templates/teacher/builder.html:226
+#: app/templates/teacher/builder.html:234
 msgid "Is Kurdish? (RTL)"
 msgstr "بە کوردییە؟ (ڕاست بۆ چەپ)"
 
-#: app/templates/teacher/builder.html:228
+#: app/templates/teacher/builder.html:237
 msgid "Question Text"
 msgstr "دەقی پرسیار"
 
-#: app/templates/teacher/builder.html:246
+#: app/templates/teacher/builder.html:239
 msgid "Assigned Lecture"
 msgstr "وانەی دیاریکراو"
 
-#: app/templates/teacher/builder.html:265
+#: app/templates/teacher/builder.html:257
 msgid "Add New Question Row"
 msgstr "زیادکردنی ڕیزە پرسیارێکی نوێ"
 
-#: app/templates/teacher/builder.html:269
+#: app/templates/teacher/builder.html:280
 msgid "URL Slug (Unique)"
 msgstr "ناسنامەی بەستەر (بێهاوتا)"
 
-#: app/templates/teacher/builder.html:275
+#: app/templates/teacher/builder.html:284
 msgid "Subject Description"
 msgstr "وەسفی بابەت"
 
-#: app/templates/teacher/builder.html:278
+#: app/templates/teacher/builder.html:288
+msgid "Subject Description (Kurdish)"
+msgstr "وەسفی بابەت (کوردی)"
+
+#: app/templates/teacher/builder.html:294
 msgid "Admin Control: Reassign Teacher"
 msgstr "کۆنتڕۆڵی بەڕێوەبەر: دووبارە دیاریکردنەوەی مامۆستا"
 
-#: app/templates/teacher/builder.html:310
-#: app/templates/teacher/builder.html:338
+#: app/templates/teacher/builder.html:297
+msgid ""
+"Only administrators can change the subject\n"
+"                                owner."
+msgstr "تەنها بەڕێوەبەران دەتوانن خاوەنی بابەتەکە بگۆڕن."
+
+#: app/templates/teacher/builder.html:320
+#: app/templates/teacher/builder.html:480
 msgid "Video Preview"
 msgstr "پێشبینینی ڤیدیۆ"
 
-#: app/templates/teacher/builder.html:325
+#: app/templates/teacher/builder.html:329
+#: app/templates/teacher/builder.html:357
 msgid "Close"
 msgstr "داخستن"
 
-#: app/templates/teacher/builder.html:332
+#: app/templates/teacher/builder.html:344
 msgid "Bulk Question Import"
 msgstr "هێنانەناوەوەی پرسیار بە کۆمەڵ"
 
-#: app/templates/teacher/builder.html:333
+#: app/templates/teacher/builder.html:351
 msgid "Required Columns:"
 msgstr "ستوونە داواکراوەکان:"
 
-#: app/templates/teacher/builder.html:339
+#: app/templates/teacher/builder.html:352
 msgid "Question, Opt A, Opt B, Opt C, Opt D, Answer"
 msgstr "پرسیار، بژاردەی ئەی، بژاردەی بی، بژاردەی سی، بژاردەی دی، وەڵام"
 
-#: app/templates/teacher/dashboard.html:25
+#: app/templates/teacher/builder.html:358
 msgid "Preview Questions"
 msgstr "پێشبینینی پرسیارەکان"
 
-# --- v0.5.0 NEW TRANSLATIONS ---
+#: app/templates/teacher/dashboard.html:26
+msgid "Profile Settings"
+msgstr "ڕێکخستنەکانی پڕۆفایل"
 
-# Feature 7: Conditional homepage
-msgid "Available Subjects"
-msgstr "بابەتە بەردەستەکان"
+#: app/templates/teacher/dashboard.html:48
+msgid "Name: Shown"
+msgstr "ناو: پیشاندراو"
 
-# Feature 1: Pinned Subjects
-msgid "Pin Subject"
-msgstr "بابەت بچسپینە"
+#: app/templates/teacher/dashboard.html:50
+msgid "Name: Hidden"
+msgstr "ناو: شاراوە"
 
-msgid "Unpin"
-msgstr "لابردن"
+#: app/templates/teacher/dashboard.html:53
+msgid "Toggle whether visitors see your name on subject pages."
+msgstr "دیاری بکە کە ئایا سەردانکەران ناوەکەت لە پەڕەی بابەتەکان ببینن یان نا."
 
-msgid "Unpin Subject"
-msgstr "لابردنی بابەت"
+#: app/templates/teacher/dashboard.html:123
+msgid "My Classroom"
+msgstr "پۆلەکەم"
 
-msgid "Pinned"
-msgstr "بچسپاوە"
+#: app/templates/teacher/dashboard.html:133
+msgid "Notifications"
+msgstr "ئاگادارکردنەوەکان"
 
-msgid "Pinned Subjects"
-msgstr "بابەتە بچسپراوەکان"
+#: app/templates/teacher/dashboard.html:138
+msgid "Unread"
+msgstr "نەخوێندراوە"
 
-msgid "Subject pinned successfully"
-msgstr "بابەت بە سەرکەوتوویی بچسپێنرا"
+#: app/templates/teacher/dashboard.html:152
+msgid "Admin Message"
+msgstr "پەیامی بەڕێوەبەر"
 
-msgid "Subject unpinned successfully"
-msgstr "بابەت بە سەرکەوتوویی لابرا"
+#: app/templates/teacher/dashboard.html:155
+msgid "From"
+msgstr "لە لایەن"
+
+#: app/templates/teacher/dashboard.html:158
+#: app/templates/teacher/dashboard.html:191
+msgid "New"
+msgstr "نوێ"
+
+#: app/templates/teacher/dashboard.html:166
+#: app/templates/teacher/dashboard.html:199
+msgid "Mark as Read"
+msgstr "نیشانکردن وەک خوێندراوە"
+
+#: app/templates/teacher/dashboard.html:188
+msgid "Lecture Comment"
+msgstr "لێدوانی وانە"
+
+#: app/templates/teacher/dashboard.html:253
+msgid "Settings"
+msgstr "ڕێکخستنەکان"
+
+#: app/templates/teacher/dashboard.html:256
+msgid "Edit Name"
+msgstr "دەستکاریکردنی ناو"
+
+#: app/templates/teacher/dashboard.html:262
+msgid "This cannot be undone."
+msgstr "ئەمە پاشگەزبوونەوەی بۆ نییە."
+
+#: app/templates/teacher/dashboard.html:263
+msgid "Delete Subject"
+msgstr "سڕینەوەی بابەت"
+
+#: app/templates/teacher/dashboard.html:307
+msgid "My Name: Shown"
+msgstr "ناوم: پیشاندراوە"
+
+#: app/templates/teacher/dashboard.html:309
+msgid "My Name: Hidden"
+msgstr "ناوم: شاردراوەتەوە"
+
+#: app/templates/teacher/dashboard.html:315
+msgid "Hide Name"
+msgstr "شاردنەوەی ناو"
+
+#: app/templates/teacher/dashboard.html:317
+msgid "Show Name"
+msgstr "پیشاندانی ناو"
+
+#: app/templates/teacher/dashboard.html:327
+msgid "Manage Content"
+msgstr "بەڕێوەبردنی ناوەڕۆک"
+
+#: app/templates/teacher/dashboard.html:335
+msgid "Add Study Page"
+msgstr "زیادکردنی پەڕەی خوێندن"
+
+#: app/templates/teacher/dashboard.html:336
+msgid "Page"
+msgstr "پەڕە"
+
+#: app/templates/teacher/dashboard.html:341
+msgid "Add Quiz Question"
+msgstr "زیادکردنی پرسیاری کویز"
+
+#: app/templates/teacher/dashboard.html:342
+msgid "Quiz"
+msgstr "کویز"
+
+#: app/templates/teacher/dashboard.html:358
+msgid "No Subjects Assigned"
+msgstr "هیچ بابەتێک دیاری نەکراوە"
+
+#: app/templates/teacher/dashboard.html:359
+msgid ""
+"Please contact the Headmaster to have a subject assigned to your\n"
+"                account."
+msgstr ""
+"تکایە پەیوەندی بە بەڕێوەبەرەوە بکە بۆ ئەوەی بابەتێک بۆ هەژمارەکەت\n"
+"                دیاری بکرێت."
+
+#~ msgid "Access Code (Unique)"
+#~ msgstr "کۆدی چوونەژوورەوە (بێهاوتا)"
+
+#~ msgid "Add Student"
+#~ msgstr "زیادکردنی قوتابی"
+
+#~ msgid "Register Account"
+#~ msgstr "تۆمارکردنی هەژمار"
+
+#~ msgid "Change Access Code"
+#~ msgstr "گۆڕینی کۆدی چوونەژوورەوە"
+
+#~ msgid "Access Code"
+#~ msgstr "کۆدی چوونەژوورەوە"
+
+#~ msgid "Update Student Details"
+#~ msgstr "نوێکردنەوەی زانیارییەکانی قوتابی"
+
+#~ msgid "Page Content"
+#~ msgstr "ناوەڕۆکی پەڕە"
+
+#~ msgid "Error: This Access Code is already in use."
+#~ msgstr "هەڵە: ئەم کۆدی چوونەژوورەوەیە پێشتر بەکارهاتووە."
+
+#~ msgid "Error: This Email is already in use."
+#~ msgstr "هەڵە: ئەم ئیمەیڵە پێشتر بەکارهاتووە."
+
+#~ msgid "Student \"%(name)s\" registered successfully."
+#~ msgstr "قوتابی \"%(name)s\" بە سەرکەوتوویی تۆمارکرا."
+
+#~ msgid ""
+#~ "Critical Error: The new access code "
+#~ "is already assigned to someone else."
+#~ msgstr "هەڵەی مەترسیدار: کۆدە نوێیەکەی چوونەژوورەوە پێشتر دراوە بە کەسێکی تر."
+
+#~ msgid "Critical Error: The new email is already assigned to someone else."
+#~ msgstr "هەڵەی مەترسیدار: ئیمەیڵە نوێیەکە پێشتر دراوە بە کەسێکی تر."
+
+#~ msgid "Student profile updated. All grades and history remain linked."
+#~ msgstr ""
+#~ "پرۆفایلی قوتابی نوێکرایەوە. هەموو نمرەکان "
+#~ "و مێژووەکەی وەک خۆیان دەمێننەوە."
+
+#~ msgid "Database Error: %(error)s"
+#~ msgstr "هەڵەی داتابەیس: %(error)s"
+
+#~ msgid "Student \"%(name)s\" and all their records have been removed."
+#~ msgstr "قوتابی \"%(name)s\" و هەموو تۆمارەکانی سڕدرانەوە."
+
+#~ msgid "Failed to delete student: %(error)s"
+#~ msgstr "سڕینەوەی قوتابی سەرکەوتوو نەبوو: %(error)s"
+
+#~ msgid ""
+#~ "Database Wipe Successful: %(students)s "
+#~ "students, %(results)s exams, and %(answers)s"
+#~ " choices deleted."
+#~ msgstr ""
+#~ "سڕینەوەی داتابەیس سەرکەوتوو بوو: %(students)s"
+#~ " قوتابی، %(results)s تاقیکردنەوە، و "
+#~ "%(answers)s هەڵبژاردە سڕدرانەوە."
+
+#~ msgid "CRITICAL SYSTEM ERROR during batch wipe: %(error)s"
+#~ msgstr "هەڵەی مەترسیداری سیستەم لە کاتی سڕینەوەی بەکۆمەڵ: %(error)s"
+
+#~ msgid "Welcome, %(name)s."
+#~ msgstr "بەخێربێیت، %(name)s."
+
+#~ msgid "The Access Code provided is invalid."
+#~ msgstr "ئەو کۆدەی چوونەژوورەوەی کە داوتە نادروستە."
+
+#~ msgid "Error: This email is already registered."
+#~ msgstr "هەڵە: ئەم ئیمەیڵە پێشتر تۆمارکراوە."
+
+#~ msgid "Account created! Your Access Code is: %(code)s. Please save it!"
+#~ msgstr ""
+#~ "هەژمار دروستکرا! کۆدی چوونەژوورەوەکەت بریتییە"
+#~ " لە: %(code)s. تکایە پاشەکەوتی بکە!"
+
+#~ msgid "Error: Email already in use by another student."
+#~ msgstr "هەڵە: ئیمەیڵەکە پێشتر لەلایەن قوتابییەکی ترەوە بەکارهاتووە."
+
+#~ msgid "Error: Access code already taken."
+#~ msgstr "هەڵە: کۆدی چوونەژوورەوە پێشتر گیراوە."
+
+#~ msgid "Import Error: Your file must contain a column named \"Name\"."
+#~ msgstr "هەڵەی هاوردەکردن: پەڕگەکەت دەبێت ستوونێکی تێدابێت بە ناوی \"Name\"."
+
+#~ msgid "Batch Processed: %(count)s students added."
+#~ msgstr "بەکۆمەڵ پرۆسە کرا: %(count)s قوتابی زیادکران."
+
+#~ msgid "Access Denied: You do not have permission to view this record."
+#~ msgstr "چوونەژوورەوە ڕەتکرایەوە: دەسەڵاتت نییە بۆ بینینی ئەم تۆمارە."
+
+#~ msgid "Critical system error during submission: %(error)s"
+#~ msgstr "هەڵەی مەترسیداری سیستەم لە کاتی ناردندا: %(error)s"
+
+#~ msgid "Manage Students"
+#~ msgstr "بەڕێوەبردنی قوتابیان"
+
+#~ msgid "Global Analytics"
+#~ msgstr "شیکارییە گشتییەکان"
+
+#~ msgid "Interface Theme"
+#~ msgstr "سیمای ڕووکار"
+
+#~ msgid "Academic Glass"
+#~ msgstr "شووشەی ئەکادیمی"
+
+#~ msgid "Student Dash"
+#~ msgstr "داشبۆردی قوتابی"
+
+#~ msgid "Student"
+#~ msgstr "قوتابی"
+
+#~ msgid "Student Portal"
+#~ msgstr "دەروازەی قوتابی"
+
+#~ msgid "Login as Student"
+#~ msgstr "چوونەژوورەوە وەک قوتابی"
+
+#~ msgid "Read in Kurdish / وەرگێڕان"
+#~ msgstr "خوێندنەوە بە کوردی / وەرگێڕان"
+
+#~ msgid "Read in English"
+#~ msgstr "خوێندنەوە بە ئینگلیزی"
+
+#~ msgid "Enter your unique access code to continue."
+#~ msgstr "کۆدی چوونەژوورەوە بێهاوتاکەت بنووسە بۆ بەردەوامبوون."
+
+#~ msgid "Register New Student"
+#~ msgstr "تۆمارکردنی قوتابی نوێ"
+
+#~ msgid "Student Registration"
+#~ msgstr "تۆمارکردنی قوتابی"
+
+#~ msgid "Create your account to access exams and study materials."
+#~ msgstr ""
+#~ "هەژمارەکەت دروست بکە بۆ دەستگەیشتن بە"
+#~ " تاقیکردنەوەکان و کەرەستەکانی خوێندن."
+
+#~ msgid "Already have an account?"
+#~ msgstr "پێشتر هەژمارت هەیە؟"
+
+#~ msgid "Edit Student:"
+#~ msgstr "دەستکاریکردنی قوتابی:"
+
+#~ msgid "Generated Access Code"
+#~ msgstr "کۆدی چوونەژوورەوەی دروستکراو"
+
+#~ msgid "Batch Operations"
+#~ msgstr "کردارە بەکۆمەڵەکان"
+
+#~ msgid "Manage large groups of students efficiently."
+#~ msgstr "بەڕێوەبردنی گرووپە گەورەکانی قوتابیان بە شێوەیەکی کارا."
+
+#~ msgid "Import Excel/CSV"
+#~ msgstr "هاوردەکردنی Excel/CSV"
+
+#~ msgid "Export Roster"
+#~ msgstr "هەناردەکردنی لیستی ناوەکان"
+
+#~ msgid "Danger Zone"
+#~ msgstr "ناوچەی مەترسیدار"
+
+#~ msgid ""
+#~ "⚠️ CRITICAL WARNING ⚠️\\n\\nAre you sure"
+#~ " you want to delete ALL "
+#~ "students?\\n\\nThis action will PERMANENTLY "
+#~ "ERASE:\\n- All student accounts\\n- All "
+#~ "exam results\\n- All detailed answer "
+#~ "logs\\n\\nThis cannot be undone. Click "
+#~ "OK to wipe the database."
+#~ msgstr ""
+#~ "⚠️ ئاگاداری مەترسیدار ⚠️\\n\\nئایا دڵنیایت "
+#~ "دەتەوێت هەموو قوتابیان بسڕیتەوە؟\\n\\nئەم "
+#~ "کردارە بە یەکجاری دەسڕێتەوە:\\n- هەموو "
+#~ "هەژمارەکانی قوتابیان\\n- هەموو ئەنجامەکانی "
+#~ "تاقیکردنەوە\\n- هەموو تۆمارە وردەکانی "
+#~ "وەڵامەکان\\n\\nئەمە پاشگەزبوونەوەی بۆ نییە. "
+#~ "کرتە لە OK بکە بۆ سڕینەوەی "
+#~ "داتابەیسەکە."
+
+#~ msgid "Delete ALL Students"
+#~ msgstr "سڕینەوەی هەموو قوتابیان"
+
+#~ msgid "Manual Registration"
+#~ msgstr "تۆمارکردنی دەستی"
+
+#~ msgid "Auto-generated secure token."
+#~ msgstr "تۆکنی پارێزراوی خۆکار-دروستکراو."
+
+#~ msgid "Register Student"
+#~ msgstr "تۆمارکردنی قوتابی"
+
+#~ msgid "Active Roster"
+#~ msgstr "لیستی ناوە چالاکەکان"
+
+#~ msgid "Print"
+#~ msgstr "چاپکردن"
+
+#~ msgid "Student Access Roster"
+#~ msgstr "لیستی چوونەژوورەوەی قوتابیان"
+
+#~ msgid "Confidential Login Credentials"
+#~ msgstr "زانیارییە نهێنییەکانی چوونەژوورەوە"
+
+#~ msgid "Missing"
+#~ msgstr "دیارنییە"
+
+#~ msgid "Edit Details"
+#~ msgstr "دەستکاریکردنی وردەکارییەکان"
+
+#~ msgid "This removes their exam history."
+#~ msgstr "ئەمە مێژووی تاقیکردنەوەکانیان دەسڕێتەوە."
+
+#~ msgid "Delete Student"
+#~ msgstr "سڕینەوەی قوتابی"
+
+#~ msgid "No students registered."
+#~ msgstr "هیچ قوتابییەک تۆمار نەکراوە."
+
+#~ msgid "Use the form or import tool to add them."
+#~ msgstr "فۆڕمەکە یان ئامرازی هاوردەکردن بەکاربهێنە بۆ زیادکردنیان."
+
+#~ msgid "Bulk Student Import"
+#~ msgstr "هاوردەکردنی قوتابیان بەکۆمەڵ"
+
+#~ msgid "Format Requirement:"
+#~ msgstr "پێداویستی فۆرمات:"
+
+#~ msgid "File must have a column:"
+#~ msgstr "پەڕگە دەبێت ستوونێکی هەبێت بە ناوی:"
+
+#~ msgid "Access codes are generated automatically."
+#~ msgstr "کۆدەکانی چوونەژوورەوە بە شێوەیەکی خۆکار دروست دەکرێن."
+
+#~ msgid "Member of Group:"
+#~ msgstr "ئەندامی گرووپی:"
+
+#~ msgid "Browse Subjects"
+#~ msgstr "گەڕان بەناو بابەتەکاندا"
+
+#~ msgid "My Settings"
+#~ msgstr "ڕێکخستنەکانم"
+
+#~ msgid "Sign Out"
+#~ msgstr "چوونەدەرەوە"
+
+#~ msgid "Action Required"
+#~ msgstr "کردار پێویستە"
+
+#~ msgid ""
+#~ "Please add your email address to secure your account and receive\n"
+#~ "                        notifications."
+#~ msgstr ""
+#~ "تکایە ناونیشانی ئیمەیڵەکەت زیاد بکە بۆ پاراستنی هەژمارەکەت و وەرگرتنی\n"
+#~ "                        ئاگادارکردنەوەکان."
+
+#~ msgid "Add Email"
+#~ msgstr "زیادکردنی ئیمەیڵ"
+
+#~ msgid "Exams Completed"
+#~ msgstr "تاقیکردنەوە تەواوکراوەکان"
+
+#~ msgid "Subject Mastery"
+#~ msgstr "شارەزایی بابەت"
+
+#~ msgid "Average Performance per Course"
+#~ msgstr "تێکڕای ئاست بۆ هەر کۆرسێک"
+
+#~ msgid "Excellent"
+#~ msgstr "نایاب"
+
+#~ msgid "Passing"
+#~ msgstr "دەرچوون"
+
+#~ msgid "Needs Review"
+#~ msgstr "پێویستی بە پێداچوونەوەیە"
+
+#~ msgid "No exams taken yet. Start a subject to track your mastery!"
+#~ msgstr ""
+#~ "هێشتا هیچ تاقیکردنەوەیەک ئەنجام نەدراوە. "
+#~ "دەست بکە بە بابەتێک بۆ چاودێریکردنی "
+#~ "شارەزاییەکەت!"
+
+#~ msgid "Recent Exam Activity"
+#~ msgstr "چالاکییەکانی تاقیکردنەوەی ئەم دواییە"
+
+#~ msgid "Date Submitted"
+#~ msgstr "بەرواری ناردن"
+
+#~ msgid "Score"
+#~ msgstr "نمرە"
+
+#~ msgid "Review"
+#~ msgstr "پێداچوونەوە"
+
+#~ msgid "Your exam history is currently empty."
+#~ msgstr "مێژووی تاقیکردنەوەکانت لە ئێستادا بەتاڵە."
+
+#~ msgid "Exam Results:"
+#~ msgstr "ئەنجامەکانی تاقیکردنەوە:"
+
+#~ msgid "Taken on"
+#~ msgstr "ئەنجامدراوە لە"
+
+#~ msgid "Final Score"
+#~ msgstr "نمرەی کۆتایی"
+
+#~ msgid "Return to Dashboard"
+#~ msgstr "گەڕانەوە بۆ داشبۆرد"
+
+#~ msgid "The correct answer was"
+#~ msgstr "وەڵامی ڕاست بریتی بوو لە"
+
+#~ msgid "Account Settings"
+#~ msgstr "ڕێکخستنەکانی هەژمار"
+
+#~ msgid "Action Required:"
+#~ msgstr "کردار پێویستە:"
+
+#~ msgid ""
+#~ "Please add your email address to secure your\n"
+#~ "                    account."
+#~ msgstr ""
+#~ "تکایە ناونیشانی ئیمەیڵەکەت زیاد بکە بۆ پاراستنی\n"
+#~ "                    هەژمارەکەت."
+
+#~ msgid "Personal Information"
+#~ msgstr "زانیارییە کەسییەکان"
+
+#~ msgid ""
+#~ "We will use this for important notifications and\n"
+#~ "                            account recovery."
+#~ msgstr ""
+#~ "ئێمە ئەمە بەکاردەهێنین بۆ ئاگادارکردنەوە گرنگەکان و\n"
+#~ "                            گەڕاندنەوەی هەژمار."
+
+#~ msgid "Appearance"
+#~ msgstr "ڕووکار"
+
+#~ msgid "Security"
+#~ msgstr "ئاسایش"
+
+#~ msgid "My Access Code"
+#~ msgstr "کۆدی چوونەژوورەوەم"
+
+#~ msgid ""
+#~ "If you change this, you will need"
+#~ " to use the new code to login"
+#~ " next time."
+#~ msgstr ""
+#~ "ئەگەر ئەمە بگۆڕیت، پێویستە جاری داهاتوو"
+#~ " کۆدە نوێیەکە بەکاربهێنیت بۆ چوونەژوورەوە."
+
+#~ msgid "Analytics Hub"
+#~ msgstr "سەنتەری شیکارییەکان"
+
+#~ msgid "Executive overview of academic performance."
+#~ msgstr "پوختەی گشتی لەسەر ئاستی ئەکادیمی."
+
+#~ msgid "Export Grades (CSV)"
+#~ msgstr "هەناردەکردنی نمرەکان (CSV)"
+
+#~ msgid "Performance"
+#~ msgstr "ئاست"
+
+#~ msgid "Grade Distribution"
+#~ msgstr "دابەشکردنی نمرەکان"
+
+#~ msgid "Student Performance"
+#~ msgstr "ئاستی قوتابی"
+
+#~ msgid "Avg Score"
+#~ msgstr "تێکڕای نمرە"
+
+#~ msgid "No students found."
+#~ msgstr "هیچ قوتابییەک نەدۆزرایەوە."
+
+#~ msgid "Class Insights"
+#~ msgstr "زانیارییەکانی پۆل"
+
+#~ msgid "Viewing as:"
+#~ msgstr "بینین وەک:"
+
+#~ msgid "Back to Admin"
+#~ msgstr "گەڕانەوە بۆ بەڕێوەبەر"
+
+#~ msgid "View Analytics"
+#~ msgstr "بینینی شیکارییەکان"
+
+#~ msgid "Export Grades"
+#~ msgstr "هەناردەکردنی نمرەکان"
+
+#~ msgid "Total Exams Taken:"
+#~ msgstr "کۆی ئەو تاقیکردنەوانەی ئەنجامدراون:"
+
+#~ msgid "Access Code:"
+#~ msgstr "کۆدی چوونەژوورەوە:"
+
+#~ msgid "Export Detailed Log"
+#~ msgstr "هەناردەکردنی تۆماری ورد"
+
+#~ msgid "Back to Analytics"
+#~ msgstr "گەڕانەوە بۆ شیکارییەکان"
+
+#~ msgid "Taken on:"
+#~ msgstr "ئەنجامدراوە لە:"
+
+#~ msgid "Score:"
+#~ msgstr "نمرە:"
+
+#~ msgid "Selection"
+#~ msgstr "هەڵبژاردن"
+
+#~ msgid "Correct Ans"
+#~ msgstr "وەڵامی ڕاست"
+
+#~ msgid "Result"
+#~ msgstr "ئەنجام"
+
+#~ msgid "Correct"
+#~ msgstr "ڕاست"
+
+#~ msgid "Wrong"
+#~ msgstr "هەڵە"
+
+#~ msgid ""
+#~ "Answer log for this exam is\n"
+#~ "                            unavailable."
+#~ msgstr ""
+#~ "تۆماری وەڵامەکان بۆ ئەم تاقیکردنەوەیە\n"
+#~ "                            بەردەست نییە."
+
+#~ msgid "No Exam History Found"
+#~ msgstr "هیچ مێژوویەکی تاقیکردنەوە نەدۆزرایەوە"
+
+#~ msgid "This student has not yet completed any exams."
+#~ msgstr "ئەم قوتابییە هێشتا هیچ تاقیکردنەوەیەکی تەواو نەکردووە."
+
+#~ msgid "Enter new password to reset (min 6 characters)."
+#~ msgstr "تێپەڕەوشەیەکی نوێ بنووسە بۆ گۆڕین (کەمتر نەبێت لە ٦ پیت)."
+
+#~ msgid "Auto-generated secure password."
+#~ msgstr "تێپەڕەوشەیەکی پارێزراو کە بە شێوەیەکی خۆکار دروستکراوە."
+
+#~ msgid "Password has been updated."
+#~ msgstr "تێپەڕەوشە نوێکرایەوە."
+
+#~ msgid "Invalid email or password."
+#~ msgstr "ئیمەیڵ یان تێپەڕەوشە هەڵەیە."
+
+#~ msgid "Account created successfully! Welcome!"
+#~ msgstr "ئەژمارەکە بە سەرکەوتوویی دروستکرا! بەخێربێیت!"
+
+#~ msgid "Please enter your current password to set a new password."
+#~ msgstr "تکایە تێپەڕەوشەی ئێستات بنووسە بۆ دانانی تێپەڕەوشەیەکی نوێ."
+
+#~ msgid "Current password is incorrect."
+#~ msgstr "تێپەڕەوشەی ئێستا هەڵەیە."
+
+#~ msgid "Please confirm that you understand the consequences."
+#~ msgstr "تکایە دووپاتی بکەرەوە کە لە دەرئەنجامەکان تێدەگەیت."
+
+#~ msgid "Enter your email and password to continue."
+#~ msgstr "ئیمەیڵ و تێپەڕەوشەکەت بنووسە بۆ بەردەوامبوون."
+
+#~ msgid "Has Password"
+#~ msgstr "تێپەڕەوشەی هەیە"
+
+#~ msgid "No Password"
+#~ msgstr "تێپەڕەوشەی نییە"
+
+#~ msgid "This action cannot be undone. Please read carefully."
+#~ msgstr "ئەم کردارە ناگەڕێتەوە. تکایە بە وریایی بیخوێنەرەوە."
+
+#~ msgid "What will happen:"
+#~ msgstr "چی ڕوودەدات:"
+
+#~ msgid "Your personal information (name, email) will be permanently removed"
+#~ msgstr "زانیارییە کەسییەکانت (ناو، ئیمەیڵ) بۆ هەمیشە دەسڕێنەوە"
+
+#~ msgid "Your exam scores and answers will be kept for analytics (anonymized)"
+#~ msgstr "نمرەکانی تاقیکردنەوە و وەڵامەکانت بۆ شیکردنەوە دەمێننەوە (بەبێ ناو)"
+
+#~ msgid "You will lose access to all study materials and exam history"
+#~ msgstr ""
+#~ "دەستڕەسی بۆ هەموو ماددە خوێندنەکان و "
+#~ "مێژووی تاقیکردنەوەکان لەدەست دەدەیت"
+
+#~ msgid "This action is irreversible"
+#~ msgstr "ئەم کردارە ناگەڕێتەوە دواوە"
+
+#~ msgid "Permanently Delete My Account"
+#~ msgstr "ئەژمارەکەم بۆ هەمیشە بسڕەوە"
+
+#~ msgid "Cancel - Keep My Account"
+#~ msgstr "پاشگەزبوونەوە - هێشتنەوەی ئەژمارەکەم"
+
+#~ msgid "Change Password"
+#~ msgstr "گۆڕینی تێپەڕەوشە"
+
+#~ msgid "Current Password"
+#~ msgstr "تێپەڕەوشەی ئێستا"
+
+#~ msgid "New Password"
+#~ msgstr "تێپەڕەوشەی نوێ"
+
+#~ msgid "Unpin"
+#~ msgstr "لابردن"
+
+#~ msgid "Unpin Subject"
+#~ msgstr "لابردنی بابەت"
+
+#~ msgid "Pinned"
+#~ msgstr "بچسپاوە"
+
+#~ msgid "Pinned Subjects"
+#~ msgstr "بابەتە بچسپراوەکان"
+
+#~ msgid "Subject pinned successfully"
+#~ msgstr "بابەت بە سەرکەوتوویی بچسپێنرا"
+
+#~ msgid "Subject unpinned successfully"
+#~ msgstr "بابەت بە سەرکەوتوویی لابرا"
 
 # Feature 2: Lesson Progress
-msgid "Mark lesson as completed"
-msgstr "نیشانکردنی وانە وەک تەواو بوو"
+#~ msgid "Mark lesson as completed"
+#~ msgstr "نیشانکردنی وانە وەک تەواو بوو"
 
-msgid "Lesson completed"
-msgstr "وانە تەواو بوو"
+#~ msgid "Lesson completed"
+#~ msgstr "وانە تەواو بوو"
 
-msgid "Lesson marked as completed"
-msgstr "وانە وەک تەواو نیشانکرا"
+#~ msgid "Lesson marked as completed"
+#~ msgstr "وانە وەک تەواو نیشانکرا"
 
-msgid "Lesson marked as incomplete"
-msgstr "نیشانەی تەواوی لابرا"
+#~ msgid "Lesson marked as incomplete"
+#~ msgstr "نیشانەی تەواوی لابرا"
 
-msgid "Progress"
-msgstr "پێشکەوتن"
+#~ msgid "Progress"
+#~ msgstr "پێشکەوتن"
 
 # Feature 4: Progressive Exam
-msgid "Answered"
-msgstr "وەڵامدراوە"
+#~ msgid "Answered"
+#~ msgstr "وەڵامدراوە"
 
-msgid "Submitted"
-msgstr "نێردراوە"
+#~ msgid "Submitted"
+#~ msgstr "نێردراوە"
 
-msgid "Your answer:"
-msgstr "وەڵامەکەت:"
+#~ msgid "Save Progress"
+#~ msgstr "پاشەکەوتی بکە"
 
-msgid "Save Progress"
-msgstr "پاشەکەوتی بکە"
+#~ msgid "Saved!"
+#~ msgstr "پاشەکەوتکرا!"
 
-msgid "Saved!"
-msgstr "پاشەکەوتکرا!"
+#~ msgid "Saving..."
+#~ msgstr "پاشەکەوتکردن..."
 
-msgid "Saving..."
-msgstr "پاشەکەوتکردن..."
+#~ msgid "You have already completed this exam."
+#~ msgstr "تۆ پێشتر ئەم تاقیکردنەوەیەت تەواو کردووە."
 
-msgid "You have already completed this exam."
-msgstr "تۆ پێشتر ئەم تاقیکردنەوەیەت تەواو کردووە."
+#~ msgid "Retake Exam"
+#~ msgstr "دووبارە تاقیکردنەوە"
 
-msgid "Retake Exam"
-msgstr "دووبارە تاقیکردنەوە"
+#~ msgid "Are you sure? This will clear all your answers."
+#~ msgstr "دڵنیایت؟ ئەمە هەموو وەڵامەکانت دەسڕێتەوە."
 
-msgid "Are you sure? This will clear all your answers."
-msgstr "دڵنیایت؟ ئەمە هەموو وەڵامەکانت دەسڕێتەوە."
+#~ msgid "Exam progress has been reset. You can now retake the exam."
+#~ msgstr ""
+#~ "پێشکەوتنی تاقیکردنەوە ڕێکخرایەوە. ئێستا "
+#~ "دەتوانی دووبارە تاقیکردنەوەکە بکەیت."
 
-msgid "Exam progress has been reset. You can now retake the exam."
-msgstr "پێشکەوتنی تاقیکردنەوە ڕێکخرایەوە. ئێستا دەتوانی دووبارە تاقیکردنەوەکە بکەیت."
-
-msgid "Progress saved successfully"
-msgstr "پاشکەوت بە سەرکەوتوویی انجام بوو"
+#~ msgid "Progress saved successfully"
+#~ msgstr "پاشکەوت بە سەرکەوتوویی انجام بوو"
 
 # Feature 5: Profile
-msgid "My Profile"
-msgstr "پڕۆفایلی من"
+#~ msgid "My Profile"
+#~ msgstr "پڕۆفایلی من"
 
-msgid "Overall Performance"
-msgstr "ئەنجامی گشتی"
+#~ msgid "Overall Performance"
+#~ msgstr "ئەنجامی گشتی"
 
-msgid "Average across %(count)s exams"
-msgstr "ڕێژەی تێکڕا لە %(count)s تاقیکردنەوە"
+#~ msgid "Average across %(count)s exams"
+#~ msgstr "ڕێژەی تێکڕا لە %(count)s تاقیکردنەوە"
 
-msgid "No Pinned Subjects"
-msgstr "هیچ بابەتێکی بچسپراو نییە"
+#~ msgid "No Pinned Subjects"
+#~ msgstr "هیچ بابەتێکی بچسپراو نییە"
 
-msgid "Pin your favorite subjects here for quick access."
-msgstr "بابەتە دڵخوازەکانت لێرە بچسپینە بۆ دەستگەیشتنی خێرا."
+#~ msgid "Pin your favorite subjects here for quick access."
+#~ msgstr "بابەتە دڵخوازەکانت لێرە بچسپینە بۆ دەستگەیشتنی خێرا."
 
-msgid "No Exams Yet"
-msgstr "هێشتا هیچ تاقیکردنەوەیەک نییە"
+#~ msgid "No Exams Yet"
+#~ msgstr "هێشتا هیچ تاقیکردنەوەیەک نییە"
 
-msgid "Take your first exam to see your history here."
-msgstr "یەکەم تاقیکردنەوەکەت بکە بۆ بینینی مێژووەکەت لێرە."
+#~ msgid "Take your first exam to see your history here."
+#~ msgstr "یەکەم تاقیکردنەوەکەت بکە بۆ بینینی مێژووەکەت لێرە."
 
-msgid "All Exam Attempts"
-msgstr "هەموو هەوڵەکانی تاقیکردنەوە"
+#~ msgid "All Exam Attempts"
+#~ msgstr "هەموو هەوڵەکانی تاقیکردنەوە"
+

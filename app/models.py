@@ -1,6 +1,14 @@
-from datetime import datetime
+from datetime import datetime, date
 from app import db, login_manager
 from flask_login import UserMixin
+
+
+def calculate_age(birth_date):
+    """Return integer age in years for a given date, or None."""
+    if not birth_date:
+        return None
+    today = date.today()
+    return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -35,8 +43,16 @@ class User(db.Model, UserMixin):
     # Preferred Language for UI (e.g., 'en', 'ku')
     preferred_lang = db.Column(db.String(10), default='en')
 
+    # Profile Info (v0.8.0): Optional Birth Date & Bio
+    birth_date = db.Column(db.Date, nullable=True)
+    bio = db.Column(db.Text, nullable=True)
+
     # Relationship: A teacher teaches many Subjects
     subjects = db.relationship('Subject', backref='teacher', lazy=True)
+
+    @property
+    def age(self):
+        return calculate_age(self.birth_date)
 
     def __repr__(self):
         return f"User('{self.username}', Admin: {self.is_admin})"
@@ -233,7 +249,8 @@ class AdminNotification(db.Model):
     """
     NOTIFICATION_TYPES = [
         'question_added', 'question_edited',
-        'page_added', 'page_edited'
+        'page_added', 'page_edited',
+        'comment_added'
     ]
 
     id = db.Column(db.Integer, primary_key=True)
@@ -244,7 +261,7 @@ class AdminNotification(db.Model):
     message = db.Column(db.Text, nullable=False)
 
     # Actor information (who triggered the notification)
-    actor_type = db.Column(db.String(20))  # 'teacher', 'system'
+    actor_type = db.Column(db.String(20))  # 'teacher', 'visitor', 'system'
     actor_id = db.Column(db.Integer)
     actor_name = db.Column(db.String(100))
 
@@ -298,20 +315,60 @@ class SubjectTeacher(db.Model):
 
 
 # ==========================================
-# 12. PAGE COMMENT MODEL (v0.7.0)
+# 12. PAGE COMMENT MODEL (v0.7.0 / v0.8.0)
 # ==========================================
 class PageComment(db.Model):
     """
     Represents a public comment posted on a Lecture (Page).
-    Requires author name, age, and comment text; personality_info is optional.
+    Requires author name, birth date, and comment text; personality_info is optional.
     """
     id = db.Column(db.Integer, primary_key=True)
     page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=False)
     author_name = db.Column(db.String(100), nullable=False)
-    author_age = db.Column(db.Integer, nullable=False)
+    author_birth_date = db.Column(db.Date, nullable=True)
+    author_age = db.Column(db.Integer, nullable=True)
     personality_info = db.Column(db.Text, nullable=True)
     comment_text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    @property
+    def display_age(self):
+        if self.author_birth_date:
+            return calculate_age(self.author_birth_date)
+        return self.author_age
+
     def __repr__(self):
-        return f"PageComment('{self.author_name}', Age: {self.author_age}, Page ID: {self.page_id})"
+        return f"PageComment('{self.author_name}', Born: {self.author_birth_date}, Page ID: {self.page_id})"
+
+
+# ==========================================
+# 13. TEACHER NOTIFICATION MODEL (v0.8.0)
+# ==========================================
+class TeacherNotification(db.Model):
+    """
+    Stores notifications for individual teachers:
+    - 'comment': New visitor comment posted on one of their lectures.
+    - 'admin_message': Direct announcement/message written by an Admin (visually distinct).
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+
+    notification_type = db.Column(db.String(30), nullable=False, default='comment')
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+
+    related_subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=True)
+    related_page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=True)
+
+    is_read = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    teacher = db.relationship('User', foreign_keys=[teacher_id], backref='notifications')
+    sender = db.relationship('User', foreign_keys=[sender_id])
+    related_subject = db.relationship('Subject', foreign_keys=[related_subject_id])
+    related_page = db.relationship('Page', foreign_keys=[related_page_id])
+
+    def __repr__(self):
+        return f"TeacherNotification({self.notification_type} -> Teacher {self.teacher_id}: {self.title})"

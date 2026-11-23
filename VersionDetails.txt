@@ -462,3 +462,28 @@ Whenever a change or new feature is added, append a new version block following 
 - **Verification**:
   - Added `tests/test_v070_features.py`; all 25 tests pass (100% pass rate).
   - Created local `version_0.7.0` snapshot under `~/Documents/statinfopro/`.
+
+---
+
+## Version 0.8.0
+**Date:** 2026-11-23
+**Summary:** Complete Kurdish translations, Teacher & Admin comment notifications, visually distinct Admin-to-Teacher messaging, dark-mode Admin notifications fix, direct Admin subject edit button, staff birth date/bio & self-profile editing, and comment birth dates.
+
+### Changes & Improvements:
+- **Complete Kurdish Translations**:
+  - Updated `app/translations/ku/LC_MESSAGES/messages.po` with 98 Sorani Kurdish translations (0 untranslated/fuzzy entries remaining) and compiled `messages.mo`.
+- **Teacher & Admin Notification System + Direct Admin Messaging**:
+  - Added `TeacherNotification` model and notifications panel in `teacher/dashboard.html`.
+  - Posting a lecture comment now creates rich notifications (Subject, Lesson, Commenter Name, Birth Date/Age, Optional Personality/Bio, Comment text, and View Lesson link) for both Admins (`AdminNotification`) and every Teacher assigned to that subject (`TeacherNotification`).
+  - Added `AdminMessageForm` and `POST /admin/message_teacher` so Admins can message individual teachers or All Teachers; rendered with visually distinct warning/amber styling in `teacher/dashboard.html`.
+  - Added notification read/dismiss routes and bottom-up `TeacherNotification` cleanup across deletion/restore/wipe routes.
+- **Admin Dashboard Improvements**:
+  - Fixed Admin Notifications box dark mode (`bg-light`/`text-dark` replaced with dark-mode-safe `card-accent`, `bg-body-tertiary`, `text-body-emphasis`) and wired proper `notification_type`, `title`, and `message` rendering.
+  - Added direct **Edit** (`/teacher/edit/subject/<id>`) button on every subject card in `admin_dashboard.html`.
+- **Birth Date, Optional Bio & Self-Service Staff Profile Editing**:
+  - Added `birth_date` and `bio` (optional) to `User` (`app/models.py`), `TeacherSignupForm`, `TeacherEditForm`, `admin_dashboard.html`, and `admin/edit_teacher.html`, with safe auto-migrations in `app/__init__.py`.
+  - Switched `PageComment` & `CommentForm` from raw age to `author_birth_date` (`<input type="date">`, validated 5–120 years, not in future).
+  - Added `TeacherProfileForm` and `POST /teacher/profile/update` so teachers and admins can edit their own name, Kurdish name, birth date, optional bio, and password directly from their dashboard.
+- **Verification**:
+  - Updated `tests/test_v070_features.py` and added `tests/test_v080_features.py`; all 30 tests pass (100% pass rate).
+  - Created local `version_0.8.0` snapshot under `~/Documents/statinfopro/`.

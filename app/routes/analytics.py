@@ -11,7 +11,7 @@ from app import db
 from app.models import (
     User, Subject, Page, Question, ExamResult,
     SiteInfo, Resource, SystemCommand, Tool,
-    SubjectTeacher, AdminNotification, PageComment
+    SubjectTeacher, AdminNotification, PageComment, TeacherNotification
 )
 from app.forms import InfoPageForm, RestoreBackupForm, WipeCleanForm
 
@@ -170,6 +170,7 @@ def restore_system():
 
                 # 2. SAFE WIPE (Delete rows in reverse dependency order)
                 try:
+                    db.session.query(TeacherNotification).delete()
                     db.session.query(AdminNotification).delete()
                     db.session.query(ExamResult).delete()
                     db.session.query(Question).delete()
@@ -385,6 +386,7 @@ def wipe_clean():
     if form.validate_on_submit():
         try:
             # Delete all data in reverse dependency order
+            db.session.query(TeacherNotification).delete()
             db.session.query(AdminNotification).delete()
             db.session.query(ExamResult).delete()
             db.session.query(Question).delete()

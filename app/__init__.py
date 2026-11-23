@@ -119,4 +119,17 @@ def create_app(config_class=Config):
         except Exception:
             pass
 
+        # v0.8.0 safe auto-migrations for birth_date, bio, and comment birth date
+        for stmt in [
+            "ALTER TABLE user ADD COLUMN birth_date DATE",
+            "ALTER TABLE user ADD COLUMN bio TEXT",
+            "ALTER TABLE page_comment ADD COLUMN author_birth_date DATE",
+        ]:
+            try:
+                with db.engine.connect() as conn:
+                    conn.execute(text(stmt))
+                    conn.commit()
+            except Exception:
+                pass
+
     return app

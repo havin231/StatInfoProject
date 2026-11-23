@@ -10,11 +10,30 @@
 
 ## 1. PROJECT IDENTITY & CONTEXT
 - **System Name:** StatInfoProject (StatInfoPRO)
-- **Current Version:** 0.7.0 (2026-11-23)
+- **Current Version:** 0.8.0 (2026-11-23)
 - **Deployment:** PythonAnywhere (Linux/Bash/MySQL).
 - **Primary Language:** Python 3.10 / Flask 3.0.0.
 - **Frontend:** HTML5, Bootstrap 5.3, Jinja2, Custom CSS Variables.
 - **Context:** A bilingual (English/Kurdish) Learning Management System for the University of Sulaimani.
+
+## RECENT CHANGES (v0.8.0)
+- **Complete Kurdish Translations**:
+  - Extracted and updated all 98 new/fuzzy strings in `app/translations/ku/LC_MESSAGES/messages.po` (0 untranslated/fuzzy remaining) and compiled `messages.mo`.
+- **Teacher & Admin Comment Notification System + Admin Messaging**:
+  - Added `TeacherNotification` model (`teacher_id`, `sender_id`, `notification_type`, `title`, `message`, `related_subject_id`, `related_page_id`, `is_read`, `created_at`).
+  - Posting a lecture comment now dispatches rich notifications (Subject, Lesson, Author, Birth Date/Age, Optional Bio, Comment, and direct View Lesson link) to both `AdminNotification` and `TeacherNotification` for all teachers assigned to that subject.
+  - Added `AdminMessageForm` and `POST /admin/message_teacher` allowing Admins to write messages to a specific teacher or All Teachers; rendered with visually distinct warning/gold styling (`bg-warning-subtle`, `border-warning`) in `teacher/dashboard.html` compared to lecture comment alerts (`border-info`).
+  - Added mark-read and dismiss routes for teacher and admin notifications, plus bottom-up cleanup of `TeacherNotification` in `delete_page`, `delete_subject`, `delete_teacher`, `restore_system`, and `wipe_clean`.
+- **Admin Notification Box Dark Mode Fix & Direct Subject Edit**:
+  - Fixed `admin_dashboard.html` notifications card to use dark-mode-safe Bootstrap 5.3 semantic classes (`card-accent`, `bg-body-tertiary`, `text-body-emphasis`) instead of hardcoded `bg-light`/`text-dark`, and fixed display of `notification_type`, `title`, and `message`.
+  - Added an **Edit** button (`/teacher/edit/subject/<id>`) directly on every subject card in `admin_dashboard.html` (and synced `SubjectTeacher` on edit).
+- **Staff Birth Date, Optional Bio, Self-Profile Editing & Comment Birth Date**:
+  - Added `birth_date` (DATE) and `bio` (TEXT) columns to `User` (`app/models.py`) and `author_birth_date` (DATE) to `PageComment`, with safe auto-migrations in `app/__init__.py`.
+  - Replaced raw age input on lecture comments (`CommentForm`, `page.html`) with `author_birth_date` (`<input type="date">`, validated 5–120 years, not in future).
+  - Added `TeacherProfileForm` and `POST /teacher/profile/update` so teachers and admins can update their own name, Kurdish name, birth date, optional bio, and password directly from their dashboard.
+  - Updated `TeacherSignupForm`, `TeacherEditForm`, `admin_dashboard.html`, and `admin/edit_teacher.html` with optional `birth_date` and `bio`.
+- **Testing**:
+  - Updated `tests/test_v070_features.py` and added `tests/test_v080_features.py` (30/30 tests passing).
 
 ## RECENT CHANGES (v0.7.0)
 - **Single Locked Theme (Removed Cyber Command)**:
@@ -173,7 +192,7 @@ Constraint: InnoDB Engine (Enforces Foreign Keys).
 
 Models & Fields
 
-User: id, username, username_kurdish (String 20, nullable), email, password_hash, is_admin (Bool), show_name_on_subject (Bool, default=False), preferred_lang (String, default='en').
+User: id, username, username_kurdish (String 20, nullable), email, password_hash, is_admin (Bool), show_name_on_subject (Bool, default=False), preferred_lang (String, default='en'), birth_date (Date, nullable), bio (Text, nullable).
 
 Subject: id, name, name_kurdish (VARCHAR 100, nullable), slug, description, description_kurdish (TEXT, nullable), teacher_id, is_public (Bool, default=True).
 
@@ -199,7 +218,9 @@ Bulk Import Supported: Yes (via `/admin/system/commands/import`). CSV columns: T
 
 Tool: id, title, title_kurdish (VARCHAR 100, nullable), link, description, description_kurdish (TEXT, nullable), created_at.
 
-PageComment: id, page_id (FK page.id), author_name (VARCHAR 100), author_age (Integer), personality_info (TEXT, nullable), comment_text (TEXT), created_at.
+PageComment: id, page_id (FK page.id), author_name (VARCHAR 100), author_birth_date (Date), author_age (Integer, nullable), personality_info (TEXT, nullable), comment_text (TEXT), created_at.
+
+TeacherNotification: id, teacher_id (FK user.id), sender_id (FK user.id, nullable), notification_type ('comment' | 'admin_message'), title, message, related_subject_id, related_page_id, is_read, created_at.
 
 4. CRITICAL LOGIC PATTERNS
 A. The "Bottom-Up" Deletion Protocol (Anti-Crash)

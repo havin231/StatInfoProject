@@ -3,8 +3,14 @@ from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
 from app import db, bcrypt
-from app.models import User, Subject, Page, Question, Resource, ExamResult, SubjectTeacher, AdminNotification, PageComment
-from app.forms import SubjectForm, TeacherSignupForm, TeacherEditForm
+from app.models import (
+    User, Subject, Page, Question, Resource, ExamResult,
+    SubjectTeacher, AdminNotification, PageComment, TeacherNotification
+)
+from app.forms import (
+    SubjectForm, TeacherSignupForm, TeacherEditForm,
+    TeacherProfileForm, AdminMessageForm
+)
 from app.routes.helpers import can_edit_subject
 
 teacher = Blueprint('teacher', __name__)
@@ -52,12 +58,24 @@ def teacher_dashboard():
         # Initialize the Staff Signup Form for the sidebar
         new_teacher_form = TeacherSignupForm()
 
+        # Initialize Admin -> Teacher Message Form
+        admin_message_form = AdminMessageForm()
+        non_admin_teachers = [s for s in all_staff_members if s.id != current_user.id]
+        admin_message_form.recipient_id.choices = [
+            (0, _('All Teachers'))
+        ] + [(s.id, s.username) for s in non_admin_teachers]
+
+        # Initialize Self-Profile Form for the logged-in admin
+        profile_form = TeacherProfileForm(obj=current_user)
+
         return render_template(
             'admin_dashboard.html',
             subjects=all_global_subjects,
             teachers=all_staff_members,
             subject_form=subject_creation_form,
             teacher_form=new_teacher_form,
+            admin_message_form=admin_message_form,
+            profile_form=profile_form,
             notifications=notifications
         )
 
@@ -68,11 +86,175 @@ def teacher_dashboard():
         assigned_subjects = [a.subject for a in assignments if a.subject]
         assignment_map = {a.subject_id: a for a in assignments}
 
+        # Fetch Teacher Notifications (Admin messages + Lecture comment alerts)
+        teacher_notifications = TeacherNotification.query.filter_by(
+            teacher_id=current_user.id
+        ).order_by(
+            TeacherNotification.is_read.asc(),
+            TeacherNotification.created_at.desc()
+        ).all()
+
+        # Self-profile form so teachers can update name, birth date, bio, password
+        profile_form = TeacherProfileForm(obj=current_user)
+
         return render_template(
             'teacher/dashboard.html',
             subjects=assigned_subjects,
-            assignment_map=assignment_map
+            assignment_map=assignment_map,
+            teacher_notifications=teacher_notifications,
+            profile_form=profile_form
         )
+
+
+@teacher.route('/teacher/profile/update', methods=['POST'])
+@login_required
+def update_own_profile():
+    """
+    SELF-SERVICE PROFILE UPDATE (TEACHERS & ADMINS)
+
+    Allows any logged-in staff member to update their own name, Kurdish name,
+    birth date, bio (optional), and optionally change their password.
+    """
+    form = TeacherProfileForm()
+
+    if form.validate_on_submit():
+        new_username = form.username.data.strip()
+
+        # Check username uniqueness if modified
+        if new_username != current_user.username:
+            if User.query.filter_by(username=new_username).first():
+                flash(_('Error: The name "%(username)s" is already taken.', username=new_username), 'danger')
+                return redirect(url_for('teacher.teacher_dashboard'))
+
+        current_user.username = new_username
+        current_user.username_kurdish = form.username_kurdish.data.strip() if form.username_kurdish.data else None
+        current_user.birth_date = form.birth_date.data
+        current_user.bio = form.bio.data.strip() if form.bio.data else None
+
+        if form.new_password.data:
+            current_user.password_hash = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+
+        try:
+            db.session.commit()
+            flash(_('Your profile has been updated successfully.'), 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error updating profile: %(error)s', error=str(e)), 'danger')
+    else:
+        for field_errors in form.errors.values():
+            for err in field_errors:
+                flash(str(err), 'danger')
+
+    return redirect(url_for('teacher.teacher_dashboard'))
+
+
+@teacher.route('/admin/message_teacher', methods=['POST'])
+@login_required
+def send_teacher_message():
+    """
+    ADMIN DIRECT MESSAGE TO TEACHERS
+
+    Creates a visually distinct 'admin_message' TeacherNotification for
+    either a specific teacher or all non-admin teachers.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    all_staff = User.query.all()
+    other_staff = [s for s in all_staff if s.id != current_user.id]
+
+    form = AdminMessageForm()
+    form.recipient_id.choices = [(0, _('All Teachers'))] + [(s.id, s.username) for s in other_staff]
+
+    if form.validate_on_submit():
+        recipient_id = form.recipient_id.data
+        msg_title = form.title.data.strip()
+        msg_body = form.message.data.strip()
+
+        if recipient_id == 0:
+            recipients = [s for s in other_staff if not s.is_admin]
+            if not recipients:
+                flash(_('No teachers available to message.'), 'warning')
+                return redirect(url_for('teacher.teacher_dashboard'))
+        else:
+            target = User.query.get(recipient_id)
+            if not target:
+                flash(_('Error: Selected teacher not found.'), 'danger')
+                return redirect(url_for('teacher.teacher_dashboard'))
+            recipients = [target]
+
+        try:
+            for rec in recipients:
+                db.session.add(TeacherNotification(
+                    teacher_id=rec.id,
+                    sender_id=current_user.id,
+                    notification_type='admin_message',
+                    title=msg_title,
+                    message=msg_body
+                ))
+            db.session.commit()
+            if recipient_id == 0:
+                flash(_('Announcement sent to %(count)s teacher(s).', count=len(recipients)), 'success')
+            else:
+                flash(_('Message sent to %(username)s.', username=recipients[0].username), 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error sending message: %(error)s', error=str(e)), 'danger')
+    else:
+        for field_errors in form.errors.values():
+            for err in field_errors:
+                flash(str(err), 'danger')
+
+    return redirect(url_for('teacher.teacher_dashboard'))
+
+
+@teacher.route('/teacher/notification/<int:notif_id>/read', methods=['POST'])
+@login_required
+def mark_teacher_notification_read(notif_id):
+    """Marks a teacher notification as read."""
+    notif = TeacherNotification.query.get_or_404(notif_id)
+    if notif.teacher_id != current_user.id:
+        abort(403)
+    try:
+        notif.is_read = True
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+    return redirect(url_for('teacher.teacher_dashboard'))
+
+
+@teacher.route('/teacher/notification/<int:notif_id>/delete', methods=['POST'])
+@login_required
+def delete_teacher_notification(notif_id):
+    """Deletes a teacher notification from their inbox."""
+    notif = TeacherNotification.query.get_or_404(notif_id)
+    if notif.teacher_id != current_user.id:
+        abort(403)
+    try:
+        db.session.delete(notif)
+        db.session.commit()
+        flash(_('Notification dismissed.'), 'info')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error dismissing notification: %(error)s', error=str(e)), 'danger')
+    return redirect(url_for('teacher.teacher_dashboard'))
+
+
+@teacher.route('/admin/notification/<int:notif_id>/delete', methods=['POST'])
+@login_required
+def delete_admin_notification(notif_id):
+    """Allows an Admin to dismiss a notification from the Admin panel."""
+    if not current_user.is_admin:
+        abort(403)
+    notif = AdminNotification.query.get_or_404(notif_id)
+    try:
+        db.session.delete(notif)
+        db.session.commit()
+        flash(_('Notification dismissed.'), 'info')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error dismissing notification: %(error)s', error=str(e)), 'danger')
+    return redirect(url_for('teacher.teacher_dashboard'))
 
 
 @teacher.route('/teacher/toggle_name_visibility', methods=['POST'])
@@ -197,6 +379,8 @@ def add_teacher():
             username_kurdish=form.username_kurdish.data,
             email=form.email.data,
             password_hash=password_hash_str,
+            birth_date=form.birth_date.data,
+            bio=form.bio.data.strip() if form.bio.data else None,
             is_admin=is_admin_user
         )
 
@@ -245,6 +429,8 @@ def edit_teacher(teacher_id):
         target_staff.username = form.username.data
         target_staff.username_kurdish = form.username_kurdish.data
         target_staff.email = form.email.data
+        target_staff.birth_date = form.birth_date.data
+        target_staff.bio = form.bio.data.strip() if form.bio.data else None
         target_staff.show_name_on_subject = form.show_name_on_subject.data
 
         # Security Logic: Prevent Admins from accidentally downgrading themselves
@@ -287,14 +473,19 @@ def delete_teacher(teacher_id):
         return redirect(url_for('teacher.teacher_dashboard'))
 
     try:
-        # 2. Remove co-teacher assignments for this teacher
+        # 2. Remove teacher notifications and co-teacher assignments for this teacher
+        TeacherNotification.query.filter(
+            (TeacherNotification.teacher_id == target_staff.id) |
+            (TeacherNotification.sender_id == target_staff.id)
+        ).delete(synchronize_session=False)
         SubjectTeacher.query.filter_by(teacher_id=target_staff.id).delete()
 
         # 3. Iterate through owned Subjects
         subjects_to_clear = Subject.query.filter_by(teacher_id=target_staff.id).all()
 
         for subj in subjects_to_clear:
-            # A. Clean up Admin Notifications referencing this subject
+            # A. Clean up Notifications referencing this subject
+            TeacherNotification.query.filter_by(related_subject_id=subj.id).delete()
             AdminNotification.query.filter_by(related_subject_id=subj.id).delete()
 
             # B. Clean up Exam Results

@@ -125,13 +125,13 @@ def test_individual_teacher_name_visibility(client, db, admin_user, teacher_user
 
 
 def test_lecture_comment_system(client, db, admin_user, sample_subject, sample_page):
-    """Visitors can comment with name, age, optional personality, and comment; staff can delete."""
+    """Visitors can comment with name, birth date, optional personality, and comment; staff can delete."""
     # Valid comment WITH optional personality info
     resp = client.post(
         f'/subject/{sample_subject.slug}/page/{sample_page.id}/comment',
         data={
             'author_name': 'Ari',
-            'author_age': '21',
+            'author_birth_date': '2004-05-15',
             'personality_info': 'Curious math enthusiast',
             'comment_text': 'Great explanation of algebra!',
         },
@@ -139,7 +139,7 @@ def test_lecture_comment_system(client, db, admin_user, sample_subject, sample_p
     )
     assert resp.status_code == 200
     assert b'Ari' in resp.data
-    assert b'21' in resp.data
+    assert b'2004-05-15' in resp.data
     assert b'Curious math enthusiast' in resp.data
     assert b'Great explanation of algebra!' in resp.data
 
@@ -148,7 +148,7 @@ def test_lecture_comment_system(client, db, admin_user, sample_subject, sample_p
         f'/subject/{sample_subject.slug}/page/{sample_page.id}/comment',
         data={
             'author_name': 'Dara',
-            'author_age': '19',
+            'author_birth_date': '2006-03-10',
             'personality_info': '',
             'comment_text': 'Very clear lecture.',
         },
@@ -158,14 +158,14 @@ def test_lecture_comment_system(client, db, admin_user, sample_subject, sample_p
     assert b'Dara' in resp2.data
     assert b'Very clear lecture.' in resp2.data
 
-    # Missing required age -> rejected
+    # Missing required birth date -> rejected
     before_count = PageComment.query.filter_by(page_id=sample_page.id).count()
     assert before_count == 2
     client.post(
         f'/subject/{sample_subject.slug}/page/{sample_page.id}/comment',
         data={
-            'author_name': 'NoAge',
-            'author_age': '',
+            'author_name': 'NoBirthDate',
+            'author_birth_date': '',
             'comment_text': 'Should fail',
         },
         follow_redirects=True,

@@ -1,8 +1,21 @@
+from datetime import date
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, IntegerField
-from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo, NumberRange
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, DateField
+from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo, ValidationError
 from flask_babel import lazy_gettext as _l
+
+
+def validate_birth_date(form, field):
+    """Ensure a birth date is realistic (not in the future, age between 5 and 120)."""
+    if not field.data:
+        return
+    today = date.today()
+    if field.data > today:
+        raise ValidationError(_l('Birth date cannot be in the future.'))
+    age = today.year - field.data.year - ((today.month, today.day) < (field.data.month, field.data.day))
+    if age < 5 or age > 120:
+        raise ValidationError(_l('Please enter a valid birth date (age must be between 5 and 120).'))
 
 # ==========================================
 # 1. AUTHENTICATION & SETUP
@@ -39,6 +52,8 @@ class TeacherSignupForm(FlaskForm):
     username_kurdish = StringField(_l('Teacher Name (Kurdish)'), validators=[Optional()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
+    birth_date = DateField(_l('Birth Date (Optional)'), format='%Y-%m-%d', validators=[Optional(), validate_birth_date])
+    bio = TextAreaField(_l('Bio (Optional)'), validators=[Optional(), Length(max=500)])
     is_admin = BooleanField(_l('Grant Admin Access'))
     submit = SubmitField(_l('Create Account'))
 
@@ -50,9 +65,35 @@ class TeacherEditForm(FlaskForm):
     username_kurdish = StringField(_l('Teacher Name (Kurdish)'), validators=[Optional()])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(_l('Reset Password (Optional)'), validators=[Optional(), Length(min=6)])
+    birth_date = DateField(_l('Birth Date (Optional)'), format='%Y-%m-%d', validators=[Optional(), validate_birth_date])
+    bio = TextAreaField(_l('Bio (Optional)'), validators=[Optional(), Length(max=500)])
     is_admin = BooleanField(_l('Grant Admin Access'))
     show_name_on_subject = BooleanField(_l('Show my name on subject pages'))
     submit = SubmitField(_l('Update Account'))
+
+class TeacherProfileForm(FlaskForm):
+    """
+    Form for teachers (and admins) to edit their own profile from their dashboard.
+    """
+    username = StringField(_l('Full Name'), validators=[DataRequired(), Length(min=1, max=20)])
+    username_kurdish = StringField(_l('Full Name (Kurdish)'), validators=[Optional(), Length(max=20)])
+    birth_date = DateField(_l('Birth Date (Optional)'), format='%Y-%m-%d', validators=[Optional(), validate_birth_date])
+    bio = TextAreaField(_l('Bio (Optional)'), validators=[Optional(), Length(max=500)])
+    new_password = PasswordField(_l('New Password (Optional)'), validators=[Optional(), Length(min=6)])
+    confirm_password = PasswordField(
+        _l('Confirm New Password'),
+        validators=[Optional(), EqualTo('new_password', message=_l('Passwords must match.'))]
+    )
+    submit = SubmitField(_l('Save Profile'))
+
+class AdminMessageForm(FlaskForm):
+    """
+    Form for Admins to send a visually distinct notification message to teachers.
+    """
+    recipient_id = SelectField(_l('Send To'), coerce=int)
+    title = StringField(_l('Message Subject'), validators=[DataRequired(), Length(min=1, max=200)])
+    message = TextAreaField(_l('Message'), validators=[DataRequired(), Length(min=1, max=2000)])
+    submit = SubmitField(_l('Send Message'))
 
 # ==========================================
 # 3. SITE CONTENT (CMS)
@@ -187,10 +228,10 @@ class ToolForm(FlaskForm):
 class CommentForm(FlaskForm):
     """
     Public form for posting a comment on a lecture page.
-    Requires name, age, and comment; personality info is optional.
+    Requires name, birth date, and comment; personality info is optional.
     """
     author_name = StringField(_l('Your Name'), validators=[DataRequired(), Length(min=1, max=100)])
-    author_age = IntegerField(_l('Your Age'), validators=[DataRequired(), NumberRange(min=5, max=120)])
+    author_birth_date = DateField(_l('Your Birth Date'), format='%Y-%m-%d', validators=[DataRequired(), validate_birth_date])
     personality_info = TextAreaField(_l('About You / Personality (Optional)'), validators=[Optional(), Length(max=500)])
     comment_text = TextAreaField(_l('Your Comment'), validators=[DataRequired(), Length(min=1, max=2000)])
     submit = SubmitField(_l('Post Comment'))

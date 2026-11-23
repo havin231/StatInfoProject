@@ -7,7 +7,10 @@ import csv
 import io
 
 from app import db
-from app.models import User, Subject, Page, Question, Resource, ExamResult, SystemCommand, SubjectTeacher, AdminNotification, PageComment
+from app.models import (
+    User, Subject, Page, Question, Resource, ExamResult,
+    SystemCommand, SubjectTeacher, AdminNotification, PageComment, TeacherNotification
+)
 from app.forms import SubjectForm, PageForm, QuestionForm, BulkImportForm, ResourceForm
 from app.routes.helpers import can_edit_subject
 
@@ -269,8 +272,23 @@ def edit_subject(subject_id):
         subj_record.description = form.description.data
         subj_record.description_kurdish = form.description_kurdish.data
 
-        if current_user.is_admin:
-             subj_record.teacher_id = form.teacher_id.data
+        if current_user.is_admin and form.teacher_id.data:
+            new_primary_tid = form.teacher_id.data
+            subj_record.teacher_id = new_primary_tid
+            SubjectTeacher.query.filter_by(subject_id=subj_record.id, is_primary=True).update({'is_primary': False})
+            existing_assign = SubjectTeacher.query.filter_by(
+                subject_id=subj_record.id, teacher_id=new_primary_tid
+            ).first()
+            if existing_assign:
+                existing_assign.is_primary = True
+            else:
+                teacher_obj = User.query.get(new_primary_tid)
+                db.session.add(SubjectTeacher(
+                    subject_id=subj_record.id,
+                    teacher_id=new_primary_tid,
+                    is_primary=True,
+                    show_name=bool(teacher_obj.show_name_on_subject) if teacher_obj else False
+                ))
 
         db.session.commit()
         flash(_('Subject information updated.'), 'success')
@@ -300,6 +318,7 @@ def delete_subject(subject_id):
 
     try:
         # A. Clear notifications referencing this subject
+        TeacherNotification.query.filter_by(related_subject_id=subj_record.id).delete()
         AdminNotification.query.filter_by(related_subject_id=subj_record.id).delete()
 
         # B. Clear exam results
@@ -407,6 +426,8 @@ def delete_page(page_id):
 
     subject_slug_ref = target_page.subject.slug
     try:
+        TeacherNotification.query.filter_by(related_page_id=target_page.id).delete()
+        AdminNotification.query.filter_by(related_page_id=target_page.id).delete()
         PageComment.query.filter_by(page_id=target_page.id).delete()
         Resource.query.filter_by(page_id=target_page.id).delete()
         Question.query.filter_by(page_id=target_page.id).update({'page_id': None})

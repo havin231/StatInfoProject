@@ -20,10 +20,27 @@
         </div>
 
         <!-- PROFILE SETTINGS CARD -->
+        {% if not view_as_admin %}
         <div class="card mb-4">
             <div class="card-body">
                 <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Profile Settings') }}</h6>
-                <form method="POST" action="/teacher/toggle_name_visibility" class="d-grid">
+
+                <!-- Quick Profile Summary -->
+                <div class="mb-3 pb-2 border-bottom small">
+                    <div class="fw-bold text-body-emphasis">{{ current_user.username }}</div>
+                    {% if current_user.birth_date %}
+                    <div class="text-muted">
+                        <i class="fas fa-birthday-cake me-1"></i>
+                        {{ current_user.birth_date.strftime('%Y-%m-%d') }}
+                        {% if current_user.age is not none %}({{ current_user.age }}){% endif %}
+                    </div>
+                    {% endif %}
+                    {% if current_user.bio %}
+                    <div class="text-muted fst-italic mt-1">{{ current_user.bio }}</div>
+                    {% endif %}
+                </div>
+
+                <form method="POST" action="/teacher/toggle_name_visibility" class="d-grid mb-3">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="btn btn-sm {% if current_user.show_name_on_subject %}btn-info{% else %}btn-outline-info{% endif %} text-start">
                         <i class="fas fa-eye{% if not current_user.show_name_on_subject %}-slash{% endif %} me-2"></i>
@@ -35,8 +52,52 @@
                     </button>
                     <div class="form-text small mt-2">{{ _('Toggle whether visitors see your name on subject pages.') }}</div>
                 </form>
+
+                <!-- Edit Own Profile (Name, Kurdish Name, Birth Date, Bio, Password) -->
+                {% if profile_form %}
+                <button class="btn btn-outline-primary btn-sm w-100 d-flex justify-content-between align-items-center"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#teacherOwnProfileCollapse">
+                    <span><i class="fas fa-user-edit me-2"></i>{{ _('Edit My Profile') }}</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </button>
+                <div class="collapse mt-3" id="teacherOwnProfileCollapse">
+                    <form method="POST" action="{{ url_for('teacher.update_own_profile') }}">
+                        {{ profile_form.hidden_tag() }}
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">{{ _('Full Name') }}</label>
+                            {{ profile_form.username(class="form-control form-control-sm") }}
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">{{ _('Full Name (Kurdish)') }}</label>
+                            {{ profile_form.username_kurdish(class="form-control form-control-sm") }}
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">{{ _('Birth Date (Optional)') }}</label>
+                            {{ profile_form.birth_date(class="form-control form-control-sm", type="date") }}
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">{{ _('Bio (Optional)') }}</label>
+                            {{ profile_form.bio(class="form-control form-control-sm", rows="2", placeholder=_('Optional short bio...')) }}
+                        </div>
+                        <div class="mb-2">
+                            <label class="form-label small fw-bold">{{ _('New Password (Optional)') }}</label>
+                            {{ profile_form.new_password(class="form-control form-control-sm", placeholder=_('Leave empty to keep current')) }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">{{ _('Confirm New Password') }}</label>
+                            {{ profile_form.confirm_password(class="form-control form-control-sm") }}
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-sm">
+                                <i class="fas fa-save me-1"></i>{{ _('Save Profile') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                {% endif %}
             </div>
         </div>
+        {% endif %}
 
         <!-- LOGOUT CARD -->
         <div class="card">
@@ -63,6 +124,111 @@
                 <p class="text-muted small mb-0">{{ subjects|length }} {{ _('Subjects Assigned') }}</p>
             </div>
         </div>
+
+        <!-- TEACHER NOTIFICATIONS PANEL (Admin Messages visually distinct from Lecture Comments) -->
+        {% if not view_as_admin %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-transparent fw-bold d-flex justify-content-between align-items-center py-3">
+                <span class="text-body-emphasis">
+                    <i class="fas fa-bell me-2 text-primary"></i>{{ _('Notifications') }}
+                </span>
+                {% if teacher_notifications %}
+                {% set unread_count = teacher_notifications | selectattr('is_read', 'equalto', false) | list | length %}
+                <span class="badge {% if unread_count > 0 %}bg-danger{% else %}bg-secondary{% endif %} rounded-pill">
+                    {{ unread_count }} {{ _('Unread') }}
+                </span>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if teacher_notifications %}
+                <div class="d-flex flex-column gap-3" style="max-height: 360px; overflow-y: auto;">
+                    {% for n in teacher_notifications %}
+                    {% if n.notification_type == 'admin_message' %}
+                    <!-- VISUALLY DISTINCT ADMIN MESSAGE -->
+                    <div class="p-3 rounded border border-warning border-2 bg-warning-subtle shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                <span class="badge bg-warning text-dark fw-bold">
+                                    <i class="fas fa-bullhorn me-1"></i>{{ _('Admin Message') }}
+                                </span>
+                                {% if n.sender %}
+                                <small class="fw-bold text-warning-emphasis">{{ _('From') }}: {{ n.sender.username }}</small>
+                                {% endif %}
+                                {% if not n.is_read %}
+                                <span class="badge bg-danger">{{ _('New') }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <small class="text-muted">{{ n.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                {% if not n.is_read %}
+                                <form method="POST" action="{{ url_for('teacher.mark_teacher_notification_read', notif_id=n.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2" title="{{ _('Mark as Read') }}">
+                                        <i class="fas fa-check small"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <form method="POST" action="{{ url_for('teacher.delete_teacher_notification', notif_id=n.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="{{ _('Dismiss') }}">
+                                        <i class="fas fa-times small"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <h6 class="fw-bold text-body-emphasis mb-1">{{ n.title }}</h6>
+                        <p class="mb-0 small text-body-emphasis" style="white-space: pre-wrap;">{{ n.message }}</p>
+                    </div>
+                    {% else %}
+                    <!-- LECTURE COMMENT NOTIFICATION -->
+                    <div class="p-3 rounded border border-start border-4 border-info bg-body-tertiary">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                <span class="badge bg-info-subtle text-info-emphasis border border-info-subtle">
+                                    <i class="fas fa-comments me-1"></i>{{ _('Lecture Comment') }}
+                                </span>
+                                {% if not n.is_read %}
+                                <span class="badge bg-primary">{{ _('New') }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <small class="text-muted">{{ n.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                {% if not n.is_read %}
+                                <form method="POST" action="{{ url_for('teacher.mark_teacher_notification_read', notif_id=n.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary py-0 px-2" title="{{ _('Mark as Read') }}">
+                                        <i class="fas fa-check small"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                                <form method="POST" action="{{ url_for('teacher.delete_teacher_notification', notif_id=n.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="{{ _('Dismiss') }}">
+                                        <i class="fas fa-times small"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="fw-bold small text-body-emphasis mb-1">{{ n.title }}</div>
+                        <p class="mb-2 small text-body-emphasis" style="white-space: pre-wrap;">{{ n.message }}</p>
+                        {% if n.related_subject and n.related_page %}
+                        <a href="{{ url_for('public.view_page', slug=n.related_subject.slug, page_id=n.related_page.id) }}#comments-section"
+                            class="btn btn-sm btn-outline-info py-0 px-2">
+                            <i class="fas fa-external-link-alt me-1"></i>{{ _('View Lesson') }}
+                        </a>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-3 text-muted small">
+                    <i class="fas fa-bell-slash me-2"></i>{{ _('No new notifications') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
 
         {% if subjects %}
         <div class="row g-4">

@@ -11,7 +11,7 @@ from app import db
 from app.models import (
     User, Subject, Page, Question, ExamResult,
     SiteInfo, Resource, SystemCommand, Tool,
-    SubjectTeacher, AdminNotification
+    SubjectTeacher, AdminNotification, PageComment
 )
 from app.forms import InfoPageForm, RestoreBackupForm, WipeCleanForm
 
@@ -173,6 +173,7 @@ def restore_system():
                     db.session.query(AdminNotification).delete()
                     db.session.query(ExamResult).delete()
                     db.session.query(Question).delete()
+                    db.session.query(PageComment).delete()
                     db.session.query(Resource).delete()
                     db.session.query(Page).delete()
                     db.session.query(SubjectTeacher).delete()
@@ -387,6 +388,7 @@ def wipe_clean():
             db.session.query(AdminNotification).delete()
             db.session.query(ExamResult).delete()
             db.session.query(Question).delete()
+            db.session.query(PageComment).delete()
             db.session.query(Resource).delete()
             db.session.query(Page).delete()
             db.session.query(SubjectTeacher).delete()

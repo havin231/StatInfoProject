@@ -7,7 +7,7 @@ import csv
 import io
 
 from app import db
-from app.models import User, Subject, Page, Question, Resource, ExamResult, SystemCommand, SubjectTeacher, AdminNotification
+from app.models import User, Subject, Page, Question, Resource, ExamResult, SystemCommand, SubjectTeacher, AdminNotification, PageComment
 from app.forms import SubjectForm, PageForm, QuestionForm, BulkImportForm, ResourceForm
 from app.routes.helpers import can_edit_subject
 
@@ -196,17 +196,51 @@ def add_subject():
         if Subject.query.filter_by(slug=form.slug.data).first():
             flash(_('Error: The URL Slug must be unique across all subjects.'), 'danger')
         else:
+            # Support assigning multiple teachers at creation time
+            raw_ids = request.form.getlist('teacher_ids')
+            selected_ids = []
+            for raw in raw_ids:
+                try:
+                    tid = int(raw)
+                    if tid not in selected_ids:
+                        selected_ids.append(tid)
+                except ValueError:
+                    continue
+
+            primary_tid = form.teacher_id.data
+            if primary_tid and primary_tid not in selected_ids:
+                selected_ids.insert(0, primary_tid)
+            if not selected_ids:
+                selected_ids = [primary_tid]
+
             new_subj = Subject(
                 name=form.name.data,
                 name_kurdish=form.name_kurdish.data,
                 slug=form.slug.data,
                 description=form.description.data,
                 description_kurdish=form.description_kurdish.data,
-                teacher_id=form.teacher_id.data
+                teacher_id=selected_ids[0]
             )
-            db.session.add(new_subj)
-            db.session.commit()
-            flash(_('Subject "%(name)s" created successfully.', name=form.name.data), 'success')
+            try:
+                db.session.add(new_subj)
+                db.session.flush()
+
+                assigned_users = User.query.filter(User.id.in_(selected_ids)).all()
+                user_map = {u.id: u for u in assigned_users}
+                for tid in selected_ids:
+                    if tid in user_map:
+                        u = user_map[tid]
+                        db.session.add(SubjectTeacher(
+                            subject_id=new_subj.id,
+                            teacher_id=tid,
+                            is_primary=(tid == selected_ids[0]),
+                            show_name=bool(u.show_name_on_subject)
+                        ))
+                db.session.commit()
+                flash(_('Subject "%(name)s" created successfully.', name=form.name.data), 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash(_('Error creating subject: %(error)s', error=str(e)), 'danger')
 
     return redirect(url_for('teacher.teacher_dashboard'))
 
@@ -274,9 +308,10 @@ def delete_subject(subject_id):
         # C. Clear Question bank (before Pages because Question.page_id references Page.id)
         Question.query.filter_by(subject_id=subj_record.id).delete()
 
-        # D. Clear Resources and Lectures
+        # D. Clear Resources, Comments, and Lectures
         pages_list = Page.query.filter_by(subject_id=subj_record.id).all()
         for p in pages_list:
+            PageComment.query.filter_by(page_id=p.id).delete()
             Resource.query.filter_by(page_id=p.id).delete()
             db.session.delete(p)
 
@@ -371,11 +406,43 @@ def delete_page(page_id):
         abort(403)
 
     subject_slug_ref = target_page.subject.slug
-    db.session.delete(target_page)
-    db.session.commit()
+    try:
+        PageComment.query.filter_by(page_id=target_page.id).delete()
+        Resource.query.filter_by(page_id=target_page.id).delete()
+        Question.query.filter_by(page_id=target_page.id).update({'page_id': None})
+        db.session.delete(target_page)
+        db.session.commit()
+        flash(_('Lecture deleted.'), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error deleting lecture: %(error)s', error=str(e)), 'danger')
 
-    flash(_('Lecture deleted.'), 'success')
     return redirect(url_for('public.subject_detail', slug=subject_slug_ref))
+
+
+@content.route('/teacher/comment/delete/<int:comment_id>', methods=['POST'])
+@login_required
+def delete_page_comment(comment_id):
+    """Allows subject teachers or admins to remove a comment on a lecture."""
+    comment = PageComment.query.get_or_404(comment_id)
+    target_page = comment.page
+    target_subject = target_page.subject
+
+    if not can_edit_subject(target_subject):
+        abort(403)
+
+    slug = target_subject.slug
+    page_id = target_page.id
+
+    try:
+        db.session.delete(comment)
+        db.session.commit()
+        flash(_('Comment deleted.'), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error deleting comment: %(error)s', error=str(e)), 'danger')
+
+    return redirect(url_for('public.view_page', slug=slug, page_id=page_id) + '#comments-section')
 
 
 @content.route('/teacher/resource/add/<int:page_id>', methods=['POST'])

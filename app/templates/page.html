@@ -136,8 +136,115 @@
             {% endif %}
         </div>
 
+        <!--
+            LECTURE COMMENTS SECTION
+            Visitors provide Name, Age, optional Personality info, and their comment.
+        -->
+        <div id="comments-section" class="card shadow-sm border-0 mb-5">
+            <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
+                <h4 class="h5 fw-bold mb-0 text-body-emphasis">
+                    <i class="fas fa-comments me-2 text-highlight"></i>{{ _('Lecture Discussion') }}
+                    <span class="badge bg-secondary-subtle text-secondary border ms-2">{{ comments|length }}</span>
+                </h4>
+            </div>
+            <div class="card-body p-4">
+                <!-- New Comment Form -->
+                <form method="POST" action="{{ url_for('public.add_page_comment', slug=subject.slug, page_id=page.id) }}" class="mb-4 pb-4 border-bottom">
+                    {{ comment_form.hidden_tag() }}
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-8">
+                            <label class="form-label small fw-bold text-body-emphasis">
+                                {{ _('Your Name') }} <span class="text-danger">*</span>
+                            </label>
+                            {{ comment_form.author_name(class="form-control", placeholder=_('Enter your name'), required=True) }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold text-body-emphasis">
+                                {{ _('Your Age') }} <span class="text-danger">*</span>
+                            </label>
+                            {{ comment_form.author_age(class="form-control", type="number", min="5", max="120", placeholder=_('e.g., 20'), required=True) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-body-emphasis">
+                            {{ _('About You / Personality') }}
+                            <span class="text-muted fw-normal">({{ _('Optional') }})</span>
+                        </label>
+                        {{ comment_form.personality_info(class="form-control", rows="2", placeholder=_('Optional: share your interests, hobbies, or personality...')) }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-body-emphasis">
+                            {{ _('Your Comment') }} <span class="text-danger">*</span>
+                        </label>
+                        {{ comment_form.comment_text(class="form-control", rows="3", placeholder=_('Write your question or thoughts about this lecture...'), required=True) }}
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary px-4">
+                            <i class="fas fa-paper-plane me-2"></i>{{ _('Post Comment') }}
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Comments List -->
+                {% if comments %}
+                <div class="d-flex flex-column gap-3">
+                    {% for c in comments %}
+                    <div class="p-3 rounded border bg-body-tertiary">
+                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                            <div>
+                                <span class="fw-bold text-body-emphasis">{{ c.author_name }}</span>
+                                <span class="badge bg-info-subtle text-info-emphasis border ms-1">
+                                    {{ _('Age') }}: {{ c.author_age }}
+                                </span>
+                                {% if c.created_at %}
+                                <small class="text-muted ms-2">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                {% endif %}
+                            </div>
+                            {% if can_moderate %}
+                            <form method="POST" action="{{ url_for('content.delete_page_comment', comment_id=c.id) }}"
+                                onsubmit="return confirm('{{ _('Delete this comment?') }}');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="{{ _('Delete Comment') }}">
+                                    <i class="fas fa-trash-alt small"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+
+                        {% if c.personality_info %}
+                        <p class="small text-muted fst-italic mb-2">
+                            <i class="fas fa-user-circle me-1"></i>{{ c.personality_info }}
+                        </p>
+                        {% endif %}
+
+                        <p class="mb-0 text-body-emphasis" style="white-space: pre-wrap;">{{ c.comment_text }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-4 text-muted">
+                    <i class="far fa-comment-dots fa-2x mb-2 d-block"></i>
+                    <p class="mb-0">{{ _('No comments yet. Be the first to share your thoughts!') }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
     </div>
 </div>
+
+<!-- FLOATING LANGUAGE TOGGLE (Preserves vertical scroll position via base.html) -->
+<a id="floatingLangToggle"
+    href="{{ url_for('public.set_lang', lang='en' if get_locale().language == 'ku' else 'ku') }}"
+    class="btn btn-primary rounded-pill shadow-lg d-flex align-items-center gap-2 px-3 py-2 lang-switch-preserve"
+    title="{{ _('Toggle Language') }}"
+    style="position: fixed; bottom: 5.25rem; inset-inline-end: 1.25rem; z-index: 1030;">
+    <i class="fas fa-globe"></i>
+    <span class="fw-bold small">{{ 'English' if get_locale().language == 'ku' else 'کوردی' }}</span>
+</a>
 
 <!--
     RICH TEXT CSS OVERRIDES

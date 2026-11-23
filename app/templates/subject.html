@@ -18,21 +18,19 @@
         <div class="flex-grow-1">
             <h1 class="display-5 fw-bold">{{ subject.name_kurdish if get_locale().language == 'ku' and subject.name_kurdish else subject.name }}</h1>
             <p class="lead text-muted">{{ subject.description_kurdish if get_locale().language == 'ku' and subject.description_kurdish else subject.description }}</p>
-            <!-- v0.5.0: Multi-Teacher Support - Show all assigned teachers -->
-            {% if subject.teacher_assignments %}
+            <!-- Multi-Teacher Support - Show ONLY currently assigned teachers who enabled name visibility -->
+            {% if visible_teachers %}
             <p class="text-muted small">
                 <i class="fas fa-chalkboard-teacher me-1"></i>
                 {{ _('Taught by') }}:
-                {% for assignment in subject.teacher_assignments %}
-                {% if assignment.show_name %}
+                {% for teacher in visible_teachers %}
                 <span class="fw-bold">
-                    {% if get_locale().language == 'ku' and assignment.teacher.username_kurdish %}
-                    {{ assignment.teacher.username_kurdish }}
+                    {% if get_locale().language == 'ku' and teacher.username_kurdish %}
+                    {{ teacher.username_kurdish }}
                     {% else %}
-                    {{ assignment.teacher.username }}
+                    {{ teacher.username }}
                     {% endif %}
                 </span>{% if not loop.last %}, {% endif %}
-                {% endif %}
                 {% endfor %}
             </p>
             {% endif %}

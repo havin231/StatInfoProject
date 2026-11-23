@@ -436,3 +436,29 @@ Whenever a change or new feature is added, append a new version block following 
 - **Verification**:
   - Updated test suite (`tests/conftest.py`, `tests/test_auth.py`, `tests/test_models.py`); all 20 tests pass (100% pass rate).
   - Created local `version_0.6.1` snapshot under `~/Documents/statinfopro/`.
+
+---
+
+## Version 0.7.0
+**Date:** 2026-11-23
+**Summary:** Locked single Academic Glass theme, multi-teacher assignment & per-teacher name visibility fixes, public lecture comment system, and scroll-preserving language toggle.
+
+### Changes & Improvements:
+- **Single Locked Theme**:
+  - Removed "Cyber Command" theme CSS (`variables.css`, `style.css`), JS `setTheme()`, logo attributes (`base.html`), and theme selector cards (`admin_dashboard.html`, `teacher/dashboard.html`).
+  - Locked `data-theme="glass"` permanently while keeping Light/Dark mode toggle.
+- **Multi-Teacher Assignment & Individual Name Visibility**:
+  - Admins can now assign multiple teachers to any subject at creation (`add_subject`) or anytime via `POST /admin/subject/<id>/teachers` (`admin_dashboard.html`).
+  - Fixed former/unassigned teachers continuing to appear on subject pages by deleting removed/transferred `SubjectTeacher` rows.
+  - Added per-subject individual "My Name: Shown / Hidden" toggle (`POST /subject/<id>/toggle_my_name`) for each teacher on `teacher/dashboard.html`, plus synced global `toggle_name_visibility()`.
+  - Updated `subject_detail()` and `subject.html` to render only currently assigned teachers with `show_name=True`.
+- **Lecture Comment System**:
+  - Added `PageComment` model (`author_name`, `author_age`, optional `personality_info`, `comment_text`, `created_at`) and `CommentForm`.
+  - Added public comment posting (`POST /subject/<slug>/page/<page_id>/comment`) with rate limiting and CSRF protection, plus staff deletion (`POST /teacher/comment/delete/<comment_id>`).
+  - Updated bottom-up deletion across `delete_page`, `delete_subject`, `delete_teacher`, `restore_system`, and `wipe_clean`.
+- **Scroll-Preserving Language Toggle**:
+  - Added floating language switch button on lesson pages (`page.html`).
+  - Added `sessionStorage` scroll save/restore logic in `base.html` so switching languages keeps users at the same vertical reading position.
+- **Verification**:
+  - Added `tests/test_v070_features.py`; all 25 tests pass (100% pass rate).
+  - Created local `version_0.7.0` snapshot under `~/Documents/statinfopro/`.

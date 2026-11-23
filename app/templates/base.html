@@ -2,7 +2,7 @@
 <!--
     The <html> tag holds the state of the UI:
     data-bs-theme: Controls Light/Dark mode (Bootstrap standard)
-    data-theme: Controls the specific visual style (Glass vs Cyber)
+    data-theme: Locked to Academic Glass visual style
 -->
 <html lang="{{ get_locale().language }}" dir="{{ 'rtl' if get_locale().language == 'ku' else 'ltr' }}"
     data-bs-theme="light" data-theme="glass">
@@ -23,9 +23,9 @@
     -->
     <script>
         (function () {
-            const savedTheme = localStorage.getItem('app_theme') || 'glass';
+            localStorage.removeItem('app_theme');
             const savedMode = localStorage.getItem('app_mode') || 'light';
-            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.documentElement.setAttribute('data-theme', 'glass');
             document.documentElement.setAttribute('data-bs-theme', savedMode);
         })();
     </script>
@@ -109,9 +109,7 @@
             <!-- Brand Logo -->
             <a class="navbar-brand d-flex align-items-center" href="/">
                 <img id="brandLogo" src="" alt="Logo" class="me-2" style="height: 1.25rem; width: auto;"
-                    data-light-cyber="{{ url_for('static', filename='Logo/Light_CyberCommand.svg') }}"
                     data-light-glass="{{ url_for('static', filename='Logo/light_AcademicGlass.svg') }}"
-                    data-dark-cyber="{{ url_for('static', filename='Logo/Dark_CyberCommand.svg') }}"
                     data-dark-glass="{{ url_for('static', filename='Logo/Dark_AcademicGlass.svg') }}">
                 <div class="ms-1" style="direction: ltr !important; display: inline-flex; align-items: center;">
                     StatInfo<span>Project</span>
@@ -234,13 +232,6 @@
             updateLogo();
         }
 
-        // Function: Set specific theme (Glass/Cyber) - Called from Dashboards
-        function setTheme(themeName) {
-            htmlEl.setAttribute('data-theme', themeName);
-            localStorage.setItem('app_theme', themeName);
-            updateLogo();
-        }
-
         // Function: Update the Sun/Moon icon based on current mode
         function updateIcons() {
             const mode = htmlEl.getAttribute('data-bs-theme');
@@ -265,14 +256,10 @@
             }
         }
 
-        // Function: Update the Brand Logo based on Theme & Mode
+        // Function: Update the Brand Logo based on Light/Dark Mode
         function updateLogo() {
             const mode = htmlEl.getAttribute('data-bs-theme') || 'light';
-            const theme = htmlEl.getAttribute('data-theme') || 'glass';
-
-            // Construct data attribute key: data-{mode}-{theme}
-            // e.g. data-light-glass, data-dark-cyber
-            const key = `data-${mode}-${theme}`;
+            const key = `data-${mode}-glass`;
 
             const brandLogo = document.getElementById('brandLogo');
             if (brandLogo && brandLogo.hasAttribute(key)) {
@@ -283,6 +270,66 @@
         // Initialize icons and logo on load
         updateIcons();
         updateLogo();
+
+        // Preserve vertical scroll position when switching language
+        (function () {
+            const SCROLL_PATH_KEY = 'lang_scroll_path';
+            const SCROLL_Y_KEY = 'lang_scroll_y';
+            const SCROLL_RATIO_KEY = 'lang_scroll_ratio';
+
+            document.addEventListener('click', function (e) {
+                const link = e.target.closest('a[href*="/set-lang/"]');
+                if (!link) return;
+                const docHeight = Math.max(
+                    document.documentElement.scrollHeight - window.innerHeight,
+                    0
+                );
+                const currentY = window.scrollY || window.pageYOffset || 0;
+                const ratio = docHeight > 0 ? currentY / docHeight : 0;
+                sessionStorage.setItem(SCROLL_PATH_KEY, window.location.pathname);
+                sessionStorage.setItem(SCROLL_Y_KEY, String(currentY));
+                sessionStorage.setItem(SCROLL_RATIO_KEY, String(ratio));
+            });
+
+            function restoreScrollPosition(clearAfter) {
+                const savedPath = sessionStorage.getItem(SCROLL_PATH_KEY);
+                if (savedPath !== window.location.pathname) return;
+
+                const savedY = parseFloat(sessionStorage.getItem(SCROLL_Y_KEY));
+                const savedRatio = parseFloat(sessionStorage.getItem(SCROLL_RATIO_KEY));
+                const maxScroll = Math.max(
+                    document.documentElement.scrollHeight - window.innerHeight,
+                    0
+                );
+
+                let targetY = savedY;
+                if (!Number.isNaN(savedRatio) && maxScroll > 0) {
+                    // Use savedY when within bounds; fall back to proportional position if page length differs significantly
+                    if (Number.isNaN(savedY) || savedY > maxScroll) {
+                        targetY = savedRatio * maxScroll;
+                    }
+                }
+
+                if (!Number.isNaN(targetY) && targetY >= 0) {
+                    window.scrollTo({ top: targetY, behavior: 'instant' });
+                }
+
+                if (clearAfter) {
+                    sessionStorage.removeItem(SCROLL_PATH_KEY);
+                    sessionStorage.removeItem(SCROLL_Y_KEY);
+                    sessionStorage.removeItem(SCROLL_RATIO_KEY);
+                }
+            }
+
+            if (sessionStorage.getItem(SCROLL_PATH_KEY) === window.location.pathname) {
+                document.addEventListener('DOMContentLoaded', function () {
+                    restoreScrollPosition(false);
+                });
+                window.addEventListener('load', function () {
+                    restoreScrollPosition(true);
+                });
+            }
+        })();
     </script>
     <!--
          MOBILE BOTTOM NAVIGATION (Instagram Style)

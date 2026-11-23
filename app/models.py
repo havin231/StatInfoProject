@@ -97,6 +97,9 @@ class Page(db.Model):
     # Resources: Multiple links per page
     resources = db.relationship('Resource', backref='page', lazy=True, cascade="all, delete-orphan")
 
+    # Comments: Public visitor comments on this lecture
+    comments = db.relationship('PageComment', backref='page', lazy=True, cascade="all, delete-orphan")
+
     def __repr__(self):
         return f"Page('{self.title}', Subject ID: {self.subject_id})"
 
@@ -292,3 +295,23 @@ class SubjectTeacher(db.Model):
 
     def __repr__(self):
         return f"SubjectTeacher(Subject: {self.subject_id}, Teacher: {self.teacher_id}, Primary: {self.is_primary})"
+
+
+# ==========================================
+# 12. PAGE COMMENT MODEL (v0.7.0)
+# ==========================================
+class PageComment(db.Model):
+    """
+    Represents a public comment posted on a Lecture (Page).
+    Requires author name, age, and comment text; personality_info is optional.
+    """
+    id = db.Column(db.Integer, primary_key=True)
+    page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=False)
+    author_name = db.Column(db.String(100), nullable=False)
+    author_age = db.Column(db.Integer, nullable=False)
+    personality_info = db.Column(db.Text, nullable=True)
+    comment_text = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"PageComment('{self.author_name}', Age: {self.author_age}, Page ID: {self.page_id})"

@@ -5,8 +5,8 @@ from flask_login import current_user, login_required
 from sqlalchemy import func, or_
 
 from app import db, bcrypt, limiter
-from app.models import User, Subject, ExamResult, SiteInfo, Page, Question
-from app.forms import SetupForm
+from app.models import User, Subject, ExamResult, SiteInfo, Page, Question, PageComment
+from app.forms import SetupForm, CommentForm
 
 public = Blueprint('public', __name__)
 
@@ -264,14 +264,19 @@ def subject_detail(slug):
 
     Lists all lectures (Pages) within a specific subject.
     Open to visitors and staff.
+    Shows ONLY currently assigned teachers who opted to show their name.
     """
+    from app.models import SubjectTeacher
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
 
     # Visibility Check: If hidden, restrict access to staff only
     if not target_subject.is_public and not current_user.is_authenticated:
         abort(403)
 
-    return render_template('subject.html', subject=target_subject)
+    current_assignments = SubjectTeacher.query.filter_by(subject_id=target_subject.id).all()
+    visible_teachers = [a.teacher for a in current_assignments if a.show_name and a.teacher]
+
+    return render_template('subject.html', subject=target_subject, visible_teachers=visible_teachers)
 
 
 @public.route('/subject/<slug>/page/<int:page_id>')
@@ -295,12 +300,67 @@ def view_page(slug, page_id):
         page_id=target_lecture.id
     ).first() is not None
 
+    comments = PageComment.query.filter_by(
+        page_id=target_lecture.id
+    ).order_by(PageComment.created_at.desc()).all()
+    comment_form = CommentForm()
+
+    can_moderate = False
+    if current_user.is_authenticated:
+        from app.routes.helpers import can_edit_subject
+        can_moderate = can_edit_subject(target_subject)
+
     return render_template(
         'page.html',
         page=target_lecture,
         subject=target_subject,
-        has_quiz=specific_questions_exist
+        has_quiz=specific_questions_exist,
+        comments=comments,
+        comment_form=comment_form,
+        can_moderate=can_moderate
     )
+
+
+@public.route('/subject/<slug>/page/<int:page_id>/comment', methods=['POST'])
+@limiter.limit("15/minute")
+def add_page_comment(slug, page_id):
+    """
+    PUBLIC LECTURE COMMENT SUBMISSION
+
+    Allows any visitor to post a comment on a lecture after providing their
+    name, age, optional personality/about-you info, and comment text.
+    """
+    target_subject = Subject.query.filter_by(slug=slug).first_or_404()
+    target_lecture = Page.query.get_or_404(page_id)
+
+    if not target_subject.is_public and not current_user.is_authenticated:
+        abort(403)
+
+    if target_lecture.subject_id != target_subject.id:
+        abort(404)
+
+    form = CommentForm()
+    if form.validate_on_submit():
+        new_comment = PageComment(
+            page_id=target_lecture.id,
+            author_name=form.author_name.data.strip(),
+            author_age=form.author_age.data,
+            personality_info=form.personality_info.data.strip() if form.personality_info.data else None,
+            comment_text=form.comment_text.data.strip()
+        )
+        try:
+            db.session.add(new_comment)
+            db.session.commit()
+            flash(_('Your comment has been posted!'), 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error posting comment: %(error)s', error=str(e)), 'danger')
+    else:
+        for field_name, errors in form.errors.items():
+            for err in errors:
+                flash(f"{err}", 'danger')
+
+    return redirect(url_for('public.view_page', slug=slug, page_id=page_id) + '#comments-section')
 
 
 # ==============================================================================

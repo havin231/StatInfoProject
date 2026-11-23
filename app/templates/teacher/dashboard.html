@@ -19,21 +19,6 @@
             </a>
         </div>
 
-        <!-- THEME SETTINGS CARD -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Interface Theme') }}</h6>
-                <div class="d-grid gap-2">
-                    <button class="btn btn-outline btn-sm text-start" onclick="setTheme('glass')">
-                        <i class="fas fa-circle text-info me-2"></i>{{ _('Academic Glass') }}
-                    </button>
-                    <button class="btn btn-outline btn-sm text-start" onclick="setTheme('cyber')">
-                        <i class="fas fa-square text-success me-2"></i>{{ _('Cyber Command') }}
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- PROFILE SETTINGS CARD -->
         <div class="card mb-4">
             <div class="card-body">
@@ -122,7 +107,7 @@
                         <!-- Action Area -->
                         <div class="mt-auto">
                             <!-- Visibility Toggle (Form POST) -->
-                            <form method="POST" action="/subject/{{ sub.id }}/toggle_visibility" class="mb-3">
+                            <form method="POST" action="/subject/{{ sub.id }}/toggle_visibility" class="mb-2">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <span class="small text-muted">
@@ -143,6 +128,32 @@
                                     </button>
                                 </div>
                             </form>
+
+                            <!-- Individual Teacher Name Visibility Toggle (Per Subject) -->
+                            {% if not view_as_admin and assignment_map and sub.id in assignment_map %}
+                            {% set my_assign = assignment_map[sub.id] %}
+                            <form method="POST" action="/subject/{{ sub.id }}/toggle_my_name" class="mb-3">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="small text-muted">
+                                        <i class="fas fa-user-tag me-1"></i>
+                                        {% if my_assign.show_name %}
+                                        <span class="text-info">{{ _('My Name: Shown') }}</span>
+                                        {% else %}
+                                        <span class="text-secondary">{{ _('My Name: Hidden') }}</span>
+                                        {% endif %}
+                                    </span>
+                                    <button type="submit"
+                                        class="btn btn-sm {% if my_assign.show_name %}btn-outline-secondary{% else %}btn-outline-info{% endif %}">
+                                        {% if my_assign.show_name %}
+                                        <i class="fas fa-eye-slash me-1"></i>{{ _('Hide Name') }}
+                                        {% else %}
+                                        <i class="fas fa-eye me-1"></i>{{ _('Show Name') }}
+                                        {% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                            {% endif %}
 
                             <!-- Primary Action -->
                             <div class="d-grid mb-2">

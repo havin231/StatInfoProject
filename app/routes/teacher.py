@@ -3,7 +3,7 @@ from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
 from app import db, bcrypt
-from app.models import User, Subject, Page, Question, Resource, ExamResult, SubjectTeacher, AdminNotification
+from app.models import User, Subject, Page, Question, Resource, ExamResult, SubjectTeacher, AdminNotification, PageComment
 from app.forms import SubjectForm, TeacherSignupForm, TeacherEditForm
 from app.routes.helpers import can_edit_subject
 
@@ -64,15 +64,14 @@ def teacher_dashboard():
     # 2. Standard Teacher Context (v0.5.0 - Multi-Teacher Support)
     else:
         # Fetch subjects assigned to this teacher via SubjectTeacher association
-        assigned_subjects = db.session.query(Subject).join(
-            SubjectTeacher
-        ).filter(
-            SubjectTeacher.teacher_id == current_user.id
-        ).all()
+        assignments = SubjectTeacher.query.filter_by(teacher_id=current_user.id).all()
+        assigned_subjects = [a.subject for a in assignments if a.subject]
+        assignment_map = {a.subject_id: a for a in assignments}
 
         return render_template(
             'teacher/dashboard.html',
-            subjects=assigned_subjects
+            subjects=assigned_subjects,
+            assignment_map=assignment_map
         )
 
 
@@ -80,23 +79,55 @@ def teacher_dashboard():
 @login_required
 def toggle_name_visibility():
     """
-    TEACHER NAME VISIBILITY TOGGLE
-    
-    Allows teachers to control whether their name appears publicly
-    on subject pages that visitors view.
+    TEACHER NAME VISIBILITY TOGGLE (GLOBAL)
+
+    Allows teachers to toggle whether their name appears publicly
+    across all their assigned subject pages.
     """
-    # Toggle the setting
     current_user.show_name_on_subject = not current_user.show_name_on_subject
-    
+
     try:
+        SubjectTeacher.query.filter_by(teacher_id=current_user.id).update(
+            {'show_name': current_user.show_name_on_subject}
+        )
         db.session.commit()
         status = _('shown') if current_user.show_name_on_subject else _('hidden')
-        flash(_('Your name will be %(status)s on subject pages.', status=status), 'success')
+        flash(_('Your name will be %(status)s on all your subject pages.', status=status), 'success')
     except Exception as e:
         db.session.rollback()
         flash(_('Error updating setting: %(error)s', error=str(e)), 'danger')
-    
+
     return redirect(url_for('teacher.teacher_dashboard'))
+
+
+@teacher.route('/subject/<int:subject_id>/toggle_my_name', methods=['POST'])
+@login_required
+def toggle_subject_name_visibility(subject_id):
+    """
+    PER-SUBJECT INDIVIDUAL TEACHER NAME VISIBILITY TOGGLE
+
+    Allows each teacher assigned to a subject to independently show or hide
+    their own name on that specific subject's public page.
+    """
+    assignment = SubjectTeacher.query.filter_by(
+        subject_id=subject_id,
+        teacher_id=current_user.id
+    ).first()
+
+    if not assignment:
+        abort(403)
+
+    assignment.show_name = not assignment.show_name
+
+    try:
+        db.session.commit()
+        status = _('shown') if assignment.show_name else _('hidden')
+        flash(_('Your name is now %(status)s on "%(subject)s".', status=status, subject=assignment.subject.name), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error updating setting: %(error)s', error=str(e)), 'danger')
+
+    return redirect(request.referrer or url_for('teacher.teacher_dashboard'))
 
 
 @teacher.route('/subject/<int:subject_id>/toggle_visibility', methods=['POST'])
@@ -272,9 +303,10 @@ def delete_teacher(teacher_id):
             # C. Clean up Questions (before Pages due to page_id FK)
             Question.query.filter_by(subject_id=subj.id).delete()
 
-            # D. Clean up Resources & Pages
+            # D. Clean up Comments, Resources & Pages
             pages_found = Page.query.filter_by(subject_id=subj.id).all()
             for p in pages_found:
+                PageComment.query.filter_by(page_id=p.id).delete()
                 Resource.query.filter_by(page_id=p.id).delete()
                 db.session.delete(p)
 
@@ -296,13 +328,87 @@ def delete_teacher(teacher_id):
     return redirect(url_for('teacher.teacher_dashboard'))
 
 
+@teacher.route('/admin/subject/<int:subject_id>/teachers', methods=['POST'])
+@login_required
+def manage_subject_teachers(subject_id):
+    """
+    MULTI-TEACHER SUBJECT ASSIGNMENT (ADMIN ONLY)
+
+    Assigns one or more teachers to a subject. Removes any teacher who is no
+    longer selected so former teachers never appear on the subject page, and
+    preserves each continuing teacher's individual show_name setting.
+    """
+    if not current_user.is_admin:
+        abort(403)
+
+    subject = Subject.query.get_or_404(subject_id)
+    raw_ids = request.form.getlist('teacher_ids')
+    selected_ids = []
+    for raw in raw_ids:
+        try:
+            tid = int(raw)
+            if tid not in selected_ids:
+                selected_ids.append(tid)
+        except ValueError:
+            continue
+
+    if not selected_ids:
+        flash(_('Error: At least one teacher must be assigned to a subject.'), 'danger')
+        return redirect(url_for('teacher.teacher_dashboard'))
+
+    valid_teachers = User.query.filter(User.id.in_(selected_ids)).all()
+    valid_map = {t.id: t for t in valid_teachers}
+    valid_ids = [tid for tid in selected_ids if tid in valid_map]
+
+    if not valid_ids:
+        flash(_('Error: No valid teachers selected.'), 'danger')
+        return redirect(url_for('teacher.teacher_dashboard'))
+
+    try:
+        # Remove any teachers no longer assigned to this subject
+        existing_assignments = SubjectTeacher.query.filter_by(subject_id=subject.id).all()
+        existing_by_tid = {a.teacher_id: a for a in existing_assignments}
+
+        for tid, assignment in existing_by_tid.items():
+            if tid not in valid_map:
+                db.session.delete(assignment)
+
+        # Ensure primary teacher_id is in the new set
+        if subject.teacher_id not in valid_map:
+            subject.teacher_id = valid_ids[0]
+
+        # Add newly assigned teachers and sync is_primary
+        for tid in valid_ids:
+            is_prim = (tid == subject.teacher_id)
+            if tid in existing_by_tid:
+                existing_by_tid[tid].is_primary = is_prim
+            else:
+                teacher_obj = valid_map[tid]
+                db.session.add(SubjectTeacher(
+                    subject_id=subject.id,
+                    teacher_id=tid,
+                    is_primary=is_prim,
+                    show_name=bool(teacher_obj.show_name_on_subject)
+                ))
+
+        db.session.commit()
+        flash(_('Assigned teachers for "%(subject)s" updated successfully.', subject=subject.name), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error updating subject teachers: %(error)s', error=str(e)), 'danger')
+
+    return redirect(url_for('teacher.teacher_dashboard'))
+
+
 @teacher.route('/admin/transfer/subject/<int:subject_id>', methods=['POST'])
 @login_required
 def transfer_subject(subject_id):
     """
     TRANSFER SUBJECT TO ANOTHER TEACHER
 
-    Allows Admin to change the teacher assignment of a subject.
+    Replaces the previous primary teacher with the new teacher and removes
+    the old teacher's SubjectTeacher assignment so former teachers no longer
+    appear on the subject page.
     """
     if not current_user.is_admin:
         abort(403)
@@ -319,16 +425,25 @@ def transfer_subject(subject_id):
         flash(_('Error: Selected teacher not found.'), 'danger')
         return redirect(url_for('teacher.teacher_dashboard'))
 
+    old_teacher_id = subject.teacher_id
     old_teacher_name = subject.teacher.username
     subject.teacher_id = new_teacher_id
 
-    # Keep SubjectTeacher association in sync
+    # Remove old primary teacher's assignment so former teachers don't linger
+    if old_teacher_id != new_teacher_id:
+        SubjectTeacher.query.filter_by(subject_id=subject.id, teacher_id=old_teacher_id).delete()
+
     SubjectTeacher.query.filter_by(subject_id=subject.id, is_primary=True).update({'is_primary': False})
     existing_assignment = SubjectTeacher.query.filter_by(subject_id=subject.id, teacher_id=new_teacher_id).first()
     if existing_assignment:
         existing_assignment.is_primary = True
     else:
-        db.session.add(SubjectTeacher(subject_id=subject.id, teacher_id=new_teacher_id, is_primary=True))
+        db.session.add(SubjectTeacher(
+            subject_id=subject.id,
+            teacher_id=new_teacher_id,
+            is_primary=True,
+            show_name=bool(new_teacher.show_name_on_subject)
+        ))
 
     try:
         db.session.commit()
@@ -354,16 +469,18 @@ def view_teacher(teacher_id):
         abort(403)
 
     teacher_record = User.query.get_or_404(teacher_id)
-    teacher_subjects = Subject.query.filter_by(teacher_id=teacher_record.id).all()
+    assignments = SubjectTeacher.query.filter_by(teacher_id=teacher_record.id).all()
+    teacher_subjects = [a.subject for a in assignments if a.subject]
+    assignment_map = {a.subject_id: a for a in assignments}
 
     # Aggregated stats for the view
-    results_count = ExamResult.query.join(Subject).filter(
-        Subject.teacher_id == teacher_record.id
-    ).count()
+    subject_ids = [s.id for s in teacher_subjects]
+    results_count = ExamResult.query.filter(ExamResult.subject_id.in_(subject_ids)).count() if subject_ids else 0
 
     return render_template(
         'teacher/dashboard.html',
         subjects=teacher_subjects,
+        assignment_map=assignment_map,
         total_results=results_count,
         view_as_admin=True,
         teacher_name=teacher_record.username

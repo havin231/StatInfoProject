@@ -104,8 +104,19 @@
                         econ-101") }}
                     </div>
                     <div class="mb-2">
-                        <label class="form-label small fw-bold">{{ _('Assign Teacher') }}</label>
+                        <label class="form-label small fw-bold">{{ _('Primary Teacher') }}</label>
                         {{ subject_form.teacher_id(class="form-select form-select-sm") }}
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">{{ _('Additional Teachers (Optional)') }}</label>
+                        <div class="border rounded p-2" style="max-height: 110px; overflow-y: auto;">
+                            {% for t in teachers %}
+                            <div class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" name="teacher_ids" value="{{ t.id }}" id="new_subj_t_{{ t.id }}">
+                                <label class="form-check-label small" for="new_subj_t_{{ t.id }}">{{ t.username }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold">{{ _('Description') }}</label>
@@ -121,21 +132,6 @@
                         <button type="submit" class="btn btn-lime btn-sm w-100">{{ _('Initialize Subject') }}</button>
                     </div>
                 </form>
-            </div>
-        </div>
-
-        <!-- THEME SETTINGS -->
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h6 class="fw-bold text-muted text-uppercase small mb-3">{{ _('Interface Theme') }}</h6>
-                <div class="d-grid gap-2">
-                    <button class="btn btn-outline btn-sm text-start" onclick="setTheme('glass')">
-                        <i class="fas fa-circle text-info me-2"></i>{{ _('Academic Glass') }}
-                    </button>
-                    <button class="btn btn-outline btn-sm text-start" onclick="setTheme('cyber')">
-                        <i class="fas fa-square text-success me-2"></i>{{ _('Cyber Command') }}
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -156,9 +152,17 @@
             <div class="col-md-6 col-xl-4">
                 <div class="card h-100 shadow-sm">
                     <div class="card-body d-flex flex-column">
-                        <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div class="d-flex justify-content-between align-items-start mb-2 gap-1 flex-wrap">
                             <h5 class="card-title text-truncate mb-0" title="{{ sub.name }}">{{ sub.name }}</h5>
-                            <span class="badge bg-light text-dark border">{{ sub.teacher.username }}</span>
+                            <div class="d-flex flex-wrap gap-1">
+                                {% if sub.teacher_assignments %}
+                                    {% for assign in sub.teacher_assignments %}
+                                    <span class="badge bg-body-secondary text-body border">{{ assign.teacher.username }}</span>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="badge bg-body-secondary text-body border">{{ sub.teacher.username }}</span>
+                                {% endif %}
+                            </div>
                         </div>
                         <p class="small text-muted flex-grow-1">{{ sub.description | truncate(60) }}</p>
 
@@ -185,6 +189,36 @@
                                     </button>
                                 </div>
                             </form>
+
+                            <!-- Multi-Teacher Assignment (Collapsible) -->
+                            {% set assigned_tids = sub.teacher_assignments | map(attribute='teacher_id') | list %}
+                            <div class="mb-2">
+                                <button class="btn btn-sm btn-outline-secondary w-100 d-flex justify-content-between align-items-center"
+                                    type="button" data-bs-toggle="collapse" data-bs-target="#assignTeachers{{ sub.id }}">
+                                    <span><i class="fas fa-users me-1"></i>{{ _('Assign Teachers') }} ({{ assigned_tids|length }})</span>
+                                    <i class="fas fa-chevron-down small"></i>
+                                </button>
+                                <div class="collapse mt-2" id="assignTeachers{{ sub.id }}">
+                                    <form method="POST" action="/admin/subject/{{ sub.id }}/teachers" class="border rounded p-2 bg-body-tertiary">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <div style="max-height: 120px; overflow-y: auto;" class="mb-2">
+                                            {% for t in teachers %}
+                                            <div class="form-check form-check-sm">
+                                                <input class="form-check-input" type="checkbox" name="teacher_ids"
+                                                    value="{{ t.id }}" id="sub_{{ sub.id }}_t_{{ t.id }}"
+                                                    {% if t.id in assigned_tids %}checked{% endif %}>
+                                                <label class="form-check-label small" for="sub_{{ sub.id }}_t_{{ t.id }}">
+                                                    {{ t.username }}
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        <button type="submit" class="btn btn-sm btn-primary w-100">
+                                            <i class="fas fa-save me-1"></i>{{ _('Save Teachers') }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
 
                             <!-- Transfer Subject Form -->
                             <form method="POST" action="/admin/transfer/subject/{{ sub.id }}" class="mb-2">
@@ -261,8 +295,8 @@
                             <td class="d-none d-sm-table-cell small text-muted">{{ t.email }}</td>
                             <td>
                                 <div class="d-flex flex-wrap gap-1">
-                                    {% for sub in t.subjects %}
-                                    <span class="badge bg-body-secondary text-body border fw-normal">{{ sub.name
+                                    {% for assign in t.subject_assignments %}
+                                    <span class="badge bg-body-secondary text-body border fw-normal">{{ assign.subject.name
                                         }}</span>
                                     {% else %}
                                     <span class="small text-muted fst-italic">{{ _('None') }}</span>

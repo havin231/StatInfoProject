@@ -10,11 +10,31 @@
 
 ## 1. PROJECT IDENTITY & CONTEXT
 - **System Name:** StatInfoProject (StatInfoPRO)
-- **Current Version:** 0.6.1 (2026-11-23)
+- **Current Version:** 0.7.0 (2026-11-23)
 - **Deployment:** PythonAnywhere (Linux/Bash/MySQL).
 - **Primary Language:** Python 3.10 / Flask 3.0.0.
 - **Frontend:** HTML5, Bootstrap 5.3, Jinja2, Custom CSS Variables.
 - **Context:** A bilingual (English/Kurdish) Learning Management System for the University of Sulaimani.
+
+## RECENT CHANGES (v0.7.0)
+- **Single Locked Theme (Removed Cyber Command)**:
+  - Removed `[data-theme="cyber"]` CSS rules from `app/static/css/variables.css` and `app/static/style.css`.
+  - Locked `data-theme="glass"` in `app/templates/base.html`, removed `setTheme()` and Cyber logo attributes, and cleared any legacy `app_theme` in `localStorage`.
+  - Removed Interface Theme switcher cards from `admin_dashboard.html` and `teacher/dashboard.html` (Light/Dark mode toggle remains).
+- **Multi-Teacher Subject Assignment & Individual Name Visibility**:
+  - Added `POST /admin/subject/<subject_id>/teachers` (`manage_subject_teachers`) and collapsible multi-teacher checkbox assignment UI in `admin_dashboard.html`, plus multi-teacher selection in `add_subject()`.
+  - Fixed stale/former teacher bug: removing a teacher or transferring a subject via `transfer_subject()` now deletes the former teacher's `SubjectTeacher` row so only currently assigned teachers can appear on `subject.html`.
+  - Added per-subject individual visibility toggle `POST /subject/<subject_id>/toggle_my_name` on `teacher/dashboard.html` and synced global `toggle_name_visibility()` with `SubjectTeacher.show_name`.
+  - Updated `subject_detail()` and `subject.html` to compute and render `visible_teachers` cleanly without trailing commas or empty labels.
+- **Public Lecture Comment System**:
+  - Added `PageComment` model (`page_id`, `author_name`, `author_age`, optional `personality_info`, `comment_text`, `created_at`) in `app/models.py` and `CommentForm` in `app/forms.py`.
+  - Added `POST /subject/<slug>/page/<page_id>/comment` (rate-limited, CSRF-protected) in `app/routes/public.py` and staff moderation `POST /teacher/comment/delete/<comment_id>` in `app/routes/content.py`.
+  - Added `#comments-section` UI in `app/templates/page.html` and bottom-up `PageComment` cleanup in `delete_page`, `delete_subject`, `delete_teacher`, `restore_system`, and `wipe_clean`.
+- **Scroll-Preserving Language Toggle on Lesson Pages**:
+  - Added floating language toggle button (`#floatingLangToggle`) in `app/templates/page.html`.
+  - Added `sessionStorage` scroll-position save/restore logic in `app/templates/base.html` for all `/set-lang/` links so users stay at the same vertical reading position after switching languages.
+- **Testing**:
+  - Added `tests/test_v070_features.py` covering all 5 features (25/25 tests passing).
 
 ## RECENT CHANGES (v0.6.1)
 - **Complete Student Removal & Blueprint Cleanup**:
@@ -178,6 +198,8 @@ SystemCommand: id, title, title_kurdish (VARCHAR 100, nullable), command_text, d
 Bulk Import Supported: Yes (via `/admin/system/commands/import`). CSV columns: Title, Title_Kurdish (optional), Command, Description (optional), Description_Kurdish (optional).
 
 Tool: id, title, title_kurdish (VARCHAR 100, nullable), link, description, description_kurdish (TEXT, nullable), created_at.
+
+PageComment: id, page_id (FK page.id), author_name (VARCHAR 100), author_age (Integer), personality_info (TEXT, nullable), comment_text (TEXT), created_at.
 
 4. CRITICAL LOGIC PATTERNS
 A. The "Bottom-Up" Deletion Protocol (Anti-Crash)

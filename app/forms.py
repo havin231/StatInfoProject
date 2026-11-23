@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, IntegerField
+from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo, NumberRange
 from flask_babel import lazy_gettext as _l
 
 # ==========================================
@@ -182,3 +182,15 @@ class ToolForm(FlaskForm):
     description = TextAreaField(_l('Description'), validators=[Optional()])
     description_kurdish = TextAreaField(_l('Description (Kurdish)'), validators=[Optional()])
     submit = SubmitField(_l('Add Tool'))
+
+
+class CommentForm(FlaskForm):
+    """
+    Public form for posting a comment on a lecture page.
+    Requires name, age, and comment; personality info is optional.
+    """
+    author_name = StringField(_l('Your Name'), validators=[DataRequired(), Length(min=1, max=100)])
+    author_age = IntegerField(_l('Your Age'), validators=[DataRequired(), NumberRange(min=5, max=120)])
+    personality_info = TextAreaField(_l('About You / Personality (Optional)'), validators=[Optional(), Length(max=500)])
+    comment_text = TextAreaField(_l('Your Comment'), validators=[DataRequired(), Length(min=1, max=2000)])
+    submit = SubmitField(_l('Post Comment'))

@@ -4,7 +4,7 @@ Uses an in-memory SQLite database for isolated, fast testing.
 """
 import pytest
 from app import create_app, db as _db, bcrypt
-from app.models import User, Student, Subject, Page, Question, ExamResult, StudentAnswer
+from app.models import User, Subject, Page, Question, ExamResult
 from config import Config
 
 
@@ -69,19 +69,6 @@ def teacher_user(app, db):
     db.session.add(teacher)
     db.session.commit()
     return teacher
-
-
-@pytest.fixture(scope='function')
-def sample_student(app, db):
-    """Create a student for testing."""
-    student = Student(
-        full_name='Test Student',
-        access_code='ABC123',
-        email='student@test.com'
-    )
-    db.session.add(student)
-    db.session.commit()
-    return student
 
 
 @pytest.fixture(scope='function')

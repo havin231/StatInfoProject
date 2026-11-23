@@ -1,4 +1,5 @@
 import os
+import secrets
 from dotenv import load_dotenv
 
 # Get the directory where this config file is located
@@ -9,7 +10,8 @@ env_path = os.path.join(BASE_DIR, '.env')
 load_dotenv(env_path)
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'academic-minimalist-secure-key-2025'
+    # Load SECRET_KEY from environment; fall back to an ephemeral random key in dev/test
+    SECRET_KEY = os.environ.get('SECRET_KEY') or secrets.token_hex(32)
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///dev.db'
 

@@ -13,8 +13,8 @@ from config import Config
 def select_locale():
     """
     Locale selector for Flask-Babel.
-    Priority: 1. Session  2. DB (Teacher/Admin)  3. DB (Student)  4. Default 'en'
-    
+    Priority: 1. Session  2. DB (Teacher/Admin)  3. Default 'en'
+
     IMPORTANT: Session ALWAYS takes priority so the language toggle works immediately.
     The DB value is only used as a fallback for users who haven't toggled yet
     (e.g., fresh login from a new browser).
@@ -36,18 +36,6 @@ def select_locale():
             return lang
         else:
             current_app.logger.debug(f"select_locale() session lang invalid or missing: {lang}")
-
-        # 3. DB THIRD — Student preferred_lang (fallback only)
-        student_id = session.get('student_id')
-        if student_id:
-            try:
-                from app.models import Student
-                student = db.session.get(Student, student_id)
-                if student and student.preferred_lang and student.preferred_lang in VALID_LOCALES:
-                    current_app.logger.debug(f"select_locale() returning from student DB: {student.preferred_lang}")
-                    return student.preferred_lang
-            except Exception:
-                pass
     else:
         current_app.logger.debug("select_locale() no request context, skipping session checks")
 
@@ -61,7 +49,7 @@ def select_locale():
     except Exception:
         pass
 
-    # 4. DEFAULT
+    # 3. DEFAULT
     current_app.logger.debug("select_locale() returning default: en")
     return 'en'
 
@@ -126,9 +114,8 @@ def create_app(config_class=Config):
         try:
             with db.engine.connect() as conn:
                 conn.execute(text("ALTER TABLE user ADD COLUMN preferred_lang VARCHAR(10) DEFAULT 'en'"))
-                conn.execute(text("ALTER TABLE student ADD COLUMN preferred_lang VARCHAR(10) DEFAULT 'en'"))
                 conn.commit()
-            app.logger.info("Migration: 'preferred_lang' column added to user and student tables.")
+            app.logger.info("Migration: 'preferred_lang' column added to user table.")
         except Exception:
             pass
 

@@ -1,7 +1,7 @@
 """
 Tests for database models: creation, relationships, and data integrity.
 """
-from app.models import User, Student, Subject, Page, Question, ExamResult, StudentAnswer
+from app.models import User, Subject, Page, Question, ExamResult
 from app import bcrypt
 
 
@@ -17,14 +17,6 @@ def test_user_password_hash(app, db, admin_user):
     assert admin_user.password_hash != 'admin123'
     assert bcrypt.check_password_hash(admin_user.password_hash, 'admin123')
     assert not bcrypt.check_password_hash(admin_user.password_hash, 'wrong_password')
-
-
-def test_student_creation(app, db, sample_student):
-    """Student is created with access code and timestamps."""
-    assert sample_student.id is not None
-    assert sample_student.access_code == 'ABC123'
-    assert sample_student.email == 'student@test.com'
-    assert sample_student.created_at is not None
 
 
 def test_subject_teacher_relationship(app, db, sample_subject, teacher_user):
@@ -46,31 +38,15 @@ def test_question_subject_relationship(app, db, sample_questions, sample_subject
     assert len(sample_subject.questions) == 3
 
 
-def test_exam_result_cascade(app, db, sample_student, sample_subject, sample_questions):
-    """ExamResult + StudentAnswer cascade works correctly."""
-    # Create an exam result
+def test_exam_result_subject_relationship(app, db, sample_subject):
+    """Anonymous ExamResult links cleanly to its Subject."""
     result = ExamResult(
-        score=67,
-        student_id=sample_student.id,
+        score=85,
         subject_id=sample_subject.id
     )
     db.session.add(result)
-    db.session.flush()
-
-    # Create student answers
-    for q in sample_questions:
-        answer = StudentAnswer(
-            student_id=sample_student.id,
-            question_id=q.id,
-            exam_id=result.id,
-            selected_option='A',
-            is_correct=True
-        )
-        db.session.add(answer)
     db.session.commit()
 
-    # Verify
     assert result.id is not None
-    assert len(result.answers) == 3
-    assert result.student.full_name == 'Test Student'
+    assert result.score == 85
     assert result.subject.name == 'Mathematics'

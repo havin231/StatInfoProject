@@ -19,11 +19,11 @@ def toolbase():
     """
     TOOL BASE / EXTERNAL LINKS MANAGER
     """
-    # Check if user is logged in (either as Staff via Flask-Login or Student via session)
+    # Check if user is logged in as Admin
     is_admin = False
     if current_user.is_authenticated:
         is_admin = current_user.is_admin
-    # Guests and Students are allowed read-only access (fall-through)
+    # Guests and non-admin staff have read-only access (fall-through)
         
     form = ToolForm()
     # Task: Bulk Import Form (Reusing existing one)

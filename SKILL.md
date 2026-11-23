@@ -10,11 +10,26 @@
 
 ## 1. PROJECT IDENTITY & CONTEXT
 - **System Name:** StatInfoProject (StatInfoPRO)
-- **Current Version:** 0.6.0 (2026-11-22)
+- **Current Version:** 0.6.1 (2026-11-23)
 - **Deployment:** PythonAnywhere (Linux/Bash/MySQL).
 - **Primary Language:** Python 3.10 / Flask 3.0.0.
 - **Frontend:** HTML5, Bootstrap 5.3, Jinja2, Custom CSS Variables.
 - **Context:** A bilingual (English/Kurdish) Learning Management System for the University of Sulaimani.
+
+## RECENT CHANGES (v0.6.1)
+- **Complete Student Removal & Blueprint Cleanup**:
+  - Permanently removed `app/routes/student.py` and migrated public course/lecture/exam routes (`/subject/<slug>`, `/subject/<slug>/page/<page_id>`, `/subject/<slug>/exam`, `/subject/<slug>/lecture/<page_id>/quiz`, `/subject/<slug>/exam/submit`) into `app/routes/public.py`.
+  - Removed deprecated student models (`Student`, `StudentAnswer`, `StudentPinnedSubject`, `LessonProgress`, `ExamProgress`) from `app/models.py` and simplified `ExamResult` to anonymous subject-level exam scores.
+  - Removed deprecated student redirect routes (`/student/login`, `/student/signup`, `/student/settings`, `/admin/students`), `generate_access_code()` helper, and student locale/migration fallbacks in `app/__init__.py`.
+  - Updated backup/restore/wipe logic in `app/routes/analytics.py` and template wording to remove all remaining student references.
+- **Security, Config & Stability Audit Fixes**:
+  - Replaced hardcoded `SECRET_KEY` fallback in `config.py` with `secrets.token_hex(32)` when unset.
+  - Replaced hardcoded `debug=True` in `run.py` with `FLASK_DEBUG` environment variable control (defaulting to `False`).
+  - Restricted `/test-lang` debug endpoint in `app/routes/public.py` to authenticated admins (`@login_required` + `is_admin`).
+  - Added `is_public` visibility checks to `view_page`, `take_exam`, and `submit_exam`, plus subject-ownership validation for `page_id` and submitted question IDs.
+  - Fixed `NameError` in `app/routes/teacher.py` (`delete_teacher`, `view_teacher`), added `try/except` + rollback for notification cleanup, fixed bottom-up deletion order (`Question` -> `Resource` -> `Page` -> `SubjectTeacher` -> `Subject`) in `delete_subject` and `delete_teacher`, and synced `SubjectTeacher` on `transfer_subject`.
+  - Guarded `import_questions_step1` against empty/NaN answer cells and validated `subject` query params in `builder_info` / `builder_exam`.
+  - Verified full test suite: 20/20 tests passing.
 
 ## RECENT CHANGES (v0.6.0)
 - **Student Accounts & Management Removal**:
@@ -103,8 +118,7 @@ StatInfoProject_PlayGround (Project Root)
     │   ├── auth.py           # Authentication (login/logout)
     │   ├── content.py        # Content management (subjects, pages, questions)
     │   ├── helpers.py        # Utility functions
-    │   ├── public.py         # Public routes (homepage, about, stats)
-    │   ├── student.py        # Student dashboard and exams
+    │   ├── public.py         # Public routes (homepage, about, stats, courses, exams)
     │   ├── teacher.py        # Teacher dashboard and tools
     │   └── toolbase.py       # External tools management
     ├── static/
@@ -141,8 +155,6 @@ Models & Fields
 
 User: id, username, username_kurdish (String 20, nullable), email, password_hash, is_admin (Bool), show_name_on_subject (Bool, default=False), preferred_lang (String, default='en').
 
-Student: id, full_name, access_code (Unique Index, nullable), password_hash (String, nullable), email (String, nullable), preferred_lang (String, default='en'), created_at, updated_at.
-
 Subject: id, name, name_kurdish (VARCHAR 100, nullable), slug, description, description_kurdish (TEXT, nullable), teacher_id, is_public (Bool, default=True).
 
 Page (Lecture): id, title, content_body (HTML), content_body_kurdish (HTML), subject_id.
@@ -157,13 +169,7 @@ page_id (Nullable): Links question to specific lecture.
 
 is_kurdish (Bool): Triggers RTL styling.
 
-ExamResult: id, score, date_submitted, student_id, subject_id.
-
-Relationship: answers (One-to-Many).
-
-StudentAnswer: id, student_id, question_id, exam_id, selected_option, is_correct.
-
-Constraint: Must link to exam_id (Parent Attempt).
+ExamResult: id, score, date_submitted, subject_id (anonymous exam score summary).
 
 SiteInfo: id, key, title, content, content_kurdish (HTML, nullable), last_updated.
 
@@ -352,7 +358,7 @@ Error 2013 (Lost Connection): MySQL timeout. Ensure pool_recycle: 280 is in conf
 ## 8. DEPLOYMENT AUTOMATION
 **Git Credentials:**
 - Username: `havin231`
-- Token: `ghp_YOUR_TOKEN_HERE`
+- Token: Configured via GitHub Personal Access Token (stored in Git credentials / environment).
 
 **Auto-Push Protocol:**
 After every significant change, run:

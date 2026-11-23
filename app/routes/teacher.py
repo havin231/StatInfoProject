@@ -3,7 +3,7 @@ from flask_babel import gettext as _
 from flask_login import login_required, current_user
 
 from app import db, bcrypt
-from app.models import User, Subject, Page, Question, SubjectTeacher, AdminNotification
+from app.models import User, Subject, Page, Question, Resource, ExamResult, SubjectTeacher, AdminNotification
 from app.forms import SubjectForm, TeacherSignupForm, TeacherEditForm
 from app.routes.helpers import can_edit_subject
 
@@ -28,8 +28,11 @@ def teacher_dashboard():
         # v0.5.0 - Admin Notification Cleanup (Delete > 3 days old)
         from datetime import datetime, timedelta
         cutoff_date = datetime.utcnow() - timedelta(days=3)
-        AdminNotification.query.filter(AdminNotification.created_at < cutoff_date).delete()
-        db.session.commit()
+        try:
+            AdminNotification.query.filter(AdminNotification.created_at < cutoff_date).delete()
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
 
         # Fetch Notifications
         notifications = AdminNotification.query.order_by(AdminNotification.created_at.desc()).all()
@@ -80,7 +83,7 @@ def toggle_name_visibility():
     TEACHER NAME VISIBILITY TOGGLE
     
     Allows teachers to control whether their name appears publicly
-    on subject pages that students view.
+    on subject pages that visitors view.
     """
     # Toggle the setting
     current_user.show_name_on_subject = not current_user.show_name_on_subject
@@ -253,33 +256,35 @@ def delete_teacher(teacher_id):
         return redirect(url_for('teacher.teacher_dashboard'))
 
     try:
-        # 2. Iterate through Subjects
+        # 2. Remove co-teacher assignments for this teacher
+        SubjectTeacher.query.filter_by(teacher_id=target_staff.id).delete()
+
+        # 3. Iterate through owned Subjects
         subjects_to_clear = Subject.query.filter_by(teacher_id=target_staff.id).all()
 
         for subj in subjects_to_clear:
-            # A. Clean up Exams
-            exams_found = ExamResult.query.filter_by(subject_id=subj.id).all()
-            for attempt in exams_found:
-                # Delete Child Answers first
-                StudentAnswer.query.filter_by(exam_id=attempt.id).delete()
-                # Delete the Result
-                db.session.delete(attempt)
+            # A. Clean up Admin Notifications referencing this subject
+            AdminNotification.query.filter_by(related_subject_id=subj.id).delete()
 
-            # B. Clean up Questions
-            questions_found = Question.query.filter_by(subject_id=subj.id).all()
-            for quest in questions_found:
-                # Delete legacy answer links
-                StudentAnswer.query.filter_by(question_id=quest.id).delete()
-                db.session.delete(quest)
+            # B. Clean up Exam Results
+            ExamResult.query.filter_by(subject_id=subj.id).delete()
 
-            # C. Clean up Pages
-            # This handles both Page content and the relationship to resources
-            Page.query.filter_by(subject_id=subj.id).delete()
+            # C. Clean up Questions (before Pages due to page_id FK)
+            Question.query.filter_by(subject_id=subj.id).delete()
 
-            # D. Delete the Subject itself
+            # D. Clean up Resources & Pages
+            pages_found = Page.query.filter_by(subject_id=subj.id).all()
+            for p in pages_found:
+                Resource.query.filter_by(page_id=p.id).delete()
+                db.session.delete(p)
+
+            # E. Clean up remaining SubjectTeacher links
+            SubjectTeacher.query.filter_by(subject_id=subj.id).delete()
+
+            # F. Delete the Subject itself
             db.session.delete(subj)
 
-        # 3. Final Step: Remove the Staff Member
+        # 4. Final Step: Remove the Staff Member
         db.session.delete(target_staff)
         db.session.commit()
         flash(_('Account for %(username)s and all associated course data have been purged.', username=target_staff.username), 'success')
@@ -316,6 +321,14 @@ def transfer_subject(subject_id):
 
     old_teacher_name = subject.teacher.username
     subject.teacher_id = new_teacher_id
+
+    # Keep SubjectTeacher association in sync
+    SubjectTeacher.query.filter_by(subject_id=subject.id, is_primary=True).update({'is_primary': False})
+    existing_assignment = SubjectTeacher.query.filter_by(subject_id=subject.id, teacher_id=new_teacher_id).first()
+    if existing_assignment:
+        existing_assignment.is_primary = True
+    else:
+        db.session.add(SubjectTeacher(subject_id=subject.id, teacher_id=new_teacher_id, is_primary=True))
 
     try:
         db.session.commit()

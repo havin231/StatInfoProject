@@ -9,8 +9,9 @@ from sqlalchemy import desc
 
 from app import db
 from app.models import (
-    User, Student, Subject, Page, Question, ExamResult,
-    StudentAnswer, SiteInfo, Resource, SystemCommand, Tool
+    User, Subject, Page, Question, ExamResult,
+    SiteInfo, Resource, SystemCommand, Tool,
+    SubjectTeacher, AdminNotification
 )
 from app.forms import InfoPageForm, RestoreBackupForm, WipeCleanForm
 
@@ -59,15 +60,6 @@ def export_full_backup():
             w_obj.writerow([subj.id, subj.name, subj.slug, subj.description, subj.teacher_id, subj.is_public])
         master_zip.writestr('2_subjects.csv', s_obj.getvalue())
 
-        # 3. Students (with all fields including email and timestamps)
-        s_obj = io.StringIO()
-        s_obj.write('\ufeff')
-        w_obj = csv.writer(s_obj, quoting=csv.QUOTE_ALL)
-        w_obj.writerow(['ID', 'Full_Name', 'Access_Code', 'Email', 'Created_At', 'Updated_At'])
-        for student in Student.query.all():
-            w_obj.writerow([student.id, student.full_name, student.access_code, student.email or '', student.created_at, student.updated_at])
-        master_zip.writestr('3_students.csv', s_obj.getvalue())
-
         # 4. Pages (Lectures)
         s_obj = io.StringIO()
         s_obj.write('\ufeff')
@@ -97,23 +89,14 @@ def export_full_backup():
             w_obj.writerow([q.id, q.subject_id, p_id, q.question_text, q.option_a, q.option_b, q.option_c, q.option_d, q.correct_answer, q.is_kurdish])
         master_zip.writestr('6_questions.csv', s_obj.getvalue())
 
-        # 7. Exam Results (Attempts)
+        # 7. Exam Results (Anonymous Attempts)
         s_obj = io.StringIO()
         s_obj.write('\ufeff')
         w_obj = csv.writer(s_obj, quoting=csv.QUOTE_ALL)
-        w_obj.writerow(['ID', 'Student_ID', 'Subject_ID', 'Score', 'Date_Submitted'])
+        w_obj.writerow(['ID', 'Subject_ID', 'Score', 'Date_Submitted'])
         for res in ExamResult.query.all():
-            w_obj.writerow([res.id, res.student_id, res.subject_id, res.score, res.date_submitted])
+            w_obj.writerow([res.id, res.subject_id, res.score, res.date_submitted])
         master_zip.writestr('7_results.csv', s_obj.getvalue())
-
-        # 8. Student Answers (Details)
-        s_obj = io.StringIO()
-        s_obj.write('\ufeff')
-        w_obj = csv.writer(s_obj, quoting=csv.QUOTE_ALL)
-        w_obj.writerow(['ID', 'Student_ID', 'Question_ID', 'Exam_ID', 'Selected_Option', 'Is_Correct'])
-        for ans in StudentAnswer.query.all():
-            w_obj.writerow([ans.id, ans.student_id, ans.question_id, ans.exam_id, ans.selected_option, ans.is_correct])
-        master_zip.writestr('8_answers.csv', s_obj.getvalue())
 
         # 9. System Commands
         s_obj = io.StringIO()
@@ -180,19 +163,19 @@ def restore_system():
                 file_list = archive.namelist()
                 
                 # Validation
-                required_files = ['1_users.csv', '2_subjects.csv', '3_students.csv']
+                required_files = ['1_users.csv', '2_subjects.csv']
                 if not all(f in file_list for f in required_files):
                     flash(_('Invalid Backup Format. Missing core CSV files.'), 'danger')
                     return redirect(request.url)
 
                 # 2. SAFE WIPE (Delete rows in reverse dependency order)
                 try:
-                    db.session.query(StudentAnswer).delete()
+                    db.session.query(AdminNotification).delete()
                     db.session.query(ExamResult).delete()
                     db.session.query(Question).delete()
                     db.session.query(Resource).delete()
                     db.session.query(Page).delete()
-                    db.session.query(Student).delete()
+                    db.session.query(SubjectTeacher).delete()
                     db.session.query(Subject).delete()
                     db.session.query(SiteInfo).delete()
                     db.session.query(SystemCommand).delete()
@@ -258,44 +241,6 @@ def restore_system():
                         is_public=is_public_val
                     ))
                 db.session.commit()
-
-                # C. Students (with new fields: email, timestamps)
-                batch = []
-                for row in stream_csv('3_students.csv'):
-                    created = None
-                    updated = None
-                    if row.get('Created_At') and row['Created_At']:
-                        try:
-                            created = datetime.strptime(row['Created_At'], '%Y-%m-%d %H:%M:%S.%f')
-                        except ValueError:
-                            try:
-                                created = datetime.strptime(row['Created_At'], '%Y-%m-%d %H:%M:%S')
-                            except ValueError:
-                                created = datetime.utcnow()
-                    if row.get('Updated_At') and row['Updated_At']:
-                        try:
-                            updated = datetime.strptime(row['Updated_At'], '%Y-%m-%d %H:%M:%S.%f')
-                        except ValueError:
-                            try:
-                                updated = datetime.strptime(row['Updated_At'], '%Y-%m-%d %H:%M:%S')
-                            except ValueError:
-                                updated = datetime.utcnow()
-                    
-                    batch.append(Student(
-                        id=int(row['ID']),
-                        full_name=row['Full_Name'],
-                        access_code=row['Access_Code'],
-                        email=row.get('Email') or None,
-                        created_at=created,
-                        updated_at=updated
-                    ))
-                    if len(batch) >= 100:
-                        db.session.add_all(batch)
-                        db.session.commit()
-                        batch = []
-                if batch: 
-                    db.session.add_all(batch)
-                    db.session.commit()
 
                 # D. Pages (with content sanitization to fix rn artifacts)
                 batch = []
@@ -363,31 +308,11 @@ def restore_system():
 
                     batch.append(ExamResult(
                         id=int(row['ID']),
-                        student_id=int(row['Student_ID']),
                         subject_id=int(row['Subject_ID']),
                         score=int(row['Score']),
                         date_submitted=d_obj
                     ))
                     if len(batch) >= 100:
-                        db.session.add_all(batch)
-                        db.session.commit()
-                        batch = []
-                if batch:
-                    db.session.add_all(batch)
-                    db.session.commit()
-
-                # H. Student Answers (The BIG Table)
-                batch = []
-                for row in stream_csv('8_answers.csv'):
-                    batch.append(StudentAnswer(
-                        id=int(row['ID']),
-                        student_id=int(row['Student_ID']),
-                        question_id=int(row['Question_ID']),
-                        exam_id=int(row['Exam_ID']),
-                        selected_option=row['Selected_Option'],
-                        is_correct=(row['Is_Correct'] == 'True')
-                    ))
-                    if len(batch) >= 200:
                         db.session.add_all(batch)
                         db.session.commit()
                         batch = []
@@ -459,12 +384,12 @@ def wipe_clean():
     if form.validate_on_submit():
         try:
             # Delete all data in reverse dependency order
-            db.session.query(StudentAnswer).delete()
+            db.session.query(AdminNotification).delete()
             db.session.query(ExamResult).delete()
             db.session.query(Question).delete()
             db.session.query(Resource).delete()
             db.session.query(Page).delete()
-            db.session.query(Student).delete()
+            db.session.query(SubjectTeacher).delete()
             db.session.query(Subject).delete()
             db.session.query(SiteInfo).delete()
             db.session.query(SystemCommand).delete()

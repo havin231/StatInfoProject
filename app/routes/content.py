@@ -7,7 +7,7 @@ import csv
 import io
 
 from app import db
-from app.models import User, Subject, Page, Question, Resource, StudentAnswer, SystemCommand, SubjectTeacher
+from app.models import User, Subject, Page, Question, Resource, ExamResult, SystemCommand, SubjectTeacher, AdminNotification
 from app.forms import SubjectForm, PageForm, QuestionForm, BulkImportForm, ResourceForm
 from app.routes.helpers import can_edit_subject
 
@@ -66,13 +66,15 @@ def import_questions_step1(subject_id):
             # Prepare Preview
             question_preview_data = []
             for _, row in data_frame.iterrows():
+                raw_ans = '' if pd.isna(row['answer']) else str(row['answer']).upper().strip()
+                ans_char = raw_ans[0] if raw_ans and raw_ans[0] in ('A', 'B', 'C', 'D') else 'A'
                 question_preview_data.append({
-                    'question_text': str(row['question']),
-                    'option_a': str(row['opt a']),
-                    'option_b': str(row['opt b']),
-                    'option_c': str(row['opt c']),
-                    'option_d': str(row['opt d']),
-                    'correct_answer': str(row['answer']).upper().strip()[0]
+                    'question_text': '' if pd.isna(row['question']) else str(row['question']),
+                    'option_a': '' if pd.isna(row['opt a']) else str(row['opt a']),
+                    'option_b': '' if pd.isna(row['opt b']) else str(row['opt b']),
+                    'option_c': '' if pd.isna(row['opt c']) else str(row['opt c']),
+                    'option_d': '' if pd.isna(row['opt d']) else str(row['opt d']),
+                    'correct_answer': ans_char
                 })
 
             return render_template(
@@ -247,38 +249,41 @@ def edit_subject(subject_id):
 @login_required
 def delete_subject(subject_id):
     """
-    SAFE SUBJECT DELETION
+    SAFE SUBJECT DELETION (BOTTOM-UP ORDER)
 
     Removes:
-    1. Answer Logs
-    2. Results
-    3. Pages/Lectures
-    4. Questions
-    5. Subject record
+    1. Admin Notifications
+    2. Exam Results
+    3. Questions (before Pages due to page_id FK)
+    4. Resources & Pages/Lectures
+    5. SubjectTeacher assignments
+    6. Subject record
     """
-    from app.models import ExamResult
     subj_record = Subject.query.get_or_404(subject_id)
 
     if not can_edit_subject(subj_record):
         abort(403)
 
     try:
-        # A. Clear results and choices
-        exam_list = ExamResult.query.filter_by(subject_id=subj_record.id).all()
-        for attempt in exam_list:
-            StudentAnswer.query.filter_by(exam_id=attempt.id).delete()
-            db.session.delete(attempt)
+        # A. Clear notifications referencing this subject
+        AdminNotification.query.filter_by(related_subject_id=subj_record.id).delete()
 
-        # B. Clear Lectures
-        Page.query.filter_by(subject_id=subj_record.id).delete()
+        # B. Clear exam results
+        ExamResult.query.filter_by(subject_id=subj_record.id).delete()
 
-        # C. Clear Question bank
-        questions_list = Question.query.filter_by(subject_id=subj_record.id).all()
-        for q in questions_list:
-            StudentAnswer.query.filter_by(question_id=q.id).delete()
-            db.session.delete(q)
+        # C. Clear Question bank (before Pages because Question.page_id references Page.id)
+        Question.query.filter_by(subject_id=subj_record.id).delete()
 
-        # D. Purge Subject
+        # D. Clear Resources and Lectures
+        pages_list = Page.query.filter_by(subject_id=subj_record.id).all()
+        for p in pages_list:
+            Resource.query.filter_by(page_id=p.id).delete()
+            db.session.delete(p)
+
+        # E. Clear teacher assignments
+        SubjectTeacher.query.filter_by(subject_id=subj_record.id).delete()
+
+        # F. Purge Subject
         db.session.delete(subj_record)
         db.session.commit()
         flash(_('Subject "%(name)s" and all internal content has been deleted.', name=subj_record.name), 'success')
@@ -294,7 +299,9 @@ def delete_subject(subject_id):
 @login_required
 def builder_info():
     """Route to add a new lecture page."""
-    sid_param = request.args.get('subject')
+    sid_param = request.args.get('subject', type=int)
+    if not sid_param:
+        abort(404)
     subj_record = Subject.query.get_or_404(sid_param)
 
     if not can_edit_subject(subj_record):
@@ -342,7 +349,7 @@ def edit_page(page_id):
         target_page.content_body_kurdish = form.content_body_kurdish.data
         db.session.commit()
         flash(_('Changes saved.'), 'success')
-        return redirect(url_for('student.subject_detail', slug=target_page.subject.slug))
+        return redirect(url_for('public.subject_detail', slug=target_page.subject.slug))
 
     return render_template(
         'teacher/builder.html',
@@ -368,7 +375,7 @@ def delete_page(page_id):
     db.session.commit()
 
     flash(_('Lecture deleted.'), 'success')
-    return redirect(url_for('student.subject_detail', slug=subject_slug_ref))
+    return redirect(url_for('public.subject_detail', slug=subject_slug_ref))
 
 
 @content.route('/teacher/resource/add/<int:page_id>', methods=['POST'])
@@ -421,7 +428,9 @@ def delete_resource(resource_id):
 @login_required
 def builder_exam():
     """Displays the Bulk Spreadsheet Editor for Questions."""
-    sid_param = request.args.get('subject')
+    sid_param = request.args.get('subject', type=int)
+    if not sid_param:
+        abort(404)
     target_subject = Subject.query.get_or_404(sid_param)
 
     if not can_edit_subject(target_subject):
@@ -480,8 +489,6 @@ def save_questions_api(subject_id):
         current_db_questions = Question.query.filter_by(subject_id=target_subject.id).all()
         for q_db in current_db_questions:
             if q_db.id not in sent_ids:
-                # Always remove answer logs first
-                StudentAnswer.query.filter_by(question_id=q_db.id).delete()
                 db.session.delete(q_db)
 
         # 2. Process UPSERT (Update or Insert)
@@ -589,7 +596,7 @@ def edit_question(question_id):
 
         db.session.commit()
         flash(_('Question updated.'), 'success')
-        return redirect(url_for('student.subject_detail', slug=target_q.subject.slug))
+        return redirect(url_for('public.subject_detail', slug=target_q.subject.slug))
 
     return render_template('teacher/builder.html', form=form, title="Modify Question", subject=target_q.subject)
 
@@ -604,7 +611,6 @@ def delete_question(question_id):
 
     subject_slug_ref = target_q.subject.slug
     try:
-        StudentAnswer.query.filter_by(question_id=target_q.id).delete()
         db.session.delete(target_q)
         db.session.commit()
         flash(_('Question removed from bank.'), 'success')
@@ -612,4 +618,4 @@ def delete_question(question_id):
         db.session.rollback()
         flash(_('Error during question deletion: %(error)s', error=str(e)), 'danger')
 
-    return redirect(url_for('student.subject_detail', slug=subject_slug_ref))
+    return redirect(url_for('public.subject_detail', slug=subject_slug_ref))

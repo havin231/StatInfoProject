@@ -1,11 +1,11 @@
 from datetime import datetime
-from flask import Blueprint, render_template, url_for, flash, redirect, request, jsonify, session
+from flask import Blueprint, render_template, url_for, flash, redirect, request, jsonify, session, abort
 from flask_babel import gettext as _
-from flask_login import current_user
+from flask_login import current_user, login_required
 from sqlalchemy import func, or_
 
 from app import db, bcrypt, limiter
-from app.models import User, Subject, ExamResult, SiteInfo, Page
+from app.models import User, Subject, ExamResult, SiteInfo, Page, Question
 from app.forms import SetupForm
 
 public = Blueprint('public', __name__)
@@ -175,11 +175,15 @@ def public_stats():
     )
 
 @public.route('/test-lang')
+@login_required
 def test_lang():
     """
-    Test route to verify translations are working correctly.
+    Admin-only test route to verify translations are working correctly.
     This helps debug language switching issues.
     """
+    if not current_user.is_admin:
+        abort(403)
+
     from flask import current_app
     from flask_babel import get_locale
     
@@ -247,4 +251,137 @@ def set_lang(lang):
     flash(_('Language changed successfully.'), 'success')
     current_app.logger.info(f"Language successfully changed to '{lang}', redirecting to: {request.referrer or url_for('public.index')}")
     return redirect(request.referrer or url_for('public.index'))
+
+
+# ==============================================================================
+# SECTION 3: COURSE & LECTURE BROWSING
+# ==============================================================================
+
+@public.route('/subject/<slug>')
+def subject_detail(slug):
+    """
+    SUBJECT REPOSITORY VIEW
+
+    Lists all lectures (Pages) within a specific subject.
+    Open to visitors and staff.
+    """
+    target_subject = Subject.query.filter_by(slug=slug).first_or_404()
+
+    # Visibility Check: If hidden, restrict access to staff only
+    if not target_subject.is_public and not current_user.is_authenticated:
+        abort(403)
+
+    return render_template('subject.html', subject=target_subject)
+
+
+@public.route('/subject/<slug>/page/<int:page_id>')
+def view_page(slug, page_id):
+    """
+    LECTURE / CHAPTER CONTENT VIEW
+
+    Displays bilingual content and attached resources.
+    Discovers if targeted quiz questions exist for this lecture.
+    """
+    target_lecture = Page.query.get_or_404(page_id)
+    target_subject = Subject.query.filter_by(slug=slug).first_or_404()
+
+    if not target_subject.is_public and not current_user.is_authenticated:
+        abort(403)
+
+    if target_lecture.subject_id != target_subject.id:
+        abort(404)
+
+    specific_questions_exist = Question.query.filter_by(
+        page_id=target_lecture.id
+    ).first() is not None
+
+    return render_template(
+        'page.html',
+        page=target_lecture,
+        subject=target_subject,
+        has_quiz=specific_questions_exist
+    )
+
+
+# ==============================================================================
+# SECTION 4: EXAM ENGINE (PUBLIC QUIZZES & EXAMS)
+# ==============================================================================
+
+@public.route('/subject/<slug>/exam')
+@public.route('/subject/<slug>/lecture/<int:page_id>/quiz')
+def take_exam(slug, page_id=None):
+    """
+    EXAM ENGINE (DUAL MODE)
+
+    Handles:
+    A) Global Final Exams: Pulls all questions for a subject.
+    B) Lecture Quizzes: Pulls only questions tagged to a specific page_id.
+    """
+    target_subject = Subject.query.filter_by(slug=slug).first_or_404()
+
+    if not target_subject.is_public and not current_user.is_authenticated:
+        abort(403)
+
+    if page_id:
+        lecture_record = Page.query.get_or_404(page_id)
+        if lecture_record.subject_id != target_subject.id:
+            abort(404)
+        active_questions = Question.query.filter_by(page_id=page_id).all()
+        exam_title_text = f"Quiz: {lecture_record.title}"
+    else:
+        active_questions = Question.query.filter_by(subject_id=target_subject.id).all()
+        exam_title_text = f"{target_subject.name} Final Examination"
+
+    return render_template(
+        'exam.html',
+        subject=target_subject,
+        questions=active_questions,
+        quiz_title=exam_title_text,
+        page_id=page_id
+    )
+
+
+@public.route('/subject/<slug>/exam/submit', methods=['POST'])
+def submit_exam(slug):
+    """
+    EXAM GRADING SYSTEM
+
+    Calculates percentage score based on submitted answers and
+    flashes the result immediately on redirect.
+    """
+    target_subject = Subject.query.filter_by(slug=slug).first_or_404()
+
+    if not target_subject.is_public and not current_user.is_authenticated:
+        abort(403)
+
+    # Dynamic Question Identification
+    submitted_question_ids = []
+    for key in request.form.keys():
+        if key.startswith('q_'):
+            try:
+                q_id_int = int(key.split('_')[1])
+                submitted_question_ids.append(q_id_int)
+            except (IndexError, ValueError):
+                continue
+
+    validated_questions = Question.query.filter(
+        Question.id.in_(submitted_question_ids),
+        Question.subject_id == target_subject.id
+    ).all() if submitted_question_ids else []
+
+    correct_choices_count = 0
+    total_exam_questions = len(validated_questions)
+
+    if total_exam_questions > 0:
+        for question in validated_questions:
+            selection = request.form.get(f'q_{question.id}')
+            if selection == question.correct_answer:
+                correct_choices_count += 1
+
+        final_percentage = int((correct_choices_count / total_exam_questions) * 100)
+    else:
+        final_percentage = 0
+
+    flash(_('Examination Submitted. Final Grade: %(grade)s%%', grade=final_percentage), 'success')
+    return redirect(url_for('public.subject_detail', slug=target_subject.slug))
 

@@ -410,3 +410,29 @@ Whenever a change or new feature is added, append a new version block following 
   - Updated `tests/test_auth.py` and `tests/test_exam.py` to match the student-account-free architecture.
   - All 20 tests in the test suite pass (100% success rate).
 
+
+---
+
+## Version 0.6.1
+**Date:** 2026-11-23
+**Summary:** Complete removal of remaining student code/models and security, config, and database stability audit fixes.
+
+### Changes & Improvements:
+- **Complete Student Code & Model Removal**:
+  - Removed `app/routes/student.py` and moved public course/lecture/exam routes (`subject_detail`, `view_page`, `take_exam`, `submit_exam`) into `app/routes/public.py`.
+  - Removed `Student`, `StudentAnswer`, `StudentPinnedSubject`, `LessonProgress`, and `ExamProgress` models from `app/models.py`; simplified `ExamResult` to anonymous subject-level scores.
+  - Removed deprecated student redirect routes (`/student/login`, `/student/signup`, `/student/settings`, `/admin/students`), `generate_access_code()`, and student locale/migration fallbacks in `app/__init__.py`.
+  - Updated backup, restore, and wipe-clean logic in `app/routes/analytics.py` and template wording to eliminate all student references.
+- **Security & Configuration Hardening**:
+  - Replaced hardcoded `SECRET_KEY` fallback in `config.py` with `secrets.token_hex(32)` when unset.
+  - Replaced hardcoded `debug=True` in `run.py` with `FLASK_DEBUG` environment variable control (defaulting to `False`).
+  - Restricted `/test-lang` debug route to authenticated admins (`@login_required` + `is_admin`).
+  - Enforced `is_public` visibility checks on `view_page`, `take_exam`, and `submit_exam`, plus subject-ownership validation for `page_id` and submitted question IDs.
+- **Database & Edge-Case Fixes**:
+  - Fixed `NameError` in `app/routes/teacher.py` (`delete_teacher` and `view_teacher`) and wrapped notification cleanup in `try/except` with `db.session.rollback()`.
+  - Fixed bottom-up deletion order (`AdminNotification` -> `ExamResult` -> `Question` -> `Resource` -> `Page` -> `SubjectTeacher` -> `Subject`) in `delete_subject` and `delete_teacher`.
+  - Synced `SubjectTeacher` association on `transfer_subject`.
+  - Guarded `import_questions_step1` against empty/NaN answer cells and validated `subject` query parameters in `builder_info` and `builder_exam`.
+- **Verification**:
+  - Updated test suite (`tests/conftest.py`, `tests/test_auth.py`, `tests/test_models.py`); all 20 tests pass (100% pass rate).
+  - Created local `version_0.6.1` snapshot under `~/Documents/statinfopro/`.

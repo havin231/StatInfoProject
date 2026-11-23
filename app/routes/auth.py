@@ -50,12 +50,3 @@ def logout():
     session.clear()
     flash(_('Session ended.'), 'info')
     return redirect(url_for('public.index'))
-
-
-# Graceful redirects for deprecated student auth endpoints
-@auth.route('/student/login', methods=['GET', 'POST'])
-@auth.route('/student/signup', methods=['GET', 'POST'])
-@auth.route('/student/settings', methods=['GET', 'POST'])
-def deprecated_student_auth():
-    """Redirect deprecated student authentication endpoints to staff login."""
-    return redirect(url_for('auth.login'))

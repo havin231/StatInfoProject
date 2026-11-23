@@ -10,16 +10,6 @@ from app.forms import BulkImportForm, CommandForm
 
 admin = Blueprint('admin', __name__)
 
-# ==============================================================================
-# DEPRECATED STUDENT ADMINISTRATION REDIRECT
-# ==============================================================================
-
-@admin.route('/admin/students', methods=['GET', 'POST'])
-@login_required
-def admin_students():
-    """Redirect deprecated student management route to admin headquarters."""
-    return redirect(url_for('teacher.teacher_dashboard'))
-
 
 # ==============================================================================
 # SECTION 7: SYSTEM COMMAND CENTER & DOCUMENTATION

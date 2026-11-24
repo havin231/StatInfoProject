@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Lecture Comments Hub') }}{% endblock %}
+
+{% block content %}
+{% set cur_lang = get_locale().language %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1">
+            <i class="fas fa-comments me-2 text-info"></i>{{ _('All Lecture Comments') }}
+            {% if unread_count %}
+            <span class="badge bg-info text-dark ms-2">{{ unread_count }} {{ _('New') }}</span>
+            {% endif %}
+        </h1>
+        <p class="text-muted small mb-0">{{ _('View, reply to, and manage visitor comments across all subjects and lectures.') }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if unread_count %}
+        <form method="POST" action="{{ url_for('admin.mark_all_comments_read') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm btn-outline-info">
+                <i class="fas fa-check-double me-1"></i>{{ _('Mark All Read') }}
+            </button>
+        </form>
+        {% endif %}
+        <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Dashboard') }}
+        </a>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<form method="GET" action="{{ url_for('admin.admin_comments') }}" class="card shadow-sm mb-4">
+    <div class="card-body row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label small fw-bold">{{ _('Subject') }}</label>
+            <select name="subject_id" class="form-select form-select-sm">
+                <option value="">{{ _('All Subjects') }}</option>
+                {% for s in subjects %}
+                <option value="{{ s.id }}" {% if selected_subject_id == s.id %}selected{% endif %}>{{ s.display_name(cur_lang) }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-bold">{{ _('Status') }}</label>
+            <select name="status" class="form-select form-select-sm">
+                <option value="all" {% if selected_status == 'all' %}selected{% endif %}>{{ _('All') }}</option>
+                <option value="unread" {% if selected_status == 'unread' %}selected{% endif %}>{{ _('Unread Only') }}</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label small fw-bold">{{ _('Search') }}</label>
+            <input type="text" name="q" value="{{ search_query }}" class="form-control form-control-sm" placeholder="{{ _('Name, comment...') }}">
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary btn-sm">{{ _('Filter') }}</button>
+        </div>
+    </div>
+</form>
+
+{% if comments %}
+<div class="d-flex flex-column gap-3">
+    {% for c in comments %}
+    {% set lec = c.page %}
+    {% set subj = lec.subject if lec else None %}
+    <div class="card shadow-sm card-accent {% if not c.is_read_by_admin %}border-info border-2{% endif %}">
+        <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                <div>
+                    {% if subj and lec %}
+                    <div class="mb-1">
+                        <span class="badge bg-primary-subtle text-primary-emphasis border">{{ subj.display_name(cur_lang) }}</span>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ lec.display_title(cur_lang) }}</span>
+                        {% if not c.is_read_by_admin %}
+                        <span class="badge bg-info text-dark">{{ _('New') }}</span>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    <strong class="text-body-emphasis">{{ c.author_name }}</strong>
+                    {% if c.author_birth_date %}
+                    <span class="badge bg-body-tertiary text-body border ms-1">
+                        {{ _('Born') }}: {{ c.author_birth_date.strftime('%Y-%m-%d') }}
+                        {% if c.display_age is not none %}({{ c.display_age }}){% endif %}
+                    </span>
+                    {% endif %}
+                    <small class="text-muted ms-2">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    {% if subj and lec %}
+                    <a href="{{ url_for('public.view_page', slug=subj.slug, page_id=lec.id) }}#comments-section"
+                        class="btn btn-sm btn-outline-primary py-0 px-2">
+                        <i class="fas fa-external-link-alt me-1"></i>{{ _('View Lesson') }}
+                    </a>
+                    {% endif %}
+                    {% if not c.is_read_by_admin %}
+                    <form method="POST" action="{{ url_for('admin.mark_comment_read', comment_id=c.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-info py-0 px-2">
+                            <i class="fas fa-check me-1"></i>{{ _('Mark as Read') }}
+                        </button>
+                    </form>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('content.delete_page_comment', comment_id=c.id) }}"
+                        onsubmit="return confirm('{{ _('Delete this comment?') }}');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="next" value="{{ url_for('admin.admin_comments') }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            {% if c.personality_info %}
+            <p class="small text-muted fst-italic mb-2"><i class="fas fa-user-circle me-1"></i>{{ c.personality_info }}</p>
+            {% endif %}
+
+            <p class="mb-3 text-body-emphasis" style="white-space: pre-wrap;">{{ c.comment_text }}</p>
+
+            <!-- Replies (Admin sees real staff username + anonymity indicator) -->
+            {% if c.replies %}
+            <div class="ps-3 border-start border-3 border-success d-flex flex-column gap-2 mb-3">
+                {% for reply in c.replies %}
+                <div class="p-2 rounded bg-success-subtle border border-success-subtle small">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div>
+                            <span class="badge bg-success">{{ reply.author_user.username if reply.author_user else reply.author_name }}</span>
+                            <small class="text-muted ms-2">{{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                        </div>
+                        <form method="POST" action="{{ url_for('content.delete_page_comment', comment_id=reply.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="hidden" name="next" value="{{ url_for('admin.admin_comments') }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1"><i class="fas fa-times"></i></button>
+                        </form>
+                    </div>
+                    <div class="text-body-emphasis" style="white-space: pre-wrap;">{{ reply.comment_text }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% if subj and lec %}
+            <form method="POST" action="{{ url_for('content.reply_page_comment', slug=subj.slug, page_id=lec.id, comment_id=c.id) }}" class="d-flex gap-2">
+                {{ reply_form.hidden_tag() }}
+                <input type="hidden" name="next" value="{{ url_for('admin.admin_comments') }}">
+                <input type="text" name="comment_text" class="form-control form-control-sm" placeholder="{{ _('Write a reply as Admin...') }}" required>
+                <button type="submit" class="btn btn-sm btn-success px-3">{{ _('Post Reply') }}</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card shadow-sm text-center py-5 text-muted">
+    <i class="far fa-comment-dots fa-3x mb-3"></i>
+    <p class="mb-0">{{ _('No comments match the current filter.') }}</p>
+</div>
+{% endif %}
+{% endblock %}

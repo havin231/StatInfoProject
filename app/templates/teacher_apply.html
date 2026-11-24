@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Apply as a Teacher') }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-md-9 col-lg-7">
+        <div class="card shadow-lg border-0 card-accent">
+            <div class="card-header bg-transparent border-bottom py-4 text-center">
+                <div class="h2 text-highlight mb-2"><i class="fas fa-chalkboard-teacher"></i></div>
+                <h1 class="h4 fw-bold mb-1">{{ _('Teacher Account Application') }}</h1>
+                <p class="text-muted small mb-0">{{ _('Submit your details below. An administrator will review and activate your account.') }}</p>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="POST" action="">
+                    {{ form.hidden_tag() }}
+
+                    {% if form.errors %}
+                    <div class="alert alert-danger small mb-4">
+                        <ul class="mb-0">
+                            {% for field, errs in form.errors.items() %}
+                                {% for e in errs %}<li>{{ e }}</li>{% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">{{ _('Full Name (English)') }} <span class="text-danger">*</span></label>
+                            {{ form.name_en(class="form-control", placeholder=_('e.g., Dr. Aram Hassan')) }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">{{ _('Full Name (Kurdish)') }} <span class="text-danger">*</span></label>
+                            {{ form.name_ku(class="form-control", dir="rtl", placeholder=_('نموونە: د. ئارام حەسەن')) }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Email Address') }} <span class="text-danger">*</span></label>
+                        {{ form.email(class="form-control", placeholder="name@university.edu") }}
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">{{ _('Gender') }} <span class="text-danger">*</span></label>
+                            {{ form.gender(class="form-select") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">{{ _('Birth Date') }} <span class="text-danger">*</span></label>
+                            {{ form.birth_date(class="form-control", type="date") }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">{{ _('Password') }} <span class="text-danger">*</span></label>
+                            {{ form.password(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">{{ _('Confirm Password') }} <span class="text-danger">*</span></label>
+                            {{ form.confirm_password(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Bio (Optional)') }}</label>
+                        {{ form.bio(class="form-control", rows="2", placeholder=_('Your academic background or specialties...')) }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label small fw-bold">{{ _('Why do you want to sign up as a teacher?') }} <span class="text-danger">*</span></label>
+                        {{ form.reason(class="form-control", rows="4", placeholder=_('Describe which subjects you would like to teach and why...')) }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold">
+                            <i class="fas fa-paper-plane me-2"></i>{{ _('Submit Application') }}
+                        </button>
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-outline-secondary btn-sm">
+                            {{ _('Back to Staff Login') }}
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

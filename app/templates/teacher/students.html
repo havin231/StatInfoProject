@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Manage Students') }}{% endblock %}
+
+{% block content %}
+{% set cur_lang = get_locale().language %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1"><i class="fas fa-user-graduate me-2 text-primary"></i>{{ _('Student Directory & Access Codes') }}</h1>
+        <p class="text-muted small mb-0">
+            {% if current_user.is_admin %}
+            {{ _('Admin View: Create students, view all students, and share student codes across teachers.') }}
+            {% else %}
+            {{ _('Create students with unique 8+ character codes for your hidden exams and quizzes.') }}
+            {% endif %}
+        </p>
+    </div>
+    <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Dashboard') }}
+    </a>
+</div>
+
+<div class="row g-4">
+    <!-- CREATE STUDENT FORM -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm card-accent">
+            <div class="card-header bg-transparent fw-bold text-uppercase small py-3">
+                <i class="fas fa-plus-circle me-2 text-primary"></i>{{ _('Register New Student') }}
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('teacher.manage_students') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">{{ _('Student Name (English)') }} <span class="text-danger">*</span></label>
+                        {{ form.name_en(class="form-control form-control-sm", placeholder=_('e.g., Zana Ali')) }}
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">{{ _('Student Name (Kurdish)') }} <span class="text-danger">*</span></label>
+                        {{ form.name_ku(class="form-control form-control-sm", dir="rtl", placeholder=_('نموونە: زانا عەلی')) }}
+                    </div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">{{ _('Birth Date') }} <span class="text-danger">*</span></label>
+                            {{ form.birth_date(class="form-control form-control-sm", type="date") }}
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-bold">{{ _('Gender') }} <span class="text-danger">*</span></label>
+                            {{ form.gender(class="form-select form-select-sm") }}
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">{{ _('Department (English)') }} <span class="text-danger">*</span></label>
+                        {{ form.department_en(class="form-control form-control-sm", placeholder=_('e.g., Statistics & Informatics')) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Department (Kurdish)') }} <span class="text-danger">*</span></label>
+                        {{ form.department_ku(class="form-control form-control-sm", dir="rtl", placeholder=_('نموونە: ئامار و زانیاری')) }}
+                    </div>
+
+                    {% if current_user.is_admin %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Assign to Teacher(s)') }}</label>
+                        <div class="border rounded p-2 bg-body-tertiary" style="max-height: 120px; overflow-y: auto;">
+                            {% for t in all_teachers %}
+                            <div class="form-check form-check-sm">
+                                <input class="form-check-input" type="checkbox" name="teacher_ids" value="{{ t.id }}"
+                                    id="create_stu_t_{{ t.id }}" {% if t.id == current_user.id %}checked{% endif %}>
+                                <label class="form-check-label small" for="create_stu_t_{{ t.id }}">{{ t.username }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-sm fw-bold">
+                            <i class="fas fa-key me-1"></i>{{ _('Create Student & Generate Code') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- STUDENTS LIST -->
+    <div class="col-lg-8">
+        <!-- Search Bar -->
+        <form method="GET" action="{{ url_for('teacher.manage_students') }}" class="input-group input-group-sm mb-3 shadow-sm">
+            <input type="search" name="q" value="{{ search_query }}" class="form-control" placeholder="{{ _('Search by name, code, or department...') }}">
+            <button class="btn btn-primary" type="submit"><i class="fas fa-search"></i></button>
+            {% if search_query %}
+            <a href="{{ url_for('teacher.manage_students') }}" class="btn btn-outline-secondary"><i class="fas fa-times"></i></a>
+            {% endif %}
+        </form>
+
+        <!-- Admin Bulk Share Toolbar (standalone form using HTML5 form= attribute on checkboxes) -->
+        {% if current_user.is_admin and students %}
+        <form id="bulkShareForm" method="POST" action="{{ url_for('teacher.bulk_share_students') }}"
+            class="card shadow-sm mb-3 p-2 bg-body-tertiary border">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <span class="small fw-bold text-body-emphasis"><i class="fas fa-share-alt me-1 text-primary"></i>{{ _('Share Selected Students With:') }}</span>
+                <select name="target_teacher_id" class="form-select form-select-sm" style="max-width: 220px;" required>
+                    <option value="">{{ _('Select Teacher...') }}</option>
+                    {% for t in all_teachers %}
+                    <option value="{{ t.id }}">{{ t.username }}</option>
+                    {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-sm btn-outline-primary">{{ _('Share Selected') }}</button>
+            </div>
+        </form>
+        {% endif %}
+
+        <div class="card shadow-sm">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0 table-hover">
+                    <thead class="bg-body-secondary">
+                        <tr>
+                            {% if current_user.is_admin %}<th style="width: 32px;"></th>{% endif %}
+                            <th>{{ _('Student') }}</th>
+                            <th>{{ _('Department') }}</th>
+                            <th>{{ _('Code') }}</th>
+                            <th>{{ _('Age / Gender') }}</th>
+                            {% if current_user.is_admin %}<th>{{ _('Teachers') }}</th>{% endif %}
+                            <th class="text-end">{{ _('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for s in students %}
+                        <tr>
+                            {% if current_user.is_admin %}
+                            <td>
+                                <input type="checkbox" class="form-check-input" form="bulkShareForm" name="student_ids" value="{{ s.id }}">
+                            </td>
+                            {% endif %}
+                            <td>
+                                <div class="fw-bold text-body-emphasis">{{ s.name_en }}</div>
+                                <div class="small text-muted">{{ s.name_ku }}</div>
+                            </td>
+                            <td>
+                                <div class="small text-body-emphasis">{{ s.department_en }}</div>
+                                <div class="small text-muted">{{ s.department_ku }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary-subtle text-primary-emphasis border font-monospace fs-6">{{ s.student_code }}</span>
+                            </td>
+                            <td class="small text-muted">
+                                {{ s.age }} / {{ _(s.gender|capitalize) }}
+                            </td>
+                            {% if current_user.is_admin %}
+                            <td>
+                                {% set stu_tids = s.teacher_links | map(attribute='teacher_id') | list %}
+                                <div class="d-flex flex-wrap gap-1 mb-1">
+                                    {% for link in s.teacher_links %}
+                                    <span class="badge bg-body-tertiary text-body border">{{ link.teacher.username }}</span>
+                                    {% endfor %}
+                                </div>
+                                <button class="btn btn-sm btn-outline-secondary py-0 px-2" type="button"
+                                    data-bs-toggle="collapse" data-bs-target="#shareStu{{ s.id }}">
+                                    <i class="fas fa-user-friends small"></i> {{ _('Assign') }}
+                                </button>
+                                <div class="collapse mt-2" id="shareStu{{ s.id }}">
+                                    <form method="POST" action="{{ url_for('teacher.assign_student_teachers', student_id=s.id) }}" class="p-2 border rounded bg-body-tertiary">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        {% for t in all_teachers %}
+                                        <div class="form-check form-check-sm">
+                                            <input class="form-check-input" type="checkbox" name="teacher_ids" value="{{ t.id }}"
+                                                id="s{{ s.id }}_t{{ t.id }}" {% if t.id in stu_tids %}checked{% endif %}>
+                                            <label class="form-check-label small" for="s{{ s.id }}_t{{ t.id }}">{{ t.username }}</label>
+                                        </div>
+                                        {% endfor %}
+                                        <button type="submit" class="btn btn-sm btn-primary w-100 mt-1 py-0">{{ _('Save') }}</button>
+                                    </form>
+                                </div>
+                            </td>
+                            {% endif %}
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{{ url_for('teacher.edit_student', student_id=s.id) }}" class="btn btn-outline-secondary" title="{{ _('Edit') }}">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="POST" action="{{ url_for('teacher.regenerate_student_code', student_id=s.id) }}" class="d-inline"
+                                        onsubmit="return confirm('{{ _('Generate a new code? The old code will stop working.') }}');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-info" title="{{ _('New Code') }}"><i class="fas fa-sync-alt"></i></button>
+                                    </form>
+                                    <form method="POST" action="{{ url_for('teacher.delete_student', student_id=s.id) }}" class="d-inline"
+                                        onsubmit="return confirm('{{ _('Remove this student?') }}');">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                        <button type="submit" class="btn btn-outline-danger" title="{{ _('Delete') }}"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-muted">
+                                {{ _('No students registered yet.') }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

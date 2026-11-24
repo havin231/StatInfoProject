@@ -119,11 +119,35 @@ def create_app(config_class=Config):
         except Exception:
             pass
 
-        # v0.8.0 safe auto-migrations for birth_date, bio, and comment birth date
+        # v0.8.0 & v0.9.0 safe auto-migrations (SQLite + MySQL compatible)
         for stmt in [
             "ALTER TABLE user ADD COLUMN birth_date DATE",
             "ALTER TABLE user ADD COLUMN bio TEXT",
+            "ALTER TABLE user ADD COLUMN gender VARCHAR(20)",
+            "ALTER TABLE user MODIFY COLUMN username VARCHAR(100) NOT NULL",
+            "ALTER TABLE user MODIFY COLUMN username_kurdish VARCHAR(100) NULL",
+            "ALTER TABLE subject ADD COLUMN exam_student_only BOOLEAN DEFAULT 0",
+            "ALTER TABLE page ADD COLUMN title_kurdish VARCHAR(200)",
+            "ALTER TABLE page ADD COLUMN quiz_student_only BOOLEAN DEFAULT 0",
+            "ALTER TABLE site_info ADD COLUMN title_kurdish VARCHAR(200)",
+            "ALTER TABLE question ADD COLUMN question_text_kurdish TEXT",
+            "ALTER TABLE question ADD COLUMN option_a_kurdish VARCHAR(200)",
+            "ALTER TABLE question ADD COLUMN option_b_kurdish VARCHAR(200)",
+            "ALTER TABLE question ADD COLUMN option_c_kurdish VARCHAR(200)",
+            "ALTER TABLE question ADD COLUMN option_d_kurdish VARCHAR(200)",
+            "ALTER TABLE exam_result ADD COLUMN correct_count INTEGER",
+            "ALTER TABLE exam_result ADD COLUMN total_questions INTEGER",
+            "ALTER TABLE exam_result ADD COLUMN page_id INTEGER",
+            "ALTER TABLE exam_result ADD COLUMN student_record_id INTEGER",
+            "ALTER TABLE exam_result ADD COLUMN taker_name VARCHAR(100)",
+            "ALTER TABLE exam_result ADD COLUMN taker_birth_date DATE",
+            "ALTER TABLE exam_result ADD COLUMN taker_gender VARCHAR(20)",
+            "ALTER TABLE exam_result MODIFY COLUMN student_id INTEGER NULL",
             "ALTER TABLE page_comment ADD COLUMN author_birth_date DATE",
+            "ALTER TABLE page_comment ADD COLUMN parent_id INTEGER",
+            "ALTER TABLE page_comment ADD COLUMN author_user_id INTEGER",
+            "ALTER TABLE page_comment ADD COLUMN is_teacher_reply BOOLEAN DEFAULT 0",
+            "ALTER TABLE page_comment ADD COLUMN is_read_by_admin BOOLEAN DEFAULT 0",
         ]:
             try:
                 with db.engine.connect() as conn:

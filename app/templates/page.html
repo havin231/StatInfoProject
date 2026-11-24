@@ -1,33 +1,28 @@
 {% extends "base.html" %}
 
-{% block title %}{{ page.title }}{% endblock %}
+{% block title %}{{ page.display_title(get_locale().language) }}{% endblock %}
 
 {% block content %}
+{% set cur_lang = get_locale().language %}
 <div class="row justify-content-center">
     <div class="col-lg-10">
 
-        <!--
-            TOP CONTROLS
-            Contains the 'Back' navigation, 'Take Quiz' (Task 4), and Language Toggle.
-        -->
+        <!-- TOP CONTROLS -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
             <a href="/subject/{{ subject.slug }}" class="btn btn-outline-secondary btn-sm">
                 <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Subject') }}
             </a>
 
-            <div class="d-flex gap-2">
-                <!--
-                    TASK 4: LECTURE QUIZ INTEGRATION
-                    This button only appears if specific questions have been tagged to this page.
-                -->
-                {% if has_quiz %}
+            <div class="d-flex gap-2 align-items-center">
+                {% if has_quiz and (not page.quiz_student_only or can_moderate) %}
                 <a href="/subject/{{ subject.slug }}/lecture/{{ page.id }}/quiz"
                     class="btn btn-danger btn-sm shadow-sm px-3">
                     <i class="fas fa-stopwatch me-2"></i>{{ _('Take Lecture Quiz') }}
+                    {% if page.quiz_student_only and can_moderate %}
+                    <span class="badge bg-warning text-dark ms-1"><i class="fas fa-lock"></i> {{ _('Hidden') }}</span>
+                    {% endif %}
                 </a>
                 {% endif %}
-
-                <!-- KURDISH TOGGLE MOVED TO FLOATING BUTTON -->
             </div>
         </div>
 
@@ -35,20 +30,18 @@
         <div class="card shadow-lg border-0 mb-5" style="min-height: 65vh;">
             <div class="card-body p-4 p-md-5">
 
-                <!-- Page Title -->
+                <!-- Page Title (Bilingual) -->
                 <h1 class="display-6 fw-bold mb-4 pb-3 border-bottom text-highlight">
-                    {{ page.title }}
+                    {{ page.display_title(cur_lang) }}
                 </h1>
 
                 <!-- CONTENT BASED ON GLOBAL LOCALE -->
-                {% if get_locale().language == 'ku' and page.content_body_kurdish %}
-                <!-- KURDISH CONTENT (when locale is Kurdish) -->
+                {% if cur_lang == 'ku' and page.content_body_kurdish %}
                 <div id="content-display" class="rich-text-content overflow-hidden"
                     style="direction: rtl; text-align: right;">
                     {{ page.content_body_kurdish | safe }}
                 </div>
                 {% else %}
-                <!-- ENGLISH CONTENT (default) -->
                 <div id="content-display" class="rich-text-content overflow-hidden">
                     {{ page.content_body | safe }}
                 </div>
@@ -56,76 +49,54 @@
 
             </div>
 
-            <!--
-                NEW: MULTIPLE RESOURCES FOOTER
-                Loops through all resources attached to this page.
-            -->
+            <!-- MULTIPLE RESOURCES FOOTER -->
             {% if page.resources %}
             <div class="card-footer bg-body-tertiary p-4">
                 <h5 class="fw-bold mb-3 small text-uppercase text-muted"><i class="fas fa-paperclip me-2"></i>{{
                     _('Learning Resources') }}</h5>
                 <div class="list-group shadow-sm">
                     {% for res in page.resources %}
+                    {% set res_title = res.title_kurdish if (cur_lang == 'ku' and res.title_kurdish) else res.title %}
                     {% set is_video = 'youtube.com' in res.link or 'youtu.be' in res.link or 'vimeo.com' in res.link or 'iframe' in res.link %}
-                    
+
                     {% if is_video %}
-                    <!-- Video Resource with Mobile Responsive Container -->
                     <div class="video-resource-card mb-3">
                         <div class="position-relative">
                             {% if 'youtube.com' in res.link or 'youtu.be' in res.link %}
-                                <!-- DEBUG: Link={{ res.link }} -->
                                 {% set video_id = res.link.split('/')[-1] if 'youtu.be' in res.link else res.link.split('v=')[1].split('&')[0] if 'v=' in res.link else res.link.split('/')[-1].split('?')[0] %}
-                                <!-- DEBUG: Video ID={{ video_id }} -->
                                 {% if video_id %}
                                 <div class="video-container">
-                                    <iframe 
-                                        src="https://www.youtube.com/embed/{{ video_id }}" 
-                                        frameborder="0" 
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                                        allowfullscreen
-                                        loading="lazy"
-                                        style="width: 100%; height: 100%;">
-                                    </iframe>
+                                    <iframe src="https://www.youtube.com/embed/{{ video_id }}" frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen loading="lazy" style="width: 100%; height: 100%;"></iframe>
                                 </div>
-                                {% else %}
-                                <div class="alert alert-warning">Could not extract video ID from: {{ res.link }}</div>
                                 {% endif %}
                             {% elif 'vimeo.com' in res.link %}
                                 {% set vimeo_id = res.link.split('/')[-1] %}
                                 {% if vimeo_id %}
                                 <div class="video-container">
-                                    <iframe src="https://player.vimeo.com/video/{{ vimeo_id }}" 
-                                            frameborder="0" 
-                                            allowfullscreen
-                                            loading="lazy">
-                                    </iframe>
+                                    <iframe src="https://player.vimeo.com/video/{{ vimeo_id }}" frameborder="0"
+                                        allowfullscreen loading="lazy"></iframe>
                                 </div>
                                 {% endif %}
                             {% else %}
-                            <div class="video-container">
-                                {{ res.link|safe }}
-                            </div>
+                            <div class="video-container">{{ res.link|safe }}</div>
                             {% endif %}
-                            
+
                             <div class="mt-3">
-                                <h6 class="fw-bold text-body-emphasis">{{ res.title }}</h6>
-                                <a href="{{ res.link }}" target="_blank" 
-                                   class="btn btn-sm btn-outline-primary">
+                                <h6 class="fw-bold text-body-emphasis">{{ res_title }}</h6>
+                                <a href="{{ res.link }}" target="_blank" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-external-link-alt me-2"></i>{{ _('Open in New Tab') }}
                                 </a>
                             </div>
                         </div>
                     </div>
                     {% else %}
-                    <!-- Regular Link Resource -->
                     <a href="{{ res.link }}" target="_blank"
                         class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3">
                         <div class="d-flex align-items-center">
-                            <div class="me-3 text-primary opacity-50">
-                                <i class="fas fa-external-link-alt"></i>
-                            </div>
-                            <!-- FIXED BUG: Changed 'text-dark' to 'text-body-emphasis' for Dark Mode support -->
-                            <span class="fw-bold text-body-emphasis">{{ res.title }}</span>
+                            <div class="me-3 text-primary opacity-50"><i class="fas fa-external-link-alt"></i></div>
+                            <span class="fw-bold text-body-emphasis">{{ res_title }}</span>
                         </div>
                         <i class="fas fa-chevron-right text-muted small"></i>
                     </a>
@@ -137,105 +108,183 @@
         </div>
 
         <!--
-            LECTURE COMMENTS SECTION
-            Visitors provide Name, Age, optional Personality info, and their comment.
+            REDESIGNED COLLAPSIBLE LECTURE COMMENTS SECTION (v0.9.0)
+            1. User presses button to open comments.
+            2. User types comment first -> presses Send -> modal collects Name, Birth Date, optional Personality.
+            3. Teacher/Admin replies appear distinctly; anonymous teachers display "From Teacher".
         -->
-        <div id="comments-section" class="card shadow-sm border-0 mb-5">
-            <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
-                <h4 class="h5 fw-bold mb-0 text-body-emphasis">
-                    <i class="fas fa-comments me-2 text-highlight"></i>{{ _('Lecture Discussion') }}
-                    <span class="badge bg-secondary-subtle text-secondary border ms-2">{{ comments|length }}</span>
-                </h4>
-            </div>
-            <div class="card-body p-4">
-                <!-- New Comment Form -->
-                <form method="POST" action="{{ url_for('public.add_page_comment', slug=subject.slug, page_id=page.id) }}" class="mb-4 pb-4 border-bottom">
-                    {{ comment_form.hidden_tag() }}
-                    <div class="row g-3 mb-3">
-                        <div class="col-md-8">
-                            <label class="form-label small fw-bold text-body-emphasis">
-                                {{ _('Your Name') }} <span class="text-danger">*</span>
-                            </label>
-                            {{ comment_form.author_name(class="form-control", placeholder=_('Enter your name'), required=True) }}
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label small fw-bold text-body-emphasis">
-                                {{ _('Your Birth Date') }} <span class="text-danger">*</span>
-                            </label>
-                            {{ comment_form.author_birth_date(class="form-control", type="date", required=True) }}
-                        </div>
-                    </div>
+        <div id="comments-section" class="mb-5">
+            <button class="btn btn-outline-primary w-100 d-flex justify-content-between align-items-center p-3 shadow-sm fw-bold mb-3"
+                type="button" data-bs-toggle="collapse" data-bs-target="#commentsCollapse" aria-expanded="false" id="commentsToggleBtn">
+                <span>
+                    <i class="fas fa-comments me-2"></i>{{ _('Lecture Discussion') }}
+                    <span class="badge bg-primary rounded-pill ms-2">{{ comments|length }}</span>
+                </span>
+                <span class="small">{{ _('Show / Add Comments') }} <i class="fas fa-chevron-down ms-1"></i></span>
+            </button>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-body-emphasis">
-                            {{ _('About You / Personality') }}
-                            <span class="text-muted fw-normal">({{ _('Optional') }})</span>
-                        </label>
-                        {{ comment_form.personality_info(class="form-control", rows="2", placeholder=_('Optional: share your interests, hobbies, or personality...')) }}
-                    </div>
+            <div class="collapse" id="commentsCollapse">
+                <div class="card shadow-sm border-0 card-accent">
+                    <div class="card-body p-4">
+                        <!-- Step 1: Comment Textarea + Step 2: Modal for Name / DOB / Optional Personality -->
+                        <form id="commentForm" method="POST"
+                            action="{{ url_for('public.add_page_comment', slug=subject.slug, page_id=page.id) }}"
+                            class="mb-4 pb-4 border-bottom">
+                            {{ comment_form.hidden_tag() }}
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-body-emphasis">
+                                    {{ _('Your Comment') }} <span class="text-danger">*</span>
+                                </label>
+                                {{ comment_form.comment_text(id="commentTextInput", class="form-control", rows="3", placeholder=_('Write your question or thoughts about this lecture...'), required=True) }}
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-primary px-4" onclick="openCommentModal()">
+                                    <i class="fas fa-paper-plane me-2"></i>{{ _('Send Comment') }}
+                                </button>
+                            </div>
 
-                    <div class="mb-3">
-                        <label class="form-label small fw-bold text-body-emphasis">
-                            {{ _('Your Comment') }} <span class="text-danger">*</span>
-                        </label>
-                        {{ comment_form.comment_text(class="form-control", rows="3", placeholder=_('Write your question or thoughts about this lecture...'), required=True) }}
-                    </div>
+                            <!-- Details Modal (Prompted on Send) -->
+                            <div class="modal fade" id="commentDetailsModal" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content border-0 shadow">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title fw-bold">
+                                                <i class="fas fa-user-circle me-2 text-primary"></i>{{ _('Before Posting Your Comment') }}
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-body-emphasis">
+                                                    {{ _('Your Name') }} <span class="text-danger">*</span>
+                                                </label>
+                                                {{ comment_form.author_name(class="form-control", placeholder=_('Enter your name'), required=True) }}
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label small fw-bold text-body-emphasis">
+                                                    {{ _('Your Birth Date') }} <span class="text-danger">*</span>
+                                                </label>
+                                                {{ comment_form.author_birth_date(class="form-control", type="date", required=True) }}
+                                            </div>
+                                            <div class="mb-2">
+                                                <label class="form-label small fw-bold text-body-emphasis">
+                                                    {{ _('About You / Personality') }}
+                                                    <span class="text-muted fw-normal">({{ _('Optional') }})</span>
+                                                </label>
+                                                {{ comment_form.personality_info(class="form-control", rows="2", placeholder=_('Optional: share your interests, hobbies, or personality...')) }}
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                                            <button type="submit" class="btn btn-primary px-4">
+                                                <i class="fas fa-check me-2"></i>{{ _('Post Comment') }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
 
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary px-4">
-                            <i class="fas fa-paper-plane me-2"></i>{{ _('Post Comment') }}
-                        </button>
-                    </div>
-                </form>
+                        <!-- Comments & Teacher Replies List -->
+                        {% if comments %}
+                        <div class="d-flex flex-column gap-3">
+                            {% for c in comments %}
+                            <div class="p-3 rounded border bg-body-tertiary">
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                    <div>
+                                        <span class="fw-bold text-body-emphasis">{{ c.author_name }}</span>
+                                        {% if c.author_birth_date %}
+                                        <span class="badge bg-info-subtle text-info-emphasis border ms-1">
+                                            <i class="fas fa-birthday-cake me-1"></i>{{ _('Born') }}: {{ c.author_birth_date.strftime('%Y-%m-%d') }}
+                                        </span>
+                                        {% elif c.display_age is not none %}
+                                        <span class="badge bg-info-subtle text-info-emphasis border ms-1">
+                                            {{ _('Age') }}: {{ c.display_age }}
+                                        </span>
+                                        {% endif %}
+                                        {% if c.created_at %}
+                                        <small class="text-muted ms-2">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-flex align-items-center gap-1">
+                                        {% if can_moderate %}
+                                        <button type="button" class="btn btn-sm btn-outline-success py-0 px-2"
+                                            data-bs-toggle="collapse" data-bs-target="#replyBox{{ c.id }}">
+                                            <i class="fas fa-reply me-1 small"></i>{{ _('Reply') }}
+                                        </button>
+                                        <form method="POST" action="{{ url_for('content.delete_page_comment', comment_id=c.id) }}"
+                                            onsubmit="return confirm('{{ _('Delete this comment?') }}');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="{{ _('Delete Comment') }}">
+                                                <i class="fas fa-trash-alt small"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
 
-                <!-- Comments List -->
-                {% if comments %}
-                <div class="d-flex flex-column gap-3">
-                    {% for c in comments %}
-                    <div class="p-3 rounded border bg-body-tertiary">
-                        <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                            <div>
-                                <span class="fw-bold text-body-emphasis">{{ c.author_name }}</span>
-                                {% if c.author_birth_date %}
-                                <span class="badge bg-info-subtle text-info-emphasis border ms-1">
-                                    <i class="fas fa-birthday-cake me-1"></i>{{ _('Born') }}: {{ c.author_birth_date.strftime('%Y-%m-%d') }}
-                                </span>
-                                {% elif c.display_age is not none %}
-                                <span class="badge bg-info-subtle text-info-emphasis border ms-1">
-                                    {{ _('Age') }}: {{ c.display_age }}
-                                </span>
+                                {% if c.personality_info %}
+                                <p class="small text-muted fst-italic mb-2">
+                                    <i class="fas fa-user-circle me-1"></i>{{ c.personality_info }}
+                                </p>
                                 {% endif %}
-                                {% if c.created_at %}
-                                <small class="text-muted ms-2">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+
+                                <p class="mb-0 text-body-emphasis" style="white-space: pre-wrap;">{{ c.comment_text }}</p>
+
+                                <!-- Teacher / Admin Replies (Visually Distinct + Respects Teacher Anonymity) -->
+                                {% if c.replies %}
+                                <div class="mt-3 ps-3 border-start border-3 border-success d-flex flex-column gap-2">
+                                    {% for reply in c.replies %}
+                                    <div class="p-2 rounded bg-success-subtle border border-success-subtle">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <div>
+                                                <span class="badge bg-success me-1">
+                                                    <i class="fas fa-chalkboard-teacher me-1"></i>{{ get_reply_display_name(reply, subject, cur_lang) }}
+                                                </span>
+                                                {% if reply.created_at %}
+                                                <small class="text-muted">{{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                                {% endif %}
+                                            </div>
+                                            {% if can_moderate %}
+                                            <form method="POST" action="{{ url_for('content.delete_page_comment', comment_id=reply.id) }}"
+                                                onsubmit="return confirm('{{ _('Delete this reply?') }}');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-1">
+                                                    <i class="fas fa-times small"></i>
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                        <p class="mb-0 small text-body-emphasis" style="white-space: pre-wrap;">{{ reply.comment_text }}</p>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+
+                                <!-- Inline Staff Reply Box -->
+                                {% if can_moderate %}
+                                <div class="collapse mt-3" id="replyBox{{ c.id }}">
+                                    <form method="POST"
+                                        action="{{ url_for('content.reply_page_comment', slug=subject.slug, page_id=page.id, comment_id=c.id) }}"
+                                        class="d-flex gap-2">
+                                        {{ reply_form.hidden_tag() }}
+                                        <input type="text" name="comment_text" class="form-control form-control-sm"
+                                            placeholder="{{ _('Write a teacher reply...') }}" required>
+                                        <button type="submit" class="btn btn-sm btn-success px-3">{{ _('Post Reply') }}</button>
+                                    </form>
+                                </div>
                                 {% endif %}
                             </div>
-                            {% if can_moderate %}
-                            <form method="POST" action="{{ url_for('content.delete_page_comment', comment_id=c.id) }}"
-                                onsubmit="return confirm('{{ _('Delete this comment?') }}');">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="{{ _('Delete Comment') }}">
-                                    <i class="fas fa-trash-alt small"></i>
-                                </button>
-                            </form>
-                            {% endif %}
+                            {% endfor %}
                         </div>
-
-                        {% if c.personality_info %}
-                        <p class="small text-muted fst-italic mb-2">
-                            <i class="fas fa-user-circle me-1"></i>{{ c.personality_info }}
-                        </p>
+                        {% else %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="far fa-comment-dots fa-2x mb-2 d-block"></i>
+                            <p class="mb-0">{{ _('No comments yet. Be the first to share your thoughts!') }}</p>
+                        </div>
                         {% endif %}
-
-                        <p class="mb-0 text-body-emphasis" style="white-space: pre-wrap;">{{ c.comment_text }}</p>
                     </div>
-                    {% endfor %}
                 </div>
-                {% else %}
-                <div class="text-center py-4 text-muted">
-                    <i class="far fa-comment-dots fa-2x mb-2 d-block"></i>
-                    <p class="mb-0">{{ _('No comments yet. Be the first to share your thoughts!') }}</p>
-                </div>
-                {% endif %}
             </div>
         </div>
 
@@ -244,13 +293,34 @@
 
 <!-- FLOATING LANGUAGE TOGGLE (Preserves vertical scroll position via base.html) -->
 <a id="floatingLangToggle"
-    href="{{ url_for('public.set_lang', lang='en' if get_locale().language == 'ku' else 'ku') }}"
+    href="{{ url_for('public.set_lang', lang='en' if cur_lang == 'ku' else 'ku') }}"
     class="btn btn-primary rounded-pill shadow-lg d-flex align-items-center gap-2 px-3 py-2 lang-switch-preserve"
     title="{{ _('Toggle Language') }}"
     style="position: fixed; bottom: 5.25rem; inset-inline-end: 1.25rem; z-index: 1030;">
     <i class="fas fa-globe"></i>
-    <span class="fw-bold small">{{ 'English' if get_locale().language == 'ku' else 'کوردی' }}</span>
+    <span class="fw-bold small">{{ 'English' if cur_lang == 'ku' else 'کوردی' }}</span>
 </a>
+
+<script>
+    function openCommentModal() {
+        const textEl = document.getElementById('commentTextInput');
+        if (!textEl || !textEl.value.trim()) {
+            if (textEl) textEl.reportValidity();
+            return;
+        }
+        const modal = new bootstrap.Modal(document.getElementById('commentDetailsModal'));
+        modal.show();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.location.hash === '#comments-section') {
+            const el = document.getElementById('commentsCollapse');
+            if (el) {
+                new bootstrap.Collapse(el, { show: true });
+            }
+        }
+    });
+</script>
 
 <!--
     RICH TEXT CSS OVERRIDES

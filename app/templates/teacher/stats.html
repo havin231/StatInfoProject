@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Teacher Statistics') }}{% endblock %}
+
+{% block content %}
+{% set cur_lang = get_locale().language %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1"><i class="fas fa-chart-line me-2 text-primary"></i>{{ _('My Subject & Student Statistics') }}</h1>
+        <p class="text-muted small mb-0">{{ _('Choose which of your assigned subjects to view below.') }}</p>
+    </div>
+    <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Dashboard') }}
+    </a>
+</div>
+
+<!-- SUBJECT VIEW ORGANIZER BAR (Teacher's own view only) -->
+<form method="GET" action="{{ url_for('analytics.teacher_stats') }}" class="card shadow-sm mb-4 card-accent">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <span class="small fw-bold text-uppercase text-muted"><i class="fas fa-filter me-1"></i>{{ _('Select Subjects to Display') }}</span>
+            <a href="{{ url_for('analytics.teacher_stats') }}" class="small text-decoration-none">{{ _('Show All My Subjects') }}</a>
+        </div>
+        <div class="d-flex flex-wrap gap-3 mb-3">
+            {% for sub in all_subjects %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="subjects" value="{{ sub.id }}"
+                    id="tsub_{{ sub.id }}" {% if sub.id in selected_ids %}checked{% endif %}>
+                <label class="form-check-label small fw-bold" for="tsub_{{ sub.id }}">{{ sub.display_name(cur_lang) }}</label>
+            </div>
+            {% else %}
+            <span class="small text-muted">{{ _('No subjects assigned yet.') }}</span>
+            {% endfor %}
+        </div>
+        {% if all_subjects %}
+        <button type="submit" class="btn btn-sm btn-primary px-4">{{ _('Apply View') }}</button>
+        {% endif %}
+    </div>
+</form>
+
+<!-- KPI SUMMARY ROW -->
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+    <div class="col">
+        <div class="card card-accent text-center p-3 h-100">
+            <div class="small text-muted text-uppercase">{{ _('Total Attempts') }}</div>
+            <div class="display-6 fw-bold text-highlight">{{ total_attempts }}</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card card-accent text-center p-3 h-100">
+            <div class="small text-muted text-uppercase">{{ _('Average Score') }}</div>
+            <div class="display-6 fw-bold text-highlight">{{ avg_score }}%</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card card-accent text-center p-3 h-100">
+            <div class="small text-muted text-uppercase">{{ _('Passed') }}</div>
+            <div class="display-6 fw-bold text-success">{{ pass_count }}</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card card-accent text-center p-3 h-100">
+            <div class="small text-muted text-uppercase">{{ _('My Students') }}</div>
+            <div class="display-6 fw-bold text-primary">{{ student_rows|length }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- CHARTS -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">{{ _('Subject Performance') }}</h5>
+                <div style="height: 260px;"><canvas id="tBarChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h5 class="fw-bold mb-3">{{ _('Pass to Fail Ratio') }}</h5>
+                <div style="height: 260px;"><canvas id="tPieChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MY STUDENTS STATS TABLE -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-transparent fw-bold py-3">
+        <i class="fas fa-user-graduate me-2 text-primary"></i>{{ _('My Registered Students') }}
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead class="bg-body-secondary">
+                <tr>
+                    <th>{{ _('Name') }}</th>
+                    <th>{{ _('Code') }}</th>
+                    <th>{{ _('Department') }}</th>
+                    <th>{{ _('Attempts') }}</th>
+                    <th class="text-end">{{ _('Average Score') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in student_rows %}
+                <tr>
+                    <td class="fw-bold text-body-emphasis">{{ row.student.display_name(cur_lang) }}</td>
+                    <td><span class="badge bg-primary-subtle text-primary-emphasis border font-monospace">{{ row.student.student_code }}</span></td>
+                    <td class="small text-muted">{{ row.student.display_department(cur_lang) }}</td>
+                    <td>{{ row.attempts }}</td>
+                    <td class="text-end fw-bold">{% if row.avg_score is not none %}{{ row.avg_score }}%{% else %}—{% endif %}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center py-4 text-muted">{{ _('No students assigned to you yet.') }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- RECENT ATTEMPTS -->
+<div class="card shadow-sm">
+    <div class="card-header bg-transparent fw-bold py-3">
+        <i class="fas fa-history me-2 text-primary"></i>{{ _('Recent Exam & Quiz Attempts') }}
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0 table-sm">
+            <thead class="bg-body-secondary">
+                <tr>
+                    <th>{{ _('Date') }}</th>
+                    <th>{{ _('Subject') }}</th>
+                    <th>{{ _('Type') }}</th>
+                    <th>{{ _('Participant') }}</th>
+                    <th>{{ _('Gender / Age') }}</th>
+                    <th class="text-end">{{ _('Score') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results[:50] %}
+                <tr>
+                    <td class="small text-muted">{{ r.date_submitted.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="fw-bold">{{ r.subject.display_name(cur_lang) }}</td>
+                    <td class="small">
+                        {% if r.page %}{{ _('Quiz') }}: {{ r.page.display_title(cur_lang) }}{% else %}{{ _('Final Exam') }}{% endif %}
+                    </td>
+                    <td class="small">
+                        {% if r.student_record %}
+                            <span class="badge bg-primary-subtle text-primary-emphasis border font-monospace me-1">{{ r.student_record.student_code }}</span>
+                            {{ r.student_record.display_name(cur_lang) }}
+                        {% else %}
+                            {{ r.taker_name or _('Anonymous Visitor') }}
+                        {% endif %}
+                    </td>
+                    <td class="small text-muted">
+                        {{ _(r.resolved_gender|capitalize) if r.resolved_gender else '—' }}
+                        {% if r.taker_age is not none %} / {{ r.taker_age }}{% endif %}
+                    </td>
+                    <td class="text-end fw-bold {% if r.score >= 50 %}text-success{% else %}text-danger{% endif %}">{{ r.score }}%</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="6" class="text-center py-4 text-muted">{{ _('No exam data available yet.') }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    new Chart(document.getElementById('tBarChart'), {
+        type: 'bar',
+        data: { labels: {{ chart_labels | tojson }}, datasets: [{ label: '{{ _("Average Score") }} (%)', data: {{ chart_values | tojson }}, backgroundColor: 'rgba(13, 110, 253, 0.7)' }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+    });
+    new Chart(document.getElementById('tPieChart'), {
+        type: 'doughnut',
+        data: { labels: ['{{ _("Passed") }}', '{{ _("Failed") }}'], datasets: [{ data: [{{ pass_count }}, {{ fail_count }}], backgroundColor: ['#198754', '#dc3545'] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+</script>
+{% endblock %}

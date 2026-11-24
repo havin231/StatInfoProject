@@ -44,14 +44,28 @@ class SetupForm(FlaskForm):
 # 2. ADMIN & USER MANAGEMENT
 # ==========================================
 
+GENDER_CHOICES_OPTIONAL = [
+    ('', _l('Prefer not to say / Optional')),
+    ('male', _l('Male')),
+    ('female', _l('Female')),
+]
+
+GENDER_CHOICES_REQUIRED = [
+    ('', _l('Select Gender')),
+    ('male', _l('Male')),
+    ('female', _l('Female')),
+]
+
+
 class TeacherSignupForm(FlaskForm):
     """
     Form for Admins to create new staff accounts.
     """
-    username = StringField(_l('Teacher Name'), validators=[DataRequired()])
-    username_kurdish = StringField(_l('Teacher Name (Kurdish)'), validators=[Optional()])
+    username = StringField(_l('Teacher Name'), validators=[DataRequired(), Length(max=100)])
+    username_kurdish = StringField(_l('Teacher Name (Kurdish)'), validators=[Optional(), Length(max=100)])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
+    gender = SelectField(_l('Gender (Optional)'), choices=GENDER_CHOICES_OPTIONAL, validators=[Optional()])
     birth_date = DateField(_l('Birth Date (Optional)'), format='%Y-%m-%d', validators=[Optional(), validate_birth_date])
     bio = TextAreaField(_l('Bio (Optional)'), validators=[Optional(), Length(max=500)])
     is_admin = BooleanField(_l('Grant Admin Access'))
@@ -61,10 +75,11 @@ class TeacherEditForm(FlaskForm):
     """
     Form for editing existing staff.
     """
-    username = StringField(_l('Teacher Name'), validators=[DataRequired()])
-    username_kurdish = StringField(_l('Teacher Name (Kurdish)'), validators=[Optional()])
+    username = StringField(_l('Teacher Name'), validators=[DataRequired(), Length(max=100)])
+    username_kurdish = StringField(_l('Teacher Name (Kurdish)'), validators=[Optional(), Length(max=100)])
     email = StringField(_l('Email'), validators=[DataRequired(), Email()])
     password = PasswordField(_l('Reset Password (Optional)'), validators=[Optional(), Length(min=6)])
+    gender = SelectField(_l('Gender (Optional)'), choices=GENDER_CHOICES_OPTIONAL, validators=[Optional()])
     birth_date = DateField(_l('Birth Date (Optional)'), format='%Y-%m-%d', validators=[Optional(), validate_birth_date])
     bio = TextAreaField(_l('Bio (Optional)'), validators=[Optional(), Length(max=500)])
     is_admin = BooleanField(_l('Grant Admin Access'))
@@ -75,8 +90,9 @@ class TeacherProfileForm(FlaskForm):
     """
     Form for teachers (and admins) to edit their own profile from their dashboard.
     """
-    username = StringField(_l('Full Name'), validators=[DataRequired(), Length(min=1, max=20)])
-    username_kurdish = StringField(_l('Full Name (Kurdish)'), validators=[Optional(), Length(max=20)])
+    username = StringField(_l('Full Name'), validators=[DataRequired(), Length(min=1, max=100)])
+    username_kurdish = StringField(_l('Full Name (Kurdish)'), validators=[Optional(), Length(max=100)])
+    gender = SelectField(_l('Gender (Optional)'), choices=GENDER_CHOICES_OPTIONAL, validators=[Optional()])
     birth_date = DateField(_l('Birth Date (Optional)'), format='%Y-%m-%d', validators=[Optional(), validate_birth_date])
     bio = TextAreaField(_l('Bio (Optional)'), validators=[Optional(), Length(max=500)])
     new_password = PasswordField(_l('New Password (Optional)'), validators=[Optional(), Length(min=6)])
@@ -138,22 +154,52 @@ class PageForm(FlaskForm):
 
 class QuestionForm(FlaskForm):
     """
-    Form for adding/editing a single question.
+    Form for adding/editing a single bilingual question (English and/or Kurdish faces).
     """
     subject_id = SelectField(_l('Subject'), coerce=int, validators=[DataRequired()])
     page_id = SelectField(_l('Link to Specific Lecture (Optional)'), coerce=int)
 
-    question_text = TextAreaField(_l('Question'), validators=[DataRequired()])
-    option_a = StringField(_l('Option A'), validators=[DataRequired()])
-    option_b = StringField(_l('Option B'), validators=[DataRequired()])
-    option_c = StringField(_l('Option C'), validators=[DataRequired()])
-    option_d = StringField(_l('Option D'), validators=[DataRequired()])
+    question_text = TextAreaField(_l('Question (English)'), validators=[Optional()])
+    option_a = StringField(_l('Option A (English)'), validators=[Optional()])
+    option_b = StringField(_l('Option B (English)'), validators=[Optional()])
+    option_c = StringField(_l('Option C (English)'), validators=[Optional()])
+    option_d = StringField(_l('Option D (English)'), validators=[Optional()])
+
+    question_text_kurdish = TextAreaField(_l('Question (Kurdish)'), validators=[Optional()])
+    option_a_kurdish = StringField(_l('Option A (Kurdish)'), validators=[Optional()])
+    option_b_kurdish = StringField(_l('Option B (Kurdish)'), validators=[Optional()])
+    option_c_kurdish = StringField(_l('Option C (Kurdish)'), validators=[Optional()])
+    option_d_kurdish = StringField(_l('Option D (Kurdish)'), validators=[Optional()])
+
     correct_answer = SelectField(_l('Correct Answer'), choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')], validators=[DataRequired()])
 
-    # Language Flag
+    # Legacy RTL flag for single-language fallback
     is_kurdish = BooleanField(_l('Is Kurdish? (Right-to-Left)'))
 
     submit = SubmitField(_l('Save Question'))
+
+    def validate(self, extra_validators=None):
+        ok = super().validate(extra_validators=extra_validators)
+        en_ok = all([
+            (self.question_text.data or '').strip(),
+            (self.option_a.data or '').strip(),
+            (self.option_b.data or '').strip(),
+            (self.option_c.data or '').strip(),
+            (self.option_d.data or '').strip(),
+        ])
+        ku_ok = all([
+            (self.question_text_kurdish.data or '').strip(),
+            (self.option_a_kurdish.data or '').strip(),
+            (self.option_b_kurdish.data or '').strip(),
+            (self.option_c_kurdish.data or '').strip(),
+            (self.option_d_kurdish.data or '').strip(),
+        ])
+        if not en_ok and not ku_ok:
+            self.question_text.errors.append(
+                _l('Please fill out at least one complete language version (English or Kurdish) including all 4 options.')
+            )
+            return False
+        return ok
 
 # ==========================================
 # 5. BULK IMPORT & RESOURCES
@@ -235,3 +281,52 @@ class CommentForm(FlaskForm):
     personality_info = TextAreaField(_l('About You / Personality (Optional)'), validators=[Optional(), Length(max=500)])
     comment_text = TextAreaField(_l('Your Comment'), validators=[DataRequired(), Length(min=1, max=2000)])
     submit = SubmitField(_l('Post Comment'))
+
+
+class CommentReplyForm(FlaskForm):
+    """
+    Form for Teachers & Admins to reply to a visitor's lecture comment.
+    """
+    comment_text = TextAreaField(_l('Your Reply'), validators=[DataRequired(), Length(min=1, max=2000)])
+    submit = SubmitField(_l('Post Reply'))
+
+
+class TeacherRequestForm(FlaskForm):
+    """
+    Public signup application form for prospective Teachers.
+    """
+    name_en = StringField(_l('Full Name (English)'), validators=[DataRequired(), Length(min=2, max=100)])
+    name_ku = StringField(_l('Full Name (Kurdish)'), validators=[DataRequired(), Length(min=2, max=100)])
+    email = StringField(_l('Email Address'), validators=[DataRequired(), Email(), Length(max=120)])
+    password = PasswordField(_l('Password'), validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField(
+        _l('Confirm Password'),
+        validators=[DataRequired(), EqualTo('password', message=_l('Passwords must match.'))]
+    )
+    gender = SelectField(_l('Gender'), choices=GENDER_CHOICES_REQUIRED, validators=[DataRequired()])
+    birth_date = DateField(_l('Birth Date'), format='%Y-%m-%d', validators=[DataRequired(), validate_birth_date])
+    bio = TextAreaField(_l('Bio (Optional)'), validators=[Optional(), Length(max=500)])
+    reason = TextAreaField(_l('Why do you want to sign up as a teacher?'), validators=[DataRequired(), Length(min=10, max=2000)])
+    submit = SubmitField(_l('Submit Application'))
+
+
+class TeacherToAdminMessageForm(FlaskForm):
+    """
+    Form allowing Teachers to send a direct message to Administrators.
+    """
+    title = StringField(_l('Subject'), validators=[DataRequired(), Length(min=1, max=200)])
+    message = TextAreaField(_l('Message to Administrators'), validators=[DataRequired(), Length(min=1, max=2000)])
+    submit = SubmitField(_l('Send to Admins'))
+
+
+class StudentManageForm(FlaskForm):
+    """
+    Form for Teachers & Admins to create or edit a code-based Student record.
+    """
+    name_en = StringField(_l('Student Name (English)'), validators=[DataRequired(), Length(min=1, max=100)])
+    name_ku = StringField(_l('Student Name (Kurdish)'), validators=[DataRequired(), Length(min=1, max=100)])
+    birth_date = DateField(_l('Birth Date'), format='%Y-%m-%d', validators=[DataRequired(), validate_birth_date])
+    gender = SelectField(_l('Gender'), choices=GENDER_CHOICES_REQUIRED, validators=[DataRequired()])
+    department_en = StringField(_l('Department (English)'), validators=[DataRequired(), Length(min=1, max=100)])
+    department_ku = StringField(_l('Department (Kurdish)'), validators=[DataRequired(), Length(min=1, max=100)])
+    submit = SubmitField(_l('Save Student'))

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Admin Notifications') }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1"><i class="fas fa-bell me-2 text-primary"></i>{{ _('Admin Notifications Hub') }}</h1>
+        <p class="text-muted small mb-0">{{ _('Permanent log of teacher messages, signup applications, and content updates until deleted.') }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if notifications %}
+        <form method="POST" action="{{ url_for('admin.delete_all_admin_notifications') }}"
+            onsubmit="return confirm('{{ _('Delete ALL notifications permanently?') }}');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+                <i class="fas fa-trash-alt me-1"></i>{{ _('Delete All') }}
+            </button>
+        </form>
+        {% endif %}
+        <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Dashboard') }}
+        </a>
+    </div>
+</div>
+
+{% if unread_comments_count %}
+<div class="alert alert-info d-flex justify-content-between align-items-center mb-4 shadow-sm">
+    <span><i class="fas fa-comments me-2"></i><strong>{{ _('%(count)s New Comment(s)', count=unread_comments_count) }}</strong> {{ _('waiting on lecture discussions.') }}</span>
+    <a href="{{ url_for('admin.admin_comments') }}" class="btn btn-sm btn-info fw-bold">{{ _('Open Comments Hub') }}</a>
+</div>
+{% endif %}
+
+<!-- Type Filter Tabs -->
+<div class="btn-group btn-group-sm mb-4 flex-wrap" role="group">
+    {% for key, label in [
+        ('all', _('All')),
+        ('teacher_message', _('Teacher Messages')),
+        ('teacher_request', _('Signup Requests')),
+        ('page_added', _('Pages Added')),
+        ('page_edited', _('Pages Edited')),
+        ('question_added', _('Questions Added')),
+        ('question_edited', _('Questions Edited'))
+    ] %}
+    <a href="{{ url_for('admin.admin_notifications_page', type=key) }}"
+        class="btn {% if selected_type == key %}btn-primary{% else %}btn-outline-secondary{% endif %}">{{ label }}</a>
+    {% endfor %}
+</div>
+
+{% if notifications %}
+<div class="d-flex flex-column gap-3">
+    {% for notif in notifications %}
+    {% set is_tmsg = (notif.notification_type == 'teacher_message') %}
+    {% set is_treq = (notif.notification_type == 'teacher_request') %}
+    <div class="card shadow-sm {% if is_tmsg %}border-primary border-2 bg-primary-subtle{% elif is_treq %}border-warning border-2 bg-warning-subtle{% else %}card-accent{% endif %}">
+        <div class="card-body p-3">
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                <div class="d-flex align-items-center flex-wrap gap-2">
+                    {% if is_tmsg %}
+                    <span class="badge bg-primary"><i class="fas fa-envelope me-1"></i>{{ _('Teacher Message') }}</span>
+                    {% elif is_treq %}
+                    <span class="badge bg-warning text-dark"><i class="fas fa-user-plus me-1"></i>{{ _('Signup Request') }}</span>
+                    {% else %}
+                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">{{ notif.notification_type }}</span>
+                    {% endif %}
+
+                    {% if notif.actor_name %}
+                    <span class="small fw-bold text-body-emphasis">{{ _('From') }}: {{ notif.actor_name }}</span>
+                    {% endif %}
+                    {% if not notif.is_checked %}
+                    <span class="badge bg-danger">{{ _('Unread') }}</span>
+                    {% endif %}
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <small class="text-muted">{{ notif.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                    {% if not notif.is_checked %}
+                    <form method="POST" action="{{ url_for('admin.check_admin_notification', notif_id=notif.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-success py-0 px-2" title="{{ _('Mark as Read') }}">
+                            <i class="fas fa-check"></i>
+                        </button>
+                    </form>
+                    {% endif %}
+                    <form method="POST" action="{{ url_for('teacher.delete_admin_notification', notif_id=notif.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="{{ _('Delete') }}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <h6 class="fw-bold text-body-emphasis mb-1">{{ notif.title }}</h6>
+            <p class="mb-2 small text-body-emphasis" style="white-space: pre-wrap;">{{ notif.message }}</p>
+            {% if is_treq %}
+            <a href="{{ url_for('admin.admin_teacher_requests') }}" class="btn btn-sm btn-warning py-0 px-2">{{ _('Review Application') }}</a>
+            {% elif notif.related_subject and notif.related_page %}
+            <a href="{{ url_for('public.view_page', slug=notif.related_subject.slug, page_id=notif.related_page.id) }}" class="btn btn-sm btn-outline-primary py-0 px-2">{{ _('View Lesson') }}</a>
+            {% elif notif.related_subject %}
+            <a href="{{ url_for('public.subject_detail', slug=notif.related_subject.slug) }}" class="btn btn-sm btn-outline-primary py-0 px-2">{{ _('Open Subject') }}</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card shadow-sm text-center py-5 text-muted">
+    <i class="fas fa-bell-slash fa-3x mb-3"></i>
+    <p class="mb-0">{{ _('No new notifications') }}</p>
+</div>
+{% endif %}
+{% endblock %}

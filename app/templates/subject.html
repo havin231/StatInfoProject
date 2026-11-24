@@ -50,35 +50,49 @@
 
         {% if subject.pages %}
         <div class="list-group shadow-sm">
+            {% set cur_lang = get_locale().language %}
             {% for page in subject.pages %}
             <!-- Clickable Page Item -->
             <a href="/subject/{{ subject.slug }}/page/{{ page.id }}"
                 class="list-group-item list-group-item-action p-4 d-flex justify-content-between align-items-center">
                 <div>
-                    <h5 class="mb-1 fw-bold text-highlight">{{ page.title }}</h5>
-                    <p class="mb-1 text-muted small">{{ page.content_body | striptags | truncate(80) }}</p>
+                    <h5 class="mb-1 fw-bold text-highlight">{{ page.display_title(cur_lang) }}</h5>
+                    <p class="mb-1 text-muted small">{{ (page.content_body_kurdish if cur_lang == 'ku' and page.content_body_kurdish else page.content_body) | striptags | truncate(80) }}</p>
 
-                    <!--
-                             FIX: Check 'page.resources' (List) instead of 'page.resource_link' (Old Column).
-                             If the list has items, show the badge.
-                        -->
-                    {% if page.resources %}
-                    <span class="badge bg-secondary-subtle text-secondary border mt-2">
-                        <i class="fas fa-paperclip me-1"></i> {{ page.resources|length }} {{ _('Resource(s)') }}
-                    </span>
-                    {% endif %}
+                    <div class="d-flex flex-wrap gap-2 mt-2">
+                        {% if page.resources %}
+                        <span class="badge bg-secondary-subtle text-secondary border">
+                            <i class="fas fa-paperclip me-1"></i> {{ page.resources|length }} {{ _('Resource(s)') }}
+                        </span>
+                        {% endif %}
+                        {% if page.quiz_student_only and can_edit %}
+                        <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+                            <i class="fas fa-lock me-1"></i>{{ _('Quiz: Student-Only') }}
+                        </span>
+                        {% endif %}
+                    </div>
                 </div>
                 <div>
                     <i class="fas fa-chevron-right text-muted"></i>
                 </div>
             </a>
 
-            <!-- TEACHER EDIT CONTROLS (Only visible to authenticated staff) -->
-            {% if current_user.is_authenticated %}
-            <div class="bg-body-tertiary border-start border-end border-bottom p-2 text-end mb-3 rounded-bottom">
-                <small class="text-muted me-2">{{ _('Instructor Controls:') }}</small>
-                <a href="/teacher/edit/page/{{ page.id }}" class="btn btn-sm btn-outline-secondary py-0">{{ _('Edit')
-                    }}</a>
+            <!-- TEACHER EDIT CONTROLS (Only visible to authorized staff) -->
+            {% if can_edit %}
+            <div class="bg-body-tertiary border-start border-end border-bottom p-2 text-end mb-3 rounded-bottom d-flex justify-content-end align-items-center flex-wrap gap-2">
+                <small class="text-muted me-auto">{{ _('Instructor Controls:') }}</small>
+                <form method="POST" action="{{ url_for('teacher.toggle_page_quiz_restriction', page_id=page.id) }}" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-sm py-0 {% if page.quiz_student_only %}btn-warning{% else %}btn-outline-secondary{% endif %}"
+                        title="{{ _('Toggle Hidden Student-Code-Only Quiz') }}">
+                        <i class="fas fa-lock{% if not page.quiz_student_only %}-open{% endif %} me-1"></i>
+                        {% if page.quiz_student_only %}{{ _('Student-Only Quiz') }}{% else %}{{ _('Public Quiz') }}{% endif %}
+                    </button>
+                </form>
+                <a href="{{ url_for('public.take_exam', slug=subject.slug, page_id=page.id) }}" class="btn btn-sm btn-outline-info py-0" title="{{ _('Direct Quiz Link') }}">
+                    <i class="fas fa-link"></i>
+                </a>
+                <a href="/teacher/edit/page/{{ page.id }}" class="btn btn-sm btn-outline-secondary py-0">{{ _('Edit') }}</a>
                 <a href="/teacher/delete/page/{{ page.id }}" class="btn btn-sm btn-outline-danger py-0"
                     onclick="return confirm('{{ _('Delete this page?') }}');">{{ _('Delete') }}</a>
             </div>
@@ -98,19 +112,35 @@
     <!-- RIGHT COLUMN: EXAMS & TOOLS -->
     <div class="col-lg-4">
 
-        <!-- EXAM CARD (Visible to Everyone) -->
+        <!-- EXAM CARD (Hidden from public if exam_student_only is active; staff still see controls) -->
+        {% if not subject.exam_student_only or can_edit %}
         <div class="card card-accent mb-4 shadow-sm">
             <div class="card-body text-center p-4">
                 <div class="h1 text-danger mb-3"><i class="fas fa-clock"></i></div>
                 <h4 class="fw-bold">{{ _('Class Exam') }}</h4>
 
+                {% if subject.exam_student_only and can_edit %}
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle mb-2">
+                    <i class="fas fa-lock me-1"></i>{{ _('Hidden (Student Code Required)') }}
+                </span>
+                {% endif %}
+
                 {% if subject.questions %}
                 <p class="text-muted small mb-4">{{ _('The exam is active. You will be graded immediately upon
                     submission.') }}</p>
-                <div class="d-grid">
+                <div class="d-grid gap-2">
                     <a href="/subject/{{ subject.slug }}/exam" class="btn btn-primary btn-lg">
                         <i class="fas fa-pen-alt me-2"></i>{{ _('Take Final Exam') }}
                     </a>
+                    {% if can_edit %}
+                    <form method="POST" action="{{ url_for('teacher.toggle_subject_exam_restriction', subject_id=subject.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-sm btn-outline-warning w-100">
+                            <i class="fas fa-lock{% if not subject.exam_student_only %}-open{% endif %} me-1"></i>
+                            {% if subject.exam_student_only %}{{ _('Make Exam Public') }}{% else %}{{ _('Make Exam Student-Only (Hidden)') }}{% endif %}
+                        </button>
+                    </form>
+                    {% endif %}
                 </div>
                 {% else %}
                 <p class="text-muted small">{{ _('No exams available yet.') }}</p>
@@ -118,6 +148,7 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
 
         <!-- TEACHER ONLY: QUESTION BANK PREVIEW -->
         {% if current_user.is_authenticated %}

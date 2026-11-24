@@ -1,17 +1,20 @@
 from flask import Blueprint, render_template, url_for, flash, redirect, abort, request
 from flask_babel import gettext as _
 from flask_login import login_required, current_user
+from sqlalchemy import or_
 
 from app import db, bcrypt
 from app.models import (
     User, Subject, Page, Question, Resource, ExamResult,
-    SubjectTeacher, AdminNotification, PageComment, TeacherNotification
+    SubjectTeacher, AdminNotification, PageComment, TeacherNotification,
+    Student, StudentTeacher, TeacherRequest
 )
 from app.forms import (
     SubjectForm, TeacherSignupForm, TeacherEditForm,
-    TeacherProfileForm, AdminMessageForm
+    TeacherProfileForm, AdminMessageForm, TeacherToAdminMessageForm,
+    StudentManageForm
 )
-from app.routes.helpers import can_edit_subject
+from app.routes.helpers import can_edit_subject, generate_student_code
 
 teacher = Blueprint('teacher', __name__)
 
@@ -31,17 +34,16 @@ def teacher_dashboard():
     """
     # 1. Administrator Context
     if current_user.is_admin:
-        # v0.5.0 - Admin Notification Cleanup (Delete > 3 days old)
-        from datetime import datetime, timedelta
-        cutoff_date = datetime.utcnow() - timedelta(days=3)
-        try:
-            AdminNotification.query.filter(AdminNotification.created_at < cutoff_date).delete()
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-
-        # Fetch Notifications
-        notifications = AdminNotification.query.order_by(AdminNotification.created_at.desc()).all()
+        # Admin notifications persist permanently until Admin deletes them
+        notifications = AdminNotification.query.order_by(
+            AdminNotification.is_checked.asc(),
+            AdminNotification.created_at.desc()
+        ).all()
+        unread_comments_count = PageComment.query.filter_by(
+            is_read_by_admin=False,
+            is_teacher_reply=False
+        ).count()
+        pending_requests_count = TeacherRequest.query.filter_by(status='pending').count()
 
         # Fetch the complete subject roster
         all_global_subjects = Subject.query.all()
@@ -50,7 +52,6 @@ def teacher_dashboard():
 
         # Initialize the Subject Creation Form for the sidebar
         subject_creation_form = SubjectForm()
-        # Populate the teacher dropdown with all staff
         subject_creation_form.teacher_id.choices = [
             (staff.id, staff.username) for staff in all_staff_members
         ]
@@ -76,17 +77,17 @@ def teacher_dashboard():
             teacher_form=new_teacher_form,
             admin_message_form=admin_message_form,
             profile_form=profile_form,
-            notifications=notifications
+            notifications=notifications,
+            unread_comments_count=unread_comments_count,
+            pending_requests_count=pending_requests_count
         )
 
     # 2. Standard Teacher Context (v0.5.0 - Multi-Teacher Support)
     else:
-        # Fetch subjects assigned to this teacher via SubjectTeacher association
         assignments = SubjectTeacher.query.filter_by(teacher_id=current_user.id).all()
         assigned_subjects = [a.subject for a in assignments if a.subject]
         assignment_map = {a.subject_id: a for a in assignments}
 
-        # Fetch Teacher Notifications (Admin messages + Lecture comment alerts)
         teacher_notifications = TeacherNotification.query.filter_by(
             teacher_id=current_user.id
         ).order_by(
@@ -94,15 +95,18 @@ def teacher_dashboard():
             TeacherNotification.created_at.desc()
         ).all()
 
-        # Self-profile form so teachers can update name, birth date, bio, password
         profile_form = TeacherProfileForm(obj=current_user)
+        admin_msg_form = TeacherToAdminMessageForm()
+        my_students_count = StudentTeacher.query.filter_by(teacher_id=current_user.id).count()
 
         return render_template(
             'teacher/dashboard.html',
             subjects=assigned_subjects,
             assignment_map=assignment_map,
             teacher_notifications=teacher_notifications,
-            profile_form=profile_form
+            profile_form=profile_form,
+            admin_msg_form=admin_msg_form,
+            my_students_count=my_students_count
         )
 
 
@@ -128,6 +132,7 @@ def update_own_profile():
 
         current_user.username = new_username
         current_user.username_kurdish = form.username_kurdish.data.strip() if form.username_kurdish.data else None
+        current_user.gender = form.gender.data or None
         current_user.birth_date = form.birth_date.data
         current_user.bio = form.bio.data.strip() if form.bio.data else None
 
@@ -379,6 +384,7 @@ def add_teacher():
             username_kurdish=form.username_kurdish.data,
             email=form.email.data,
             password_hash=password_hash_str,
+            gender=form.gender.data or None,
             birth_date=form.birth_date.data,
             bio=form.bio.data.strip() if form.bio.data else None,
             is_admin=is_admin_user
@@ -429,6 +435,7 @@ def edit_teacher(teacher_id):
         target_staff.username = form.username.data
         target_staff.username_kurdish = form.username_kurdish.data
         target_staff.email = form.email.data
+        target_staff.gender = form.gender.data or None
         target_staff.birth_date = form.birth_date.data
         target_staff.bio = form.bio.data.strip() if form.bio.data else None
         target_staff.show_name_on_subject = form.show_name_on_subject.data
@@ -473,11 +480,15 @@ def delete_teacher(teacher_id):
         return redirect(url_for('teacher.teacher_dashboard'))
 
     try:
-        # 2. Remove teacher notifications and co-teacher assignments for this teacher
+        # 2. Clean up notifications, student ownership/sharing, review links, and comment authorship
         TeacherNotification.query.filter(
             (TeacherNotification.teacher_id == target_staff.id) |
             (TeacherNotification.sender_id == target_staff.id)
         ).delete(synchronize_session=False)
+        StudentTeacher.query.filter_by(teacher_id=target_staff.id).delete()
+        Student.query.filter_by(created_by_id=target_staff.id).update({'created_by_id': None})
+        TeacherRequest.query.filter_by(reviewed_by_id=target_staff.id).update({'reviewed_by_id': None})
+        PageComment.query.filter_by(author_user_id=target_staff.id).update({'author_user_id': None})
         SubjectTeacher.query.filter_by(teacher_id=target_staff.id).delete()
 
         # 3. Iterate through owned Subjects
@@ -494,9 +505,10 @@ def delete_teacher(teacher_id):
             # C. Clean up Questions (before Pages due to page_id FK)
             Question.query.filter_by(subject_id=subj.id).delete()
 
-            # D. Clean up Comments, Resources & Pages
+            # D. Clean up Comments (replies first), Resources & Pages
             pages_found = Page.query.filter_by(subject_id=subj.id).all()
             for p in pages_found:
+                PageComment.query.filter(PageComment.page_id == p.id, PageComment.parent_id.isnot(None)).delete(synchronize_session=False)
                 PageComment.query.filter_by(page_id=p.id).delete()
                 Resource.query.filter_by(page_id=p.id).delete()
                 db.session.delete(p)
@@ -676,3 +688,326 @@ def view_teacher(teacher_id):
         view_as_admin=True,
         teacher_name=teacher_record.username
     )
+
+
+# ==============================================================================
+# TEACHER -> ADMIN MESSAGING & TEACHER NOTIFICATIONS PAGE (v0.9.0)
+# ==============================================================================
+
+@teacher.route('/teacher/message_admin', methods=['POST'])
+@login_required
+def send_admin_message():
+    """Allows any logged-in Teacher to send a visually distinct message to Admins."""
+    form = TeacherToAdminMessageForm()
+    if form.validate_on_submit():
+        notif = AdminNotification(
+            notification_type='teacher_message',
+            title=form.title.data.strip(),
+            message=form.message.data.strip(),
+            actor_type='teacher',
+            actor_id=current_user.id,
+            actor_name=current_user.username
+        )
+        try:
+            db.session.add(notif)
+            db.session.commit()
+            flash(_('Your message has been sent to the administrators.'), 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error sending message: %(error)s', error=str(e)), 'danger')
+    else:
+        for errs in form.errors.values():
+            for err in errs:
+                flash(str(err), 'danger')
+    return redirect(url_for('teacher.teacher_dashboard'))
+
+
+@teacher.route('/teacher/notifications')
+@login_required
+def teacher_notifications_page():
+    """Dedicated full-page notifications view for the logged-in teacher."""
+    notifs = TeacherNotification.query.filter_by(
+        teacher_id=current_user.id
+    ).order_by(
+        TeacherNotification.is_read.asc(),
+        TeacherNotification.created_at.desc()
+    ).all()
+    return render_template('teacher/notifications.html', notifications=notifs)
+
+
+@teacher.route('/teacher/notifications/mark_all_read', methods=['POST'])
+@login_required
+def mark_all_teacher_notifications_read():
+    try:
+        TeacherNotification.query.filter_by(teacher_id=current_user.id, is_read=False).update({'is_read': True})
+        db.session.commit()
+        flash(_('All notifications marked as read.'), 'success')
+    except Exception:
+        db.session.rollback()
+    return redirect(request.referrer or url_for('teacher.teacher_notifications_page'))
+
+
+# ==============================================================================
+# HIDDEN / STUDENT-CODE-ONLY EXAM & QUIZ TOGGLES (v0.9.0)
+# ==============================================================================
+
+@teacher.route('/subject/<int:subject_id>/toggle_exam_restriction', methods=['POST'])
+@login_required
+def toggle_subject_exam_restriction(subject_id):
+    subj = Subject.query.get_or_404(subject_id)
+    if not can_edit_subject(subj):
+        abort(403)
+    try:
+        subj.exam_student_only = not bool(subj.exam_student_only)
+        db.session.commit()
+        msg = _('Final exam is now hidden and restricted to Student Codes.') if subj.exam_student_only else _('Final exam is now public.')
+        flash(msg, 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error updating restriction: %(error)s', error=str(e)), 'danger')
+    return redirect(request.referrer or url_for('public.subject_detail', slug=subj.slug))
+
+
+@teacher.route('/page/<int:page_id>/toggle_quiz_restriction', methods=['POST'])
+@login_required
+def toggle_page_quiz_restriction(page_id):
+    page = Page.query.get_or_404(page_id)
+    if not can_edit_subject(page.subject):
+        abort(403)
+    try:
+        page.quiz_student_only = not bool(page.quiz_student_only)
+        db.session.commit()
+        msg = _('Lecture quiz is now hidden and restricted to Student Codes.') if page.quiz_student_only else _('Lecture quiz is now public.')
+        flash(msg, 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error updating restriction: %(error)s', error=str(e)), 'danger')
+    return redirect(request.referrer or url_for('public.subject_detail', slug=page.subject.slug))
+
+
+# ==============================================================================
+# STUDENT RECORD MANAGEMENT & ADMIN CROSS-TEACHER SHARING (v0.9.0)
+# ==============================================================================
+
+@teacher.route('/staff/students', methods=['GET', 'POST'])
+@login_required
+def manage_students():
+    """
+    Create and manage code-based Student records.
+    - Teachers see only students linked to them in StudentTeacher.
+    - Admins see all students and can assign/share any student across teachers.
+    """
+    form = StudentManageForm()
+    all_teachers = User.query.order_by(User.username.asc()).all()
+
+    if form.validate_on_submit():
+        code = generate_student_code(8)
+        new_student = Student(
+            name_en=form.name_en.data.strip(),
+            name_ku=form.name_ku.data.strip(),
+            birth_date=form.birth_date.data,
+            gender=form.gender.data,
+            department_en=form.department_en.data.strip(),
+            department_ku=form.department_ku.data.strip(),
+            student_code=code,
+            created_by_id=current_user.id
+        )
+        try:
+            db.session.add(new_student)
+            db.session.flush()
+
+            if current_user.is_admin:
+                raw_tids = request.form.getlist('teacher_ids')
+                tids = []
+                for r in raw_tids:
+                    try:
+                        tid = int(r)
+                        if tid not in tids:
+                            tids.append(tid)
+                    except ValueError:
+                        continue
+                if not tids:
+                    tids = [current_user.id]
+                for tid in tids:
+                    db.session.add(StudentTeacher(student_id=new_student.id, teacher_id=tid))
+            else:
+                db.session.add(StudentTeacher(student_id=new_student.id, teacher_id=current_user.id))
+
+            db.session.commit()
+            flash(_('Student "%(name)s" created with code %(code)s.', name=new_student.name_en, code=code), 'success')
+            return redirect(url_for('teacher.manage_students'))
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error creating student: %(error)s', error=str(e)), 'danger')
+
+    q_str = (request.args.get('q') or '').strip()
+    if current_user.is_admin:
+        query = Student.query
+    else:
+        query = Student.query.join(StudentTeacher).filter(StudentTeacher.teacher_id == current_user.id)
+
+    if q_str:
+        query = query.filter(or_(
+            Student.name_en.ilike(f'%{q_str}%'),
+            Student.name_ku.ilike(f'%{q_str}%'),
+            Student.student_code.ilike(f'%{q_str}%'),
+            Student.department_en.ilike(f'%{q_str}%'),
+            Student.department_ku.ilike(f'%{q_str}%'),
+        ))
+
+    students_list = query.order_by(Student.created_at.desc()).all()
+    return render_template(
+        'teacher/students.html',
+        form=form,
+        students=students_list,
+        all_teachers=all_teachers,
+        search_query=q_str
+    )
+
+
+@teacher.route('/staff/students/<int:student_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_student(student_id):
+    student = Student.query.get_or_404(student_id)
+    if not current_user.is_admin:
+        has_link = StudentTeacher.query.filter_by(student_id=student.id, teacher_id=current_user.id).first()
+        if not has_link:
+            abort(403)
+
+    form = StudentManageForm(obj=student)
+    if form.validate_on_submit():
+        student.name_en = form.name_en.data.strip()
+        student.name_ku = form.name_ku.data.strip()
+        student.birth_date = form.birth_date.data
+        student.gender = form.gender.data
+        student.department_en = form.department_en.data.strip()
+        student.department_ku = form.department_ku.data.strip()
+        try:
+            db.session.commit()
+            flash(_('Student information updated.'), 'success')
+            return redirect(url_for('teacher.manage_students'))
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error updating student: %(error)s', error=str(e)), 'danger')
+
+    return render_template('teacher/edit_student.html', form=form, student=student)
+
+
+@teacher.route('/staff/students/<int:student_id>/regenerate_code', methods=['POST'])
+@login_required
+def regenerate_student_code(student_id):
+    student = Student.query.get_or_404(student_id)
+    if not current_user.is_admin:
+        has_link = StudentTeacher.query.filter_by(student_id=student.id, teacher_id=current_user.id).first()
+        if not has_link:
+            abort(403)
+
+    student.student_code = generate_student_code(8)
+    try:
+        db.session.commit()
+        flash(_('New student code generated: %(code)s', code=student.student_code), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error regenerating code: %(error)s', error=str(e)), 'danger')
+    return redirect(url_for('teacher.manage_students'))
+
+
+@teacher.route('/staff/students/<int:student_id>/delete', methods=['POST'])
+@login_required
+def delete_student(student_id):
+    student = Student.query.get_or_404(student_id)
+    if not current_user.is_admin:
+        has_link = StudentTeacher.query.filter_by(student_id=student.id, teacher_id=current_user.id).first()
+        if not has_link:
+            abort(403)
+
+    try:
+        if current_user.is_admin:
+            ExamResult.query.filter_by(student_record_id=student.id).update({'student_record_id': None})
+            StudentTeacher.query.filter_by(student_id=student.id).delete()
+            db.session.delete(student)
+            flash(_('Student deleted permanently.'), 'success')
+        else:
+            StudentTeacher.query.filter_by(student_id=student.id, teacher_id=current_user.id).delete()
+            remaining = StudentTeacher.query.filter_by(student_id=student.id).count()
+            if remaining == 0 and student.created_by_id == current_user.id:
+                ExamResult.query.filter_by(student_record_id=student.id).update({'student_record_id': None})
+                db.session.delete(student)
+            flash(_('Student removed from your roster.'), 'success')
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error deleting student: %(error)s', error=str(e)), 'danger')
+
+    return redirect(url_for('teacher.manage_students'))
+
+
+@teacher.route('/admin/students/<int:student_id>/teachers', methods=['POST'])
+@login_required
+def assign_student_teachers(student_id):
+    """Admin-only: Assign/share an existing student across one or more teachers."""
+    if not current_user.is_admin:
+        abort(403)
+
+    student = Student.query.get_or_404(student_id)
+    raw_tids = request.form.getlist('teacher_ids')
+    selected_tids = set()
+    for r in raw_tids:
+        try:
+            selected_tids.add(int(r))
+        except ValueError:
+            continue
+
+    if not selected_tids:
+        flash(_('Please select at least one teacher.'), 'danger')
+        return redirect(url_for('teacher.manage_students'))
+
+    try:
+        existing_links = StudentTeacher.query.filter_by(student_id=student.id).all()
+        existing_tids = {link.teacher_id for link in existing_links}
+        for link in existing_links:
+            if link.teacher_id not in selected_tids:
+                db.session.delete(link)
+        for tid in selected_tids:
+            if tid not in existing_tids:
+                db.session.add(StudentTeacher(student_id=student.id, teacher_id=tid))
+        db.session.commit()
+        flash(_('Teacher assignments updated for "%(name)s".', name=student.name_en), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error updating student teachers: %(error)s', error=str(e)), 'danger')
+
+    return redirect(url_for('teacher.manage_students'))
+
+
+@teacher.route('/admin/students/bulk_share', methods=['POST'])
+@login_required
+def bulk_share_students():
+    """Admin-only: Share all selected students with a target teacher."""
+    if not current_user.is_admin:
+        abort(403)
+
+    target_tid = request.form.get('target_teacher_id', type=int)
+    raw_sids = request.form.getlist('student_ids')
+    if not target_tid or not raw_sids:
+        flash(_('Select at least one student and a target teacher.'), 'warning')
+        return redirect(url_for('teacher.manage_students'))
+
+    target_teacher = User.query.get_or_404(target_tid)
+    added = 0
+    try:
+        for raw_sid in raw_sids:
+            try:
+                sid = int(raw_sid)
+            except ValueError:
+                continue
+            if not StudentTeacher.query.filter_by(student_id=sid, teacher_id=target_teacher.id).first():
+                db.session.add(StudentTeacher(student_id=sid, teacher_id=target_teacher.id))
+                added += 1
+        db.session.commit()
+        flash(_('Shared %(count)s student(s) with %(teacher)s.', count=added, teacher=target_teacher.username), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error sharing students: %(error)s', error=str(e)), 'danger')
+
+    return redirect(url_for('teacher.manage_students'))

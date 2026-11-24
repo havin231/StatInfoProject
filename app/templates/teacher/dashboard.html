@@ -72,6 +72,10 @@
                             {{ profile_form.username_kurdish(class="form-control form-control-sm") }}
                         </div>
                         <div class="mb-2">
+                            <label class="form-label small fw-bold">{{ _('Gender (Optional)') }}</label>
+                            {{ profile_form.gender(class="form-select form-select-sm") }}
+                        </div>
+                        <div class="mb-2">
                             <label class="form-label small fw-bold">{{ _('Birth Date (Optional)') }}</label>
                             {{ profile_form.birth_date(class="form-control form-control-sm", type="date") }}
                         </div>
@@ -97,6 +101,50 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
+
+        <!-- QUICK TEACHER NAVIGATION CARD + MESSAGE ADMIN CARD -->
+        {% if not view_as_admin %}
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body d-grid gap-2">
+                <a href="{{ url_for('analytics.teacher_stats') }}" class="btn btn-primary btn-sm fw-bold">
+                    <i class="fas fa-chart-line me-2"></i>{{ _('My Statistics') }}
+                </a>
+                <a href="{{ url_for('teacher.manage_students') }}" class="btn btn-outline-primary btn-sm d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-user-graduate me-2"></i>{{ _('My Students') }}</span>
+                    <span class="badge bg-primary rounded-pill">{{ my_students_count }}</span>
+                </a>
+                <a href="{{ url_for('teacher.teacher_notifications_page') }}" class="btn btn-outline-info btn-sm">
+                    <i class="fas fa-bell me-2"></i>{{ _('All Notifications') }}
+                </a>
+            </div>
+        </div>
+
+        {% if admin_msg_form %}
+        <div class="card mb-4 shadow-sm border-primary">
+            <div class="card-header bg-primary-subtle text-primary-emphasis fw-bold text-uppercase small py-2">
+                <i class="fas fa-envelope me-2"></i>{{ _('Message Administration') }}
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('teacher.send_admin_message') }}">
+                    {{ admin_msg_form.hidden_tag() }}
+                    <div class="mb-2">
+                        <label class="form-label small fw-bold">{{ _('Subject') }}</label>
+                        {{ admin_msg_form.title(class="form-control form-control-sm", placeholder=_('e.g., Request Student Sharing')) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold">{{ _('Message to Administrators') }}</label>
+                        {{ admin_msg_form.message(class="form-control form-control-sm", rows="3", placeholder=_('Write your message to the admins...')) }}
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-sm">
+                            <i class="fas fa-paper-plane me-1"></i>{{ _('Send to Admins') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
         {% endif %}
 
         <!-- LOGOUT CARD -->
@@ -294,6 +342,26 @@
                                     </button>
                                 </div>
                             </form>
+
+                            <!-- Final Exam Restriction Toggle (Hidden Student-Code Only) -->
+                            {% if not view_as_admin %}
+                            <form method="POST" action="{{ url_for('teacher.toggle_subject_exam_restriction', subject_id=sub.id) }}" class="mb-2">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <span class="small text-muted">
+                                        <i class="fas fa-lock{% if not sub.exam_student_only %}-open{% endif %} me-1"></i>
+                                        {% if sub.exam_student_only %}
+                                        <span class="text-warning">{{ _('Exam: Student-Only') }}</span>
+                                        {% else %}
+                                        <span class="text-secondary">{{ _('Exam: Public') }}</span>
+                                        {% endif %}
+                                    </span>
+                                    <button type="submit" class="btn btn-sm {% if sub.exam_student_only %}btn-warning{% else %}btn-outline-secondary{% endif %}">
+                                        {% if sub.exam_student_only %}{{ _('Unlock Exam') }}{% else %}{{ _('Student-Only') }}{% endif %}
+                                    </button>
+                                </div>
+                            </form>
+                            {% endif %}
 
                             <!-- Individual Teacher Name Visibility Toggle (Per Subject) -->
                             {% if not view_as_admin and assignment_map and sub.id in assignment_map %}

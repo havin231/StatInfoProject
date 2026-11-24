@@ -73,18 +73,25 @@ def toolbase():
                     flash(_('Import Error: CSV must have \"Name\" and \"Link\" columns.'), 'danger')
                     return redirect(url_for('tools.toolbase'))
                 
-                # Iterate and Add
+                # Iterate and Add (safe against NaN + supports Kurdish columns)
+                def _clean(val):
+                    return '' if pd.isna(val) else str(val).strip()
+
                 count = 0
                 for _, row in df.iterrows():
-                    t_title = str(row['name']).strip()
-                    t_link = str(row['link']).strip()
-                    t_desc = str(row.get('description', '')).strip()
-                    
+                    t_title = _clean(row['name'])
+                    t_link = _clean(row['link'])
+                    t_desc = _clean(row.get('description', '')) if 'description' in df.columns else ''
+                    t_title_ku = _clean(row.get('name_kurdish', '')) if 'name_kurdish' in df.columns else ''
+                    t_desc_ku = _clean(row.get('description_kurdish', '')) if 'description_kurdish' in df.columns else ''
+
                     if t_title and t_link:
                          new_tool = Tool(
                              title=t_title,
+                             title_kurdish=t_title_ku or None,
                              link=t_link,
-                             description=t_desc
+                             description=t_desc or None,
+                             description_kurdish=t_desc_ku or None
                          )
                          db.session.add(new_tool)
                          count += 1

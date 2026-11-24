@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Admin Detailed Statistics') }}{% endblock %}
+
+{% block content %}
+{% set cur_lang = get_locale().language %}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="h3 fw-bold mb-1"><i class="fas fa-chart-pie me-2 text-primary"></i>{{ _('Admin Detailed Statistics') }}</h1>
+        <p class="text-muted small mb-0">{{ _('Complete system-wide analytics across subjects, students, guests, demographics, and departments.') }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('analytics.export_admin_stats', subjects=selected_ids, teacher_id=teacher_id, gender=gender_filter, taker_type=taker_type, exam_type=exam_type, department=department_filter) }}"
+            class="btn btn-sm btn-outline-success">
+            <i class="fas fa-file-csv me-1"></i>{{ _('Export CSV') }}
+        </a>
+        <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Dashboard') }}
+        </a>
+    </div>
+</div>
+
+<!-- ORGANIZER & MULTI-FILTER PANEL -->
+<form method="GET" action="{{ url_for('analytics.admin_stats') }}" class="card shadow-sm mb-4 card-accent">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <span class="small fw-bold text-uppercase text-muted"><i class="fas fa-sliders-h me-1"></i>{{ _('Filter Subjects & Granular Details') }}</span>
+            <a href="{{ url_for('analytics.admin_stats') }}" class="small text-decoration-none">{{ _('Reset All Filters') }}</a>
+        </div>
+        <div class="d-flex flex-wrap gap-3 mb-3 pb-3 border-bottom">
+            {% for sub in all_subjects %}
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="subjects" value="{{ sub.id }}"
+                    id="asub_{{ sub.id }}" {% if sub.id in selected_ids %}checked{% endif %}>
+                <label class="form-check-label small fw-bold" for="asub_{{ sub.id }}">{{ sub.display_name(cur_lang) }}</label>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">{{ _('Teacher') }}</label>
+                <select name="teacher_id" class="form-select form-select-sm">
+                    <option value="">{{ _('All Teachers') }}</option>
+                    {% for t in all_teachers %}
+                    <option value="{{ t.id }}" {% if teacher_id == t.id %}selected{% endif %}>{{ t.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">{{ _('Exam Type') }}</label>
+                <select name="exam_type" class="form-select form-select-sm">
+                    <option value="all" {% if exam_type == 'all' %}selected{% endif %}>{{ _('All') }}</option>
+                    <option value="final" {% if exam_type == 'final' %}selected{% endif %}>{{ _('Final Exam') }}</option>
+                    <option value="quiz" {% if exam_type == 'quiz' %}selected{% endif %}>{{ _('Lecture Quiz') }}</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">{{ _('Participant') }}</label>
+                <select name="taker_type" class="form-select form-select-sm">
+                    <option value="all" {% if taker_type == 'all' %}selected{% endif %}>{{ _('All') }}</option>
+                    <option value="student" {% if taker_type == 'student' %}selected{% endif %}>{{ _('Registered Student') }}</option>
+                    <option value="guest" {% if taker_type == 'guest' %}selected{% endif %}>{{ _('Visitor / Guest') }}</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">{{ _('Gender') }}</label>
+                <select name="gender" class="form-select form-select-sm">
+                    <option value="all" {% if gender_filter == 'all' %}selected{% endif %}>{{ _('All') }}</option>
+                    <option value="male" {% if gender_filter == 'male' %}selected{% endif %}>{{ _('Male') }}</option>
+                    <option value="female" {% if gender_filter == 'female' %}selected{% endif %}>{{ _('Female') }}</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small fw-bold">{{ _('Department') }}</label>
+                <input type="text" name="department" value="{{ department_filter }}" class="form-control form-control-sm" placeholder="{{ _('Department...') }}">
+            </div>
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-sm btn-primary">{{ _('Apply') }}</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- KPI SUMMARY ROW -->
+<div class="row row-cols-2 row-cols-md-5 g-3 mb-4">
+    <div class="col"><div class="card card-accent text-center p-3 h-100"><div class="small text-muted text-uppercase">{{ _('Total Attempts') }}</div><div class="h2 fw-bold text-highlight mb-0">{{ total_attempts }}</div></div></div>
+    <div class="col"><div class="card card-accent text-center p-3 h-100"><div class="small text-muted text-uppercase">{{ _('Average Score') }}</div><div class="h2 fw-bold text-highlight mb-0">{{ avg_score }}%</div></div></div>
+    <div class="col"><div class="card card-accent text-center p-3 h-100"><div class="small text-muted text-uppercase">{{ _('Passed / Failed') }}</div><div class="h4 fw-bold mb-0"><span class="text-success">{{ pass_count }}</span> / <span class="text-danger">{{ fail_count }}</span></div></div></div>
+    <div class="col"><div class="card card-accent text-center p-3 h-100"><div class="small text-muted text-uppercase">{{ _('Male / Female') }}</div><div class="h4 fw-bold mb-0">{{ gender_counts.male }} / {{ gender_counts.female }}</div></div></div>
+    <div class="col"><div class="card card-accent text-center p-3 h-100"><div class="small text-muted text-uppercase">{{ _('Total Students') }}</div><div class="h2 fw-bold text-primary mb-0">{{ student_rows|length }}</div></div></div>
+</div>
+
+<!-- CHARTS + DEMOGRAPHICS -->
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <h5 class="fw-bold mb-3">{{ _('Subject Performance') }}</h5>
+            <div style="height: 240px;"><canvas id="aBarChart"></canvas></div>
+        </div></div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <h5 class="fw-bold mb-3">{{ _('Gender Breakdown') }}</h5>
+            <div style="height: 240px;"><canvas id="aGenderChart"></canvas></div>
+        </div></div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card shadow-sm h-100"><div class="card-body">
+            <h5 class="fw-bold mb-3">{{ _('Age Distribution') }}</h5>
+            <div style="height: 240px;"><canvas id="aAgeChart"></canvas></div>
+        </div></div>
+    </div>
+</div>
+
+{% if dept_stats %}
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-transparent fw-bold py-3"><i class="fas fa-building me-2 text-primary"></i>{{ _('Department Breakdown') }}</div>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle mb-0">
+            <thead class="bg-body-secondary"><tr><th>{{ _('Department') }}</th><th>{{ _('Attempts') }}</th><th class="text-end">{{ _('Average Score') }}</th></tr></thead>
+            <tbody>
+                {% for d in dept_stats %}
+                <tr><td class="fw-bold">{{ d.name }}</td><td>{{ d.attempts }}</td><td class="text-end fw-bold">{{ d.avg }}%</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<!-- ALL STUDENTS PERFORMANCE -->
+<div class="card shadow-sm mb-4">
+    <div class="card-header bg-transparent fw-bold py-3"><i class="fas fa-user-graduate me-2 text-primary"></i>{{ _('All Students Performance') }}</div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0 table-sm">
+            <thead class="bg-body-secondary">
+                <tr>
+                    <th>{{ _('Code') }}</th>
+                    <th>{{ _('Name (EN / KU)') }}</th>
+                    <th>{{ _('Department') }}</th>
+                    <th>{{ _('Gender / Age') }}</th>
+                    <th>{{ _('Assigned Teachers') }}</th>
+                    <th>{{ _('Attempts') }}</th>
+                    <th class="text-end">{{ _('Average Score') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in student_rows %}
+                {% set s = row.student %}
+                <tr>
+                    <td><span class="badge bg-primary-subtle text-primary-emphasis border font-monospace">{{ s.student_code }}</span></td>
+                    <td><div class="fw-bold">{{ s.name_en }}</div><div class="small text-muted">{{ s.name_ku }}</div></td>
+                    <td class="small">{{ s.display_department(cur_lang) }}</td>
+                    <td class="small text-muted">{{ _(s.gender|capitalize) }} / {{ s.age }}</td>
+                    <td class="small">{% for link in s.teacher_links %}<span class="badge bg-body-tertiary text-body border">{{ link.teacher.username }}</span> {% endfor %}</td>
+                    <td>{{ row.attempts }}</td>
+                    <td class="text-end fw-bold">{% if row.avg_score is not none %}{{ row.avg_score }}%{% else %}—{% endif %}</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="7" class="text-center py-4 text-muted">{{ _('No students found.') }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- FULL GRANULAR ATTEMPT LOG -->
+<div class="card shadow-sm">
+    <div class="card-header bg-transparent fw-bold py-3"><i class="fas fa-list-alt me-2 text-primary"></i>{{ _('Detailed Exam & Quiz Attempt Log') }}</div>
+    <div class="table-responsive">
+        <table class="table align-middle mb-0 table-sm">
+            <thead class="bg-body-secondary">
+                <tr>
+                    <th>{{ _('Date') }}</th>
+                    <th>{{ _('Subject') }}</th>
+                    <th>{{ _('Exam / Quiz') }}</th>
+                    <th>{{ _('Taker / Student') }}</th>
+                    <th>{{ _('Department') }}</th>
+                    <th>{{ _('DOB / Age / Gender') }}</th>
+                    <th>{{ _('Correct / Total') }}</th>
+                    <th class="text-end">{{ _('Score') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results %}
+                {% set stu = r.student_record %}
+                <tr>
+                    <td class="small text-muted">{{ r.date_submitted.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td class="fw-bold">{{ r.subject.display_name(cur_lang) }}</td>
+                    <td class="small">{% if r.page %}{{ _('Quiz') }}: {{ r.page.display_title(cur_lang) }}{% else %}{{ _('Final Exam') }}{% endif %}</td>
+                    <td class="small">
+                        {% if stu %}
+                            <span class="badge bg-primary-subtle text-primary-emphasis border font-monospace">{{ stu.student_code }}</span>
+                            <strong>{{ stu.display_name(cur_lang) }}</strong>
+                        {% else %}
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ _('Guest') }}</span>
+                            {{ r.taker_name or _('Anonymous') }}
+                        {% endif %}
+                    </td>
+                    <td class="small text-muted">{{ stu.display_department(cur_lang) if stu else '—' }}</td>
+                    <td class="small text-muted">
+                        {% set dob = stu.birth_date if stu else r.taker_birth_date %}
+                        {{ dob.strftime('%Y-%m-%d') if dob else '—' }}
+                        ({{ r.taker_age if r.taker_age is not none else '?' }}) /
+                        {{ _(r.resolved_gender|capitalize) if r.resolved_gender else '—' }}
+                    </td>
+                    <td class="small font-monospace">{% if r.correct_count is not none %}{{ r.correct_count }}/{{ r.total_questions }}{% else %}—{% endif %}</td>
+                    <td class="text-end fw-bold {% if r.score >= 50 %}text-success{% else %}text-danger{% endif %}">{{ r.score }}%</td>
+                </tr>
+                {% else %}
+                <tr><td colspan="8" class="text-center py-4 text-muted">{{ _('No exam data available yet.') }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    new Chart(document.getElementById('aBarChart'), {
+        type: 'bar',
+        data: { labels: {{ chart_labels | tojson }}, datasets: [{ label: '{{ _("Average Score") }} (%)', data: {{ chart_values | tojson }}, backgroundColor: 'rgba(13, 110, 253, 0.7)' }] },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+    });
+    new Chart(document.getElementById('aGenderChart'), {
+        type: 'doughnut',
+        data: { labels: ['{{ _("Male") }}', '{{ _("Female") }}'], datasets: [{ data: [{{ gender_counts.male }}, {{ gender_counts.female }}], backgroundColor: ['#0d6efd', '#d63384'] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+    new Chart(document.getElementById('aAgeChart'), {
+        type: 'bar',
+        data: {
+            labels: ['<18', '18-22', '23-30', '30+'],
+            datasets: [{ label: '{{ _("Participants") }}', data: [{{ age_groups['<18'] }}, {{ age_groups['18-22'] }}, {{ age_groups['23-30'] }}, {{ age_groups['30+'] }}], backgroundColor: '#198754' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+</script>
+{% endblock %}

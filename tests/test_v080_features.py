@@ -33,16 +33,10 @@ def test_comment_creates_admin_and_teacher_notifications(client, db, admin_user,
     )
     assert resp.status_code == 200
 
-    # Verify AdminNotification has full details
-    admin_notifs = AdminNotification.query.filter_by(notification_type='comment_added').all()
-    assert len(admin_notifs) == 1
-    an = admin_notifs[0]
-    assert sample_subject.name in an.message
-    assert sample_page.title in an.message
-    assert 'Soran' in an.message
-    assert '2003-08-20' in an.message
-    assert 'Loves statistics' in an.message
-    assert 'Could you explain step 2 again?' in an.message
+    # Verify PageComment is flagged unread for admin and available in /admin/comments
+    comment = PageComment.query.filter_by(author_name='Soran').first()
+    assert comment is not None
+    assert comment.is_read_by_admin is False
 
     # Verify TeacherNotification was created for teacher_user
     t_notifs = TeacherNotification.query.filter_by(teacher_id=teacher_user.id, notification_type='comment').all()
@@ -50,13 +44,24 @@ def test_comment_creates_admin_and_teacher_notifications(client, db, admin_user,
     assert 'Soran' in t_notifs[0].message
     assert sample_page.title in t_notifs[0].message
 
-    # Verify Admin dashboard displays the comment notification & has dark-mode safe markup + Edit button
+    # Verify Admin dashboard displays unread comments badge & link + dark-mode safe markup + Edit button
     client.post('/login', data={'email': 'admin@test.com', 'password': 'admin123'})
     admin_dash = client.get('/teacher/dashboard')
     assert admin_dash.status_code == 200
-    assert b'Soran' in admin_dash.data
+    assert b'1 New Comment(s)' in admin_dash.data
+    assert b'/admin/comments' in admin_dash.data
     assert b'bg-light' not in admin_dash.data
     assert f'/teacher/edit/subject/{sample_subject.id}'.encode() in admin_dash.data
+
+    # Verify dedicated /admin/comments page displays full comment details
+    comments_page = client.get('/admin/comments')
+    assert comments_page.status_code == 200
+    assert b'Soran' in comments_page.data
+    assert b'2003-08-20' in comments_page.data
+    assert b'Loves statistics' in comments_page.data
+    assert b'Could you explain step 2 again?' in comments_page.data
+    assert sample_subject.name.encode() in comments_page.data
+    assert sample_page.title.encode() in comments_page.data
 
 
 def test_admin_message_to_teacher_is_visually_distinct(client, db, admin_user, teacher_user):

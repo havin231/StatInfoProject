@@ -487,3 +487,39 @@ Whenever a change or new feature is added, append a new version block following 
 - **Verification**:
   - Updated `tests/test_v070_features.py` and added `tests/test_v080_features.py`; all 30 tests pass (100% pass rate).
   - Created local `version_0.8.0` snapshot under `~/Documents/statinfopro/`.
+
+---
+
+## Version 0.9.0
+**Date:** 2026-11-24
+**Summary:** Major logical & security audit fixes, live Statistics persistence with Teacher/Admin statistics hubs, dual-language Question Bank, code-based Student records & student-only hidden exams/quizzes, public Teacher signup requests, Teacher-to-Admin messaging, collapsible threaded lecture comments with Teacher anonymity support, permanent Notifications hubs, zero-loss 16-CSV Full Backup/Restore, and full Sorani Kurdish localization.
+
+### Changes & Improvements:
+- **Logical Audit Fixes & Bilingual Exam Engine**:
+  - Persisted `ExamResult` rows on every quiz/final-exam submission (`score`, `correct_count`, `total_questions`, `page_id`, `student_record_id`, guest `taker_name` [optional], `taker_birth_date`, `taker_gender`) so Statistics update live.
+  - Prevented partial-answer 100% grading exploit by grading against the complete expected question set and enforcing HTML5 form validation prior to submit confirmation.
+  - Added dual-language Question Bank ("two language faces") with `question_text_kurdish` and `option_a_kurdish`–`option_d_kurdish` across DB, bulk spreadsheet editor (`builder.html`), single question form (`QuestionForm`), public exam rendering (`exam.html`), and CSV export/import (accepting `'Answer'` and `'Ans'` headers with NaN handling).
+  - Fixed `Page.title_kurdish` and `SiteInfo.title_kurdish` schema/UI display, bilingual homepage search, bilingual `/public/stats`, `edit_subject` duplicate slug validation, Command/Tool CSV NaN sanitization, and `base.html` endpoint fallback (`public.index`).
+- **Zero-Loss 16-CSV Backup & Restore**:
+  - Fixed the `.replace('rn', '\n')` string corruption bug in `restore_system()`.
+  - Upgraded `export_full_backup()` and `restore_system()` to cover all 16 CSV exports (`1_users.csv` through `16_teacher_notifications.csv`) with full primary/foreign key fidelity and strict bottom-up wipe order.
+- **Teacher & Admin View-Only Statistics Hubs**:
+  - Added `/teacher/stats` (`teacher/stats.html`) scoped to the teacher's assigned subjects and linked students, with view-only subject filter checkboxes.
+  - Added `/admin/stats` (`admin/stats.html`) and `/admin/stats/export` CSV export with multi-criteria filtering (subjects, teacher, exam type, taker type, gender, search query, and date range).
+  - Fixed Chart.js i18n formatting in `teacher/stats.html` and `admin/stats.html` (`_('Average Score') (%)`).
+- **Code-Based Students & Hidden Student-Only Exams/Quizzes**:
+  - Re-introduced code-based `Student` records (`student_record` table, zero student passwords/logins) and `StudentTeacher` multi-teacher assignments (`/staff/students`, `/staff/students/<id>/edit`, `/staff/students/<id>/regenerate_code`, `/admin/students/<id>/teachers`, `/admin/students/bulk_share`), generating unique >= 8-character codes (`generate_student_code`).
+  - Added visibility restriction toggles for Final Exams (`Subject.exam_student_only`) and Lecture Quizzes (`Page.quiz_student_only`) protected by `exam_gate.html` and `POST /subject/<slug>/unlock_exam`.
+  - Updated exam/quiz submission flow to accept either a Student Code OR guest info (optional name, required birth date & gender).
+- **Public Teacher Signup Requests, Teacher-to-Admin Messaging & Permanent Notifications**:
+  - Added `/teacher/apply` (`TeacherRequestForm`) where prospective teachers submit EN/KU names, email, chosen password, gender, birth date, optional bio, and application reason; Admins approve/reject/delete in `/admin/teacher-requests`.
+  - Added `POST /teacher/message_admin` (`TeacherToAdminMessageForm`) sending visually distinct messages (`bg-primary-subtle`) to Admin notifications.
+  - Removed 3-day automatic deletion of Admin notifications; added permanent `/admin/notifications` and `/teacher/notifications` pages.
+- **Redesigned Collapsible Lecture Comments & Anonymous-Aware Teacher Replies**:
+  - Collapsed comments under `#commentsCollapse` on `page.html`, collecting author details (`author_name`, `author_birth_date`, optional `personality_info`) via `#commentDetailsModal` on Send.
+  - Added threaded replies (`POST /subject/<slug>/page/<page_id>/comment/<comment_id>/reply`); teachers hiding their name on a subject appear publicly as `"From Teacher"` (`لە لایەن مامۆستاوە`), while Admins view full author details in `/admin/comments`.
+  - Updated Admin dashboard sidebar to display unread visitor comment count (`is_read_by_admin`) linking directly to `/admin/comments`.
+- **Translations & Verification**:
+  - Updated all 258 Sorani Kurdish strings in `app/translations/ku/LC_MESSAGES/messages.po` (0 untranslated/fuzzy remaining) and compiled `messages.mo`.
+  - Updated `tests/test_exam.py` and `tests/test_v080_features.py`, and added `tests/test_v090_features.py`; all 38 tests pass (100% pass rate).
+  - Created local `version_0.9.0` snapshot under `~/Documents/statinfopro/`.

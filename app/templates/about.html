@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ info.title if info else 'About Us' }}{% endblock %}
+{% block title %}{{ (info.title_kurdish if get_locale().language == 'ku' and info.title_kurdish else info.title) if info else _('About Us') }}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -9,7 +9,7 @@
         <!-- HEADER SECTION -->
         <div class="text-center mb-5">
             <h1 class="display-5 fw-bold text-highlight">
-                {{ info.title if info else _('About Us') }}
+                {{ (info.title_kurdish if get_locale().language == 'ku' and info.title_kurdish else info.title) if info else _('About Us') }}
             </h1>
         </div>
 

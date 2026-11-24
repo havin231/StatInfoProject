@@ -27,7 +27,7 @@ class User(db.Model, UserMixin):
     Can be a regular Teacher or a System Administrator.
     """
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
+    username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(60), nullable=False)
 
@@ -38,12 +38,13 @@ class User(db.Model, UserMixin):
     show_name_on_subject = db.Column(db.Boolean, default=False)
 
     # NEW: Kurdish name for bilingual display
-    username_kurdish = db.Column(db.String(20), nullable=True)
+    username_kurdish = db.Column(db.String(100), nullable=True)
 
     # Preferred Language for UI (e.g., 'en', 'ku')
     preferred_lang = db.Column(db.String(10), default='en')
 
-    # Profile Info (v0.8.0): Optional Birth Date & Bio
+    # Profile Info (v0.8.0 / v0.9.0): Optional Gender, Birth Date & Bio
+    gender = db.Column(db.String(20), nullable=True)
     birth_date = db.Column(db.Date, nullable=True)
     bio = db.Column(db.Text, nullable=True)
 
@@ -75,6 +76,9 @@ class Subject(db.Model):
     # Visibility Flag: If False, subject is hidden from public home page
     is_public = db.Column(db.Boolean, default=True)
 
+    # Restriction Flag (v0.9.0): If True, Final Exam is hidden & requires an authorized Student Code
+    exam_student_only = db.Column(db.Boolean, default=False)
+
     # Foreign Key: Link to the Teacher who owns this subject
     teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
@@ -86,6 +90,9 @@ class Subject(db.Model):
     # Bilingual Support: Kurdish translations
     name_kurdish = db.Column(db.String(100), nullable=True)
     description_kurdish = db.Column(db.Text, nullable=True)
+
+    def display_name(self, lang='en'):
+        return self.name_kurdish if (lang == 'ku' and self.name_kurdish) else self.name
 
     def __repr__(self):
         return f"Subject('{self.name}', Slug: {self.slug})"
@@ -99,11 +106,15 @@ class Page(db.Model):
     Supports bilingual content (English & Kurdish).
     """
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    title_kurdish = db.Column(db.String(200), nullable=True)
 
     # Content Body: Stores HTML content from the Rich Text Editor
     content_body = db.Column(db.Text, nullable=False)
     content_body_kurdish = db.Column(db.Text, nullable=True)
+
+    # Restriction Flag (v0.9.0): If True, Lecture Quiz is hidden & requires an authorized Student Code
+    quiz_student_only = db.Column(db.Boolean, default=False)
 
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
 
@@ -115,6 +126,9 @@ class Page(db.Model):
 
     # Comments: Public visitor comments on this lecture
     comments = db.relationship('PageComment', backref='page', lazy=True, cascade="all, delete-orphan")
+
+    def display_title(self, lang='en'):
+        return self.title_kurdish if (lang == 'ku' and self.title_kurdish) else self.title
 
     def __repr__(self):
         return f"Page('{self.title}', Subject ID: {self.subject_id})"
@@ -143,44 +157,91 @@ class Resource(db.Model):
 class Question(db.Model):
     """
     Represents a multiple-choice question in the Question Bank.
+    Supports dual English & Kurdish faces (v0.9.0).
     """
     id = db.Column(db.Integer, primary_key=True)
     question_text = db.Column(db.Text, nullable=False)
+    question_text_kurdish = db.Column(db.Text, nullable=True)
 
-    # The 4 multiple-choice options
+    # The 4 multiple-choice options (English)
     option_a = db.Column(db.String(200), nullable=False)
     option_b = db.Column(db.String(200), nullable=False)
     option_c = db.Column(db.String(200), nullable=False)
     option_d = db.Column(db.String(200), nullable=False)
+
+    # The 4 multiple-choice options (Kurdish face)
+    option_a_kurdish = db.Column(db.String(200), nullable=True)
+    option_b_kurdish = db.Column(db.String(200), nullable=True)
+    option_c_kurdish = db.Column(db.String(200), nullable=True)
+    option_d_kurdish = db.Column(db.String(200), nullable=True)
 
     # The correct answer key: 'A', 'B', 'C', or 'D'
     correct_answer = db.Column(db.String(1), nullable=False)
 
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
 
-    # TASK 4: Optional link to a specific Page/Lecture.
-    # If NULL, this is a general subject question.
-    # If assigned, it only appears in that lecture's quiz.
+    # Optional link to a specific Page/Lecture.
     page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=True)
 
-    # NEW: Flag for Kurdish Language (Default False/English)
+    # Legacy fallback flag for Kurdish Language
     is_kurdish = db.Column(db.Boolean, default=False)
+
+    def get_text(self, lang='en'):
+        if lang == 'ku':
+            return self.question_text_kurdish or self.question_text
+        return self.question_text or self.question_text_kurdish
+
+    def get_option(self, letter, lang='en'):
+        letter = (letter or 'A').upper()
+        en_map = {'A': self.option_a, 'B': self.option_b, 'C': self.option_c, 'D': self.option_d}
+        ku_map = {'A': self.option_a_kurdish, 'B': self.option_b_kurdish, 'C': self.option_c_kurdish, 'D': self.option_d_kurdish}
+        if lang == 'ku':
+            return ku_map.get(letter) or en_map.get(letter, '')
+        return en_map.get(letter) or ku_map.get(letter, '')
+
+    def use_rtl(self, lang='en'):
+        return (lang == 'ku' and bool(self.question_text_kurdish)) or (not self.question_text_kurdish and bool(self.is_kurdish))
 
     def __repr__(self):
         return f"Question('{self.question_text[:20]}...', Correct: {self.correct_answer})"
 
 # ==========================================
-# 6. EXAM RESULT MODEL (Anonymous Summary)
+# 6. EXAM RESULT MODEL (Live Stats & Attempt Log)
 # ==========================================
 class ExamResult(db.Model):
     """
-    Represents the final score of an anonymous exam attempt.
+    Represents the final score of a visitor or student's exam/quiz attempt.
     """
     id = db.Column(db.Integer, primary_key=True)
     score = db.Column(db.Integer, nullable=False) # Percentage (0-100)
-    date_submitted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    correct_count = db.Column(db.Integer, nullable=True)
+    total_questions = db.Column(db.Integer, nullable=True)
+    date_submitted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, index=True)
 
-    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False, index=True)
+    page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=True)  # NULL = Final Exam, set = Lecture Quiz
+    student_record_id = db.Column(db.Integer, db.ForeignKey('student_record.id'), nullable=True, index=True)
+
+    # Guest taker info (when not using a Student Code)
+    taker_name = db.Column(db.String(100), nullable=True)
+    taker_birth_date = db.Column(db.Date, nullable=True)
+    taker_gender = db.Column(db.String(20), nullable=True)
+
+    # Relationships
+    page = db.relationship('Page', foreign_keys=[page_id])
+    student_record = db.relationship('Student', foreign_keys=[student_record_id], backref='exam_results')
+
+    @property
+    def taker_age(self):
+        if self.student_record:
+            return self.student_record.age
+        return calculate_age(self.taker_birth_date)
+
+    @property
+    def resolved_gender(self):
+        if self.student_record:
+            return self.student_record.gender
+        return self.taker_gender
 
     def __repr__(self):
         return f"Result(Subject: {self.subject_id}, Score: {self.score})"
@@ -195,7 +256,8 @@ class SiteInfo(db.Model):
     """
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(50), unique=True, nullable=False) # Unique identifier
-    title = db.Column(db.String(100), default="About Us")
+    title = db.Column(db.String(200), default="About Us")
+    title_kurdish = db.Column(db.String(200), nullable=True)
     content = db.Column(db.Text, nullable=True) # HTML content
     content_kurdish = db.Column(db.Text, nullable=True)  # Kurdish translation
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -250,6 +312,7 @@ class AdminNotification(db.Model):
     NOTIFICATION_TYPES = [
         'question_added', 'question_edited',
         'page_added', 'page_edited',
+        'teacher_message', 'teacher_request',
         'comment_added'
     ]
 
@@ -315,21 +378,35 @@ class SubjectTeacher(db.Model):
 
 
 # ==========================================
-# 12. PAGE COMMENT MODEL (v0.7.0 / v0.8.0)
+# 12. PAGE COMMENT MODEL (v0.7.0 / v0.8.0 / v0.9.0)
 # ==========================================
 class PageComment(db.Model):
     """
-    Represents a public comment posted on a Lecture (Page).
+    Represents a public comment or teacher/admin reply on a Lecture (Page).
     Requires author name, birth date, and comment text; personality_info is optional.
     """
     id = db.Column(db.Integer, primary_key=True)
-    page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=False)
+    page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=False, index=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('page_comment.id'), nullable=True, index=True)
+    author_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    is_teacher_reply = db.Column(db.Boolean, default=False)
+    is_read_by_admin = db.Column(db.Boolean, default=False, index=True)
+
     author_name = db.Column(db.String(100), nullable=False)
     author_birth_date = db.Column(db.Date, nullable=True)
     author_age = db.Column(db.Integer, nullable=True)
     personality_info = db.Column(db.Text, nullable=True)
     comment_text = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    replies = db.relationship(
+        'PageComment',
+        backref=db.backref('parent', remote_side=[id]),
+        lazy=True,
+        order_by='PageComment.created_at.asc()'
+    )
+    author_user = db.relationship('User', foreign_keys=[author_user_id])
 
     @property
     def display_age(self):
@@ -351,7 +428,7 @@ class TeacherNotification(db.Model):
     - 'admin_message': Direct announcement/message written by an Admin (visually distinct).
     """
     id = db.Column(db.Integer, primary_key=True)
-    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
 
     notification_type = db.Column(db.String(30), nullable=False, default='comment')
@@ -361,7 +438,7 @@ class TeacherNotification(db.Model):
     related_subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=True)
     related_page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=True)
 
-    is_read = db.Column(db.Boolean, default=False)
+    is_read = db.Column(db.Boolean, default=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -372,3 +449,100 @@ class TeacherNotification(db.Model):
 
     def __repr__(self):
         return f"TeacherNotification({self.notification_type} -> Teacher {self.teacher_id}: {self.title})"
+
+
+# ==========================================
+# 14. TEACHER SIGNUP REQUEST MODEL (v0.9.0)
+# ==========================================
+class TeacherRequest(db.Model):
+    """
+    Public teacher registration requests awaiting Admin approval.
+    """
+    __tablename__ = 'teacher_request'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name_en = db.Column(db.String(100), nullable=False)
+    name_ku = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False, index=True)
+    password_hash = db.Column(db.String(60), nullable=False)
+    gender = db.Column(db.String(20), nullable=False)
+    birth_date = db.Column(db.Date, nullable=False)
+    bio = db.Column(db.Text, nullable=True)
+    reason = db.Column(db.Text, nullable=False)
+
+    status = db.Column(db.String(20), nullable=False, default='pending', index=True)
+    reviewed_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    reviewed_at = db.Column(db.DateTime, nullable=True)
+    admin_note = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    reviewed_by = db.relationship('User', foreign_keys=[reviewed_by_id])
+
+    @property
+    def age(self):
+        return calculate_age(self.birth_date)
+
+    def __repr__(self):
+        return f"TeacherRequest('{self.name_en}', Status: {self.status})"
+
+
+# ==========================================
+# 15. STUDENT RECORD MODEL (v0.9.0 - Code-Based, No Login)
+# ==========================================
+class Student(db.Model):
+    """
+    Code-based student records managed by Teachers & Admins (no password/login).
+    Named 'student_record' to avoid colliding with any legacy pre-v0.6.1 MySQL 'student' table.
+    """
+    __tablename__ = 'student_record'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name_en = db.Column(db.String(100), nullable=False)
+    name_ku = db.Column(db.String(100), nullable=False)
+    birth_date = db.Column(db.Date, nullable=False)
+    gender = db.Column(db.String(20), nullable=False)
+    department_en = db.Column(db.String(100), nullable=False)
+    department_ku = db.Column(db.String(100), nullable=False)
+    student_code = db.Column(db.String(16), unique=True, nullable=False, index=True)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    created_by = db.relationship('User', foreign_keys=[created_by_id])
+
+    @property
+    def age(self):
+        return calculate_age(self.birth_date)
+
+    def display_name(self, lang='en'):
+        return self.name_ku if (lang == 'ku' and self.name_ku) else self.name_en
+
+    def display_department(self, lang='en'):
+        return self.department_ku if (lang == 'ku' and self.department_ku) else self.department_en
+
+    def __repr__(self):
+        return f"Student('{self.name_en}', Code: {self.student_code})"
+
+
+# ==========================================
+# 16. STUDENT-TEACHER ASSIGNMENT MODEL (v0.9.0)
+# ==========================================
+class StudentTeacher(db.Model):
+    """
+    Links code-based Students to authorized Teachers.
+    Admins can share students across multiple teachers so one code unlocks
+    multiple teachers' hidden exams and appears in their stats.
+    """
+    __tablename__ = 'student_teacher'
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student_record.id'), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, index=True)
+    assigned_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    student = db.relationship('Student', backref=db.backref('teacher_links', lazy=True))
+    teacher = db.relationship('User', backref=db.backref('student_links', lazy=True))
+
+    __table_args__ = (db.UniqueConstraint('student_id', 'teacher_id'),)
+
+    def __repr__(self):
+        return f"StudentTeacher(Student: {self.student_id}, Teacher: {self.teacher_id})"

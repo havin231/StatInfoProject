@@ -64,6 +64,9 @@
             <!-- Card Footer -->
             <div class="card-footer bg-transparent text-center py-3 border-0">
                 <div class="d-grid gap-2">
+                    <a href="{{ url_for('auth.teacher_apply') }}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-user-plus me-1"></i>{{ _('Apply for a Teacher Account') }}
+                    </a>
                     <a href="/" class="small text-muted text-decoration-none">← {{ _('Return Home') }}</a>
                 </div>
             </div>

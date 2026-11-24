@@ -58,7 +58,10 @@ def import_questions_step1(subject_id):
 
             data_frame.columns = [col.lower().strip() for col in data_frame.columns]
 
-            # Define required structure
+            # Define required structure (accept both 'answer' and 'ans' headers)
+            if 'answer' not in data_frame.columns and 'ans' in data_frame.columns:
+                data_frame['answer'] = data_frame['ans']
+
             required_fields = ['question', 'opt a', 'opt b', 'opt c', 'opt d', 'answer']
             missing_fields = [f for f in required_fields if f not in data_frame.columns]
 
@@ -66,17 +69,25 @@ def import_questions_step1(subject_id):
                 flash(_('Import Error: Missing columns: %(fields)s', fields=", ".join(missing_fields)), 'danger')
                 return redirect(url_for('content.builder_exam', subject=target_subject.id))
 
+            def clean_cell(val):
+                return '' if pd.isna(val) else str(val).strip()
+
             # Prepare Preview
             question_preview_data = []
             for _, row in data_frame.iterrows():
-                raw_ans = '' if pd.isna(row['answer']) else str(row['answer']).upper().strip()
+                raw_ans = clean_cell(row['answer']).upper()
                 ans_char = raw_ans[0] if raw_ans and raw_ans[0] in ('A', 'B', 'C', 'D') else 'A'
                 question_preview_data.append({
-                    'question_text': '' if pd.isna(row['question']) else str(row['question']),
-                    'option_a': '' if pd.isna(row['opt a']) else str(row['opt a']),
-                    'option_b': '' if pd.isna(row['opt b']) else str(row['opt b']),
-                    'option_c': '' if pd.isna(row['opt c']) else str(row['opt c']),
-                    'option_d': '' if pd.isna(row['opt d']) else str(row['opt d']),
+                    'question_text': clean_cell(row['question']),
+                    'option_a': clean_cell(row['opt a']),
+                    'option_b': clean_cell(row['opt b']),
+                    'option_c': clean_cell(row['opt c']),
+                    'option_d': clean_cell(row['opt d']),
+                    'question_text_kurdish': clean_cell(row.get('question_ku', '')) if 'question_ku' in data_frame.columns else '',
+                    'option_a_kurdish': clean_cell(row.get('opt a_ku', '')) if 'opt a_ku' in data_frame.columns else '',
+                    'option_b_kurdish': clean_cell(row.get('opt b_ku', '')) if 'opt b_ku' in data_frame.columns else '',
+                    'option_c_kurdish': clean_cell(row.get('opt c_ku', '')) if 'opt c_ku' in data_frame.columns else '',
+                    'option_d_kurdish': clean_cell(row.get('opt d_ku', '')) if 'opt d_ku' in data_frame.columns else '',
                     'correct_answer': ans_char
                 })
 
@@ -137,17 +148,34 @@ def process_import_confirmation():
             q_save_count = 0
             for q_row in parsed_data:
                 db.session.add(Question(
-                    question_text=q_row['question_text'],
-                    option_a=q_row['option_a'],
-                    option_b=q_row['option_b'],
-                    option_c=q_row['option_c'],
-                    option_d=q_row['option_d'],
+                    question_text=q_row.get('question_text', ''),
+                    option_a=q_row.get('option_a', ''),
+                    option_b=q_row.get('option_b', ''),
+                    option_c=q_row.get('option_c', ''),
+                    option_d=q_row.get('option_d', ''),
+                    question_text_kurdish=q_row.get('question_text_kurdish') or None,
+                    option_a_kurdish=q_row.get('option_a_kurdish') or None,
+                    option_b_kurdish=q_row.get('option_b_kurdish') or None,
+                    option_c_kurdish=q_row.get('option_c_kurdish') or None,
+                    option_d_kurdish=q_row.get('option_d_kurdish') or None,
                     correct_answer=q_row['correct_answer'],
                     subject_id=subject_record.id,
                     page_id=global_pid,     # Linked to specific lecture
                     is_kurdish=mark_kurdish # Applied globally per your request
                 ))
                 q_save_count += 1
+
+            if not current_user.is_admin and q_save_count > 0:
+                db.session.add(AdminNotification(
+                    notification_type='question_added',
+                    title=f"{subject_record.name} — Questions Imported",
+                    message=f"{current_user.username} imported {q_save_count} question(s) into {subject_record.name}.",
+                    actor_type='teacher',
+                    actor_id=current_user.id,
+                    actor_name=current_user.username,
+                    related_subject_id=subject_record.id,
+                    related_page_id=global_pid
+                ))
 
             db.session.commit()
             flash(_('Batch Processed: %(count)s questions assigned to bank.', count=q_save_count), 'success')
@@ -162,8 +190,10 @@ def process_import_confirmation():
             for cmd_row in parsed_data:
                 db.session.add(SystemCommand(
                     title=cmd_row['title'],
+                    title_kurdish=cmd_row.get('title_kurdish') or None,
                     command_text=cmd_row['command_text'],
-                    description=cmd_row.get('description', '')
+                    description=cmd_row.get('description', ''),
+                    description_kurdish=cmd_row.get('description_kurdish') or None
                 ))
                 cmd_save_count += 1
 
@@ -266,6 +296,14 @@ def edit_subject(subject_id):
          form.teacher_id.choices = [(current_user.id, current_user.username)]
 
     if form.validate_on_submit():
+        duplicate_slug = Subject.query.filter(
+            Subject.slug == form.slug.data,
+            Subject.id != subj_record.id
+        ).first()
+        if duplicate_slug:
+            flash(_('Error: The URL Slug must be unique across all subjects.'), 'danger')
+            return render_template('teacher/builder.html', form=form, title="Edit Subject Details", subject=subj_record)
+
         subj_record.name = form.name.data
         subj_record.name_kurdish = form.name_kurdish.data
         subj_record.slug = form.slug.data
@@ -327,9 +365,10 @@ def delete_subject(subject_id):
         # C. Clear Question bank (before Pages because Question.page_id references Page.id)
         Question.query.filter_by(subject_id=subj_record.id).delete()
 
-        # D. Clear Resources, Comments, and Lectures
+        # D. Clear Resources, Comments (replies first), and Lectures
         pages_list = Page.query.filter_by(subject_id=subj_record.id).all()
         for p in pages_list:
+            PageComment.query.filter(PageComment.page_id == p.id, PageComment.parent_id.isnot(None)).delete(synchronize_session=False)
             PageComment.query.filter_by(page_id=p.id).delete()
             Resource.query.filter_by(page_id=p.id).delete()
             db.session.delete(p)
@@ -370,11 +409,24 @@ def builder_info():
     if form.validate_on_submit():
         new_page_record = Page(
             title=form.title.data,
+            title_kurdish=form.title_kurdish.data,
             content_body=form.content_body.data,
             content_body_kurdish=form.content_body_kurdish.data,
             subject_id=subj_record.id
         )
         db.session.add(new_page_record)
+        db.session.flush()
+        if not current_user.is_admin:
+            db.session.add(AdminNotification(
+                notification_type='page_added',
+                title=f"{subj_record.name} — {new_page_record.title}",
+                message=f"{current_user.username} added lecture '{new_page_record.title}' to {subj_record.name}.",
+                actor_type='teacher',
+                actor_id=current_user.id,
+                actor_name=current_user.username,
+                related_subject_id=subj_record.id,
+                related_page_id=new_page_record.id
+            ))
         db.session.commit()
         flash(_('Lecture content published.'), 'success')
         return redirect(url_for('teacher.teacher_dashboard'))
@@ -399,8 +451,20 @@ def edit_page(page_id):
 
     if form.validate_on_submit():
         target_page.title = form.title.data
+        target_page.title_kurdish = form.title_kurdish.data
         target_page.content_body = form.content_body.data
         target_page.content_body_kurdish = form.content_body_kurdish.data
+        if not current_user.is_admin:
+            db.session.add(AdminNotification(
+                notification_type='page_edited',
+                title=f"{target_page.subject.name} — {target_page.title}",
+                message=f"{current_user.username} updated lecture '{target_page.title}' in {target_page.subject.name}.",
+                actor_type='teacher',
+                actor_id=current_user.id,
+                actor_name=current_user.username,
+                related_subject_id=target_page.subject.id,
+                related_page_id=target_page.id
+            ))
         db.session.commit()
         flash(_('Changes saved.'), 'success')
         return redirect(url_for('public.subject_detail', slug=target_page.subject.slug))
@@ -428,6 +492,8 @@ def delete_page(page_id):
     try:
         TeacherNotification.query.filter_by(related_page_id=target_page.id).delete()
         AdminNotification.query.filter_by(related_page_id=target_page.id).delete()
+        ExamResult.query.filter_by(page_id=target_page.id).update({'page_id': None})
+        PageComment.query.filter(PageComment.page_id == target_page.id, PageComment.parent_id.isnot(None)).delete(synchronize_session=False)
         PageComment.query.filter_by(page_id=target_page.id).delete()
         Resource.query.filter_by(page_id=target_page.id).delete()
         Question.query.filter_by(page_id=target_page.id).update({'page_id': None})
@@ -444,7 +510,7 @@ def delete_page(page_id):
 @content.route('/teacher/comment/delete/<int:comment_id>', methods=['POST'])
 @login_required
 def delete_page_comment(comment_id):
-    """Allows subject teachers or admins to remove a comment on a lecture."""
+    """Allows subject teachers or admins to remove a comment (and its replies) on a lecture."""
     comment = PageComment.query.get_or_404(comment_id)
     target_page = comment.page
     target_subject = target_page.subject
@@ -456,6 +522,7 @@ def delete_page_comment(comment_id):
     page_id = target_page.id
 
     try:
+        PageComment.query.filter_by(parent_id=comment.id).delete()
         db.session.delete(comment)
         db.session.commit()
         flash(_('Comment deleted.'), 'success')
@@ -463,6 +530,51 @@ def delete_page_comment(comment_id):
         db.session.rollback()
         flash(_('Error deleting comment: %(error)s', error=str(e)), 'danger')
 
+    next_url = request.form.get('next')
+    if next_url and next_url.startswith('/'):
+        return redirect(next_url)
+    return redirect(url_for('public.view_page', slug=slug, page_id=page_id) + '#comments-section')
+
+
+@content.route('/subject/<slug>/page/<int:page_id>/comment/<int:comment_id>/reply', methods=['POST'])
+@login_required
+def reply_page_comment(slug, page_id, comment_id):
+    """Allows teachers (assigned to subject) or admins to reply to a visitor's comment."""
+    from app.forms import CommentReplyForm
+    target_subject = Subject.query.filter_by(slug=slug).first_or_404()
+    target_page = Page.query.get_or_404(page_id)
+    parent_comment = PageComment.query.get_or_404(comment_id)
+
+    if target_page.subject_id != target_subject.id or parent_comment.page_id != target_page.id:
+        abort(404)
+
+    if not can_edit_subject(target_subject):
+        abort(403)
+
+    form = CommentReplyForm()
+    if form.validate_on_submit():
+        reply = PageComment(
+            page_id=target_page.id,
+            parent_id=parent_comment.id,
+            author_user_id=current_user.id,
+            is_teacher_reply=True,
+            is_read_by_admin=True,
+            author_name=current_user.username,
+            comment_text=form.comment_text.data.strip()
+        )
+        try:
+            db.session.add(reply)
+            db.session.commit()
+            flash(_('Reply posted.'), 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error posting reply: %(error)s', error=str(e)), 'danger')
+    else:
+        flash(_('Reply text cannot be empty.'), 'danger')
+
+    next_url = request.form.get('next')
+    if next_url and next_url.startswith('/'):
+        return redirect(next_url)
     return redirect(url_for('public.view_page', slug=slug, page_id=page_id) + '#comments-section')
 
 
@@ -541,6 +653,11 @@ def builder_exam():
             'b': question.option_b,
             'c': question.option_c,
             'd': question.option_d,
+            'text_ku': question.question_text_kurdish or '',
+            'a_ku': question.option_a_kurdish or '',
+            'b_ku': question.option_b_kurdish or '',
+            'c_ku': question.option_c_kurdish or '',
+            'd_ku': question.option_d_kurdish or '',
             'correct': question.correct_answer,
             'page_id': question.page_id,
             'is_kurdish': question.is_kurdish
@@ -560,7 +677,7 @@ def builder_exam():
 @content.route('/teacher/api/save_questions/<int:subject_id>', methods=['POST'])
 @login_required
 def save_questions_api(subject_id):
-    """The AJAX backend that saves the Bulk Editor grid data."""
+    """The AJAX backend that saves the Bulk Editor grid data (supports dual EN & KU faces)."""
     target_subject = Subject.query.get_or_404(subject_id)
     if not can_edit_subject(target_subject):
         return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
@@ -573,28 +690,30 @@ def save_questions_api(subject_id):
         # Determine which IDs were sent
         sent_ids = [q['id'] for q in incoming_json_data if q.get('id')]
 
-        # 1. Clean up deleted questions
+        # 1. Clean up deleted questions (unlink AdminNotification FK first)
         current_db_questions = Question.query.filter_by(subject_id=target_subject.id).all()
         for q_db in current_db_questions:
             if q_db.id not in sent_ids:
+                AdminNotification.query.filter_by(related_question_id=q_db.id).update({'related_question_id': None})
                 db.session.delete(q_db)
 
         # 2. Process UPSERT (Update or Insert)
         for data_row in incoming_json_data:
-            text_content = data_row.get('text', '').strip()
-            if not text_content:
+            text_content = (data_row.get('text') or '').strip()
+            text_ku = (data_row.get('text_ku') or '').strip()
+            if not text_content and not text_ku:
                 continue
 
             # Handle Foreign Key for Lecture
             pid_val = data_row.get('page_id')
             if pid_val == "" or pid_val == "None" or pid_val == 0:
                 pid_val = None
+            else:
+                pid_val = int(pid_val)
 
-            # Boolean check for language
-            kurdish_flag = data_row.get('is_kurdish', False)
+            kurdish_flag = bool(data_row.get('is_kurdish', False))
 
             if data_row.get('id'):
-                # Update existing
                 target_q = Question.query.get(data_row['id'])
                 if target_q and target_q.subject_id == target_subject.id:
                     target_q.question_text = text_content
@@ -602,22 +721,42 @@ def save_questions_api(subject_id):
                     target_q.option_b = data_row.get('b', '')
                     target_q.option_c = data_row.get('c', '')
                     target_q.option_d = data_row.get('d', '')
+                    target_q.question_text_kurdish = text_ku or None
+                    target_q.option_a_kurdish = (data_row.get('a_ku') or '').strip() or None
+                    target_q.option_b_kurdish = (data_row.get('b_ku') or '').strip() or None
+                    target_q.option_c_kurdish = (data_row.get('c_ku') or '').strip() or None
+                    target_q.option_d_kurdish = (data_row.get('d_ku') or '').strip() or None
                     target_q.correct_answer = data_row.get('correct', 'A')
                     target_q.page_id = pid_val
                     target_q.is_kurdish = kurdish_flag
             else:
-                # Insert new
                 db.session.add(Question(
                     question_text=text_content,
                     option_a=data_row.get('a', ''),
                     option_b=data_row.get('b', ''),
                     option_c=data_row.get('c', ''),
                     option_d=data_row.get('d', ''),
+                    question_text_kurdish=text_ku or None,
+                    option_a_kurdish=(data_row.get('a_ku') or '').strip() or None,
+                    option_b_kurdish=(data_row.get('b_ku') or '').strip() or None,
+                    option_c_kurdish=(data_row.get('c_ku') or '').strip() or None,
+                    option_d_kurdish=(data_row.get('d_ku') or '').strip() or None,
                     correct_answer=data_row.get('correct', 'A'),
                     subject_id=target_subject.id,
                     page_id=pid_val,
                     is_kurdish=kurdish_flag
                 ))
+
+        if not current_user.is_admin:
+            db.session.add(AdminNotification(
+                notification_type='question_edited',
+                title=f"{target_subject.name} — Question Bank Updated",
+                message=f"{current_user.username} updated the question bank for {target_subject.name}.",
+                actor_type='teacher',
+                actor_id=current_user.id,
+                actor_name=current_user.username,
+                related_subject_id=target_subject.id
+            ))
 
         db.session.commit()
         return jsonify({'status': 'success'})
@@ -630,7 +769,7 @@ def save_questions_api(subject_id):
 @content.route('/teacher/export/questions/<int:subject_id>', methods=['GET'])
 @login_required
 def export_questions_csv(subject_id):
-    """Exports Question Bank for a subject. Uses strict quoting and BOM."""
+    """Exports bilingual Question Bank for a subject. Uses strict quoting and BOM."""
     target_subject = Subject.query.get_or_404(subject_id)
     if not can_edit_subject(target_subject):
         abort(403)
@@ -639,11 +778,17 @@ def export_questions_csv(subject_id):
     string_io_obj.write('\ufeff') # BOM for Excel UTF-8
     csv_writer_obj = csv.writer(string_io_obj, quoting=csv.QUOTE_ALL)
 
-    csv_writer_obj.writerow(['Question', 'Opt A', 'Opt B', 'Opt C', 'Opt D', 'Ans', 'Kurdish'])
+    csv_writer_obj.writerow([
+        'Question', 'Opt A', 'Opt B', 'Opt C', 'Opt D',
+        'Question_KU', 'Opt A_KU', 'Opt B_KU', 'Opt C_KU', 'Opt D_KU',
+        'Answer', 'Kurdish'
+    ])
     for q in target_subject.questions:
         csv_writer_obj.writerow([
-            q.question_text, q.option_a, q.option_b, q.option_c, q.option_d, q.correct_answer,
-            "True" if q.is_kurdish else "False"
+            q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
+            q.question_text_kurdish or '', q.option_a_kurdish or '',
+            q.option_b_kurdish or '', q.option_c_kurdish or '', q.option_d_kurdish or '',
+            q.correct_answer, "True" if q.is_kurdish else "False"
         ])
 
     return Response(
@@ -656,7 +801,7 @@ def export_questions_csv(subject_id):
 @content.route('/teacher/edit/question/<int:question_id>', methods=['GET', 'POST'])
 @login_required
 def edit_question(question_id):
-    """Edit a single question manually."""
+    """Edit a single bilingual question manually."""
     target_q = Question.query.get_or_404(question_id)
     if not can_edit_subject(target_q.subject):
         abort(403)
@@ -668,19 +813,36 @@ def edit_question(question_id):
     form.page_id.choices = [(0, "(None - General Exam)")] + [(p.id, p.title) for p in target_q.subject.pages]
 
     if form.validate_on_submit():
-        target_q.question_text = form.question_text.data
-        target_q.option_a = form.option_a.data
-        target_q.option_b = form.option_b.data
-        target_q.option_c = form.option_c.data
-        target_q.option_d = form.option_d.data
+        target_q.question_text = (form.question_text.data or '').strip()
+        target_q.option_a = (form.option_a.data or '').strip()
+        target_q.option_b = (form.option_b.data or '').strip()
+        target_q.option_c = (form.option_c.data or '').strip()
+        target_q.option_d = (form.option_d.data or '').strip()
+        target_q.question_text_kurdish = (form.question_text_kurdish.data or '').strip() or None
+        target_q.option_a_kurdish = (form.option_a_kurdish.data or '').strip() or None
+        target_q.option_b_kurdish = (form.option_b_kurdish.data or '').strip() or None
+        target_q.option_c_kurdish = (form.option_c_kurdish.data or '').strip() or None
+        target_q.option_d_kurdish = (form.option_d_kurdish.data or '').strip() or None
         target_q.correct_answer = form.correct_answer.data
         target_q.is_kurdish = form.is_kurdish.data
 
-        # Handle the 0/None selection for page_id
         if form.page_id.data == 0:
             target_q.page_id = None
         else:
             target_q.page_id = form.page_id.data
+
+        if not current_user.is_admin:
+            db.session.add(AdminNotification(
+                notification_type='question_edited',
+                title=f"{target_q.subject.name} — Question Edited",
+                message=f"{current_user.username} edited a question in {target_q.subject.name}.",
+                actor_type='teacher',
+                actor_id=current_user.id,
+                actor_name=current_user.username,
+                related_subject_id=target_q.subject.id,
+                related_page_id=target_q.page_id,
+                related_question_id=target_q.id
+            ))
 
         db.session.commit()
         flash(_('Question updated.'), 'success')
@@ -699,6 +861,7 @@ def delete_question(question_id):
 
     subject_slug_ref = target_q.subject.slug
     try:
+        AdminNotification.query.filter_by(related_question_id=target_q.id).update({'related_question_id': None})
         db.session.delete(target_q)
         db.session.commit()
         flash(_('Question removed from bank.'), 'success')

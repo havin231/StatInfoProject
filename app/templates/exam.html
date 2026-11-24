@@ -21,62 +21,104 @@
             <input type="hidden" name="page_id" value="{{ page_id }}" />
             {% endif %}
 
+            {% set cur_lang = get_locale().language %}
+
+            {% if questions %}
+            <!-- TAKER IDENTIFICATION CARD -->
+            <div class="card mb-4 border-primary shadow-sm card-accent">
+                <div class="card-header bg-transparent fw-bold text-body-emphasis">
+                    <i class="fas fa-id-card me-2 text-primary"></i>{{ _('Participant Information') }}
+                </div>
+                <div class="card-body">
+                    {% if is_restricted and unlocked_student %}
+                        <input type="hidden" name="taker_mode" value="student">
+                        <input type="hidden" name="student_code" value="{{ unlocked_student.student_code }}">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <span class="badge bg-success me-2"><i class="fas fa-check-circle me-1"></i>{{ _('Verified Student') }}</span>
+                                <strong class="text-body-emphasis">{{ unlocked_student.display_name(cur_lang) }}</strong>
+                                <span class="text-muted small ms-2">({{ unlocked_student.display_department(cur_lang) }})</span>
+                            </div>
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis border font-monospace">{{ unlocked_student.student_code }}</span>
+                        </div>
+                    {% else %}
+                        {% if not is_restricted %}
+                        <div class="btn-group w-100 mb-3" role="group">
+                            <input type="radio" class="btn-check" name="taker_mode" id="modeGuest" value="guest" {% if not unlocked_student %}checked{% endif %} onchange="switchTakerMode('guest')">
+                            <label class="btn btn-outline-primary btn-sm" for="modeGuest">
+                                <i class="fas fa-user me-1"></i>{{ _('Visitor / Guest') }}
+                            </label>
+
+                            <input type="radio" class="btn-check" name="taker_mode" id="modeStudent" value="student" {% if unlocked_student %}checked{% endif %} onchange="switchTakerMode('student')">
+                            <label class="btn btn-outline-primary btn-sm" for="modeStudent">
+                                <i class="fas fa-graduation-cap me-1"></i>{{ _('I have a Student Code') }}
+                            </label>
+                        </div>
+                        {% else %}
+                        <input type="hidden" name="taker_mode" value="student">
+                        {% endif %}
+
+                        <!-- GUEST INTAKE FIELDS -->
+                        <div id="guestFields" {% if unlocked_student or is_restricted %}class="d-none"{% endif %}>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">{{ _('Name (Optional)') }}</label>
+                                    <input type="text" name="taker_name" id="taker_name" class="form-control form-control-sm" placeholder="{{ _('Optional') }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">{{ _('Birth Date') }} <span class="text-danger">*</span></label>
+                                    <input type="date" name="taker_birth_date" id="taker_birth_date" class="form-control form-control-sm" {% if not unlocked_student and not is_restricted %}required{% endif %}>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">{{ _('Gender') }} <span class="text-danger">*</span></label>
+                                    <select name="taker_gender" id="taker_gender" class="form-select form-select-sm" {% if not unlocked_student and not is_restricted %}required{% endif %}>
+                                        <option value="">{{ _('Select Gender') }}</option>
+                                        <option value="male">{{ _('Male') }}</option>
+                                        <option value="female">{{ _('Female') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STUDENT CODE FIELD -->
+                        <div id="studentCodeField" {% if not unlocked_student and not is_restricted %}class="d-none"{% endif %}>
+                            <label class="form-label small fw-bold">{{ _('Student Code') }} <span class="text-danger">*</span></label>
+                            <input type="text" name="student_code" id="student_code"
+                                   class="form-control form-control-sm font-monospace text-uppercase"
+                                   value="{{ unlocked_student.student_code if unlocked_student else '' }}"
+                                   placeholder="{{ _('Enter your 8+ character Student Code') }}"
+                                   {% if unlocked_student or is_restricted %}required{% endif %}>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
             {% for q in questions %}
-            <!--
-                RTL LOGIC:
-                If q.is_kurdish is True, we add the 'rtl-question' class.
-                The CSS below handles the flipping.
-            -->
-            <div class="card mb-5 border-0 shadow-sm question-card {% if q.is_kurdish %} rtl-question {% endif %}">
+            {% set q_rtl = q.use_rtl(cur_lang) %}
+            <div class="card mb-5 border-0 shadow-sm question-card {% if q_rtl %} rtl-question {% endif %}">
 
                 <!-- Question Text -->
                 <div class="card-header bg-transparent border-bottom-0 pt-4 px-4">
                     <h5 class="fw-bold mb-0 question-title">
                         <span class="badge bg-primary me-2 shadow-sm q-badge">Q{{ loop.index }}</span>
-                        {{ q.question_text }}
+                        {{ q.get_text(cur_lang) }}
                     </h5>
                 </div>
 
                 <!-- Options Area -->
                 <div class="card-body px-4 pb-4">
                     <div class="d-flex flex-column gap-3">
-
+                        {% for opt_key in ['A', 'B', 'C', 'D'] %}
                         <label class="option-container">
-                            <input type="radio" name="q_{{ q.id }}" value="A" required>
+                            <input type="radio" name="q_{{ q.id }}" value="{{ opt_key }}" required>
                             <div class="option-card">
-                                <div class="option-indicator">A</div>
-                                <div class="option-text">{{ q.option_a }}</div>
+                                <div class="option-indicator">{{ opt_key }}</div>
+                                <div class="option-text">{{ q.get_option(opt_key, cur_lang) }}</div>
                                 <div class="check-icon"><i class="fas fa-check"></i></div>
                             </div>
                         </label>
-
-                        <label class="option-container">
-                            <input type="radio" name="q_{{ q.id }}" value="B" required>
-                            <div class="option-card">
-                                <div class="option-indicator">B</div>
-                                <div class="option-text">{{ q.option_b }}</div>
-                                <div class="check-icon"><i class="fas fa-check"></i></div>
-                            </div>
-                        </label>
-
-                        <label class="option-container">
-                            <input type="radio" name="q_{{ q.id }}" value="C" required>
-                            <div class="option-card">
-                                <div class="option-indicator">C</div>
-                                <div class="option-text">{{ q.option_c }}</div>
-                                <div class="check-icon"><i class="fas fa-check"></i></div>
-                            </div>
-                        </label>
-
-                        <label class="option-container">
-                            <input type="radio" name="q_{{ q.id }}" value="D" required>
-                            <div class="option-card">
-                                <div class="option-indicator">D</div>
-                                <div class="option-text">{{ q.option_d }}</div>
-                                <div class="check-icon"><i class="fas fa-check"></i></div>
-                            </div>
-                        </label>
-
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -112,11 +154,86 @@
     </div>
 </div>
 
+<!-- FLOATING LANGUAGE TOGGLE (Preserves answers & scroll on language switch) -->
+<a id="floatingExamLangToggle"
+    href="{{ url_for('public.set_lang', lang='en' if get_locale().language == 'ku' else 'ku') }}"
+    class="btn btn-primary rounded-pill shadow-lg d-flex align-items-center gap-2 px-3 py-2"
+    title="{{ _('Toggle Language') }}"
+    style="position: fixed; bottom: 5.25rem; inset-inline-end: 1.25rem; z-index: 1030;">
+    <i class="fas fa-globe"></i>
+    <span class="fw-bold small">{{ 'English' if get_locale().language == 'ku' else 'کوردی' }}</span>
+</a>
+
 <script>
-    // Submit button handler
+    function switchTakerMode(mode) {
+        const guestBox = document.getElementById('guestFields');
+        const codeBox = document.getElementById('studentCodeField');
+        const dobEl = document.getElementById('taker_birth_date');
+        const genderEl = document.getElementById('taker_gender');
+        const codeEl = document.getElementById('student_code');
+        if (!guestBox || !codeBox) return;
+
+        if (mode === 'student') {
+            guestBox.classList.add('d-none');
+            codeBox.classList.remove('d-none');
+            if (dobEl) dobEl.required = false;
+            if (genderEl) genderEl.required = false;
+            if (codeEl) codeEl.required = true;
+        } else {
+            guestBox.classList.remove('d-none');
+            codeBox.classList.add('d-none');
+            if (dobEl) dobEl.required = true;
+            if (genderEl) genderEl.required = true;
+            if (codeEl) codeEl.required = false;
+        }
+    }
+
+    // Preserve in-progress answers when toggling language
+    (function () {
+        const EXAM_STATE_KEY = 'exam_draft_' + window.location.pathname;
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('a[href*="/set-lang/"]')) {
+                const form = document.getElementById('examForm');
+                if (!form) return;
+                const state = {};
+                form.querySelectorAll('input[type="radio"]:checked').forEach(r => { state[r.name] = r.value; });
+                ['taker_name', 'taker_birth_date', 'taker_gender', 'student_code'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.value) state[id] = el.value;
+                });
+                sessionStorage.setItem(EXAM_STATE_KEY, JSON.stringify(state));
+            }
+        });
+        const raw = sessionStorage.getItem(EXAM_STATE_KEY);
+        if (raw) {
+            try {
+                const state = JSON.parse(raw);
+                if (state.taker_mode) {
+                    const r = document.querySelector(`input[name="taker_mode"][value="${state.taker_mode}"]`);
+                    if (r) { r.checked = true; switchTakerMode(state.taker_mode); }
+                }
+                Object.entries(state).forEach(([k, v]) => {
+                    if (k.startsWith('q_')) {
+                        const radio = document.querySelector(`input[name="${k}"][value="${v}"]`);
+                        if (radio) radio.checked = true;
+                    } else if (k !== 'taker_mode') {
+                        const el = document.getElementById(k);
+                        if (el) el.value = v;
+                    }
+                });
+            } catch (_) {}
+            sessionStorage.removeItem(EXAM_STATE_KEY);
+        }
+    })();
+
+    // Submit button handler (enforces HTML5 required checks first!)
     const submitBtn = document.getElementById('submitBtn');
     if (submitBtn) {
         submitBtn.addEventListener('click', function () {
+            const examForm = document.getElementById('examForm');
+            if (examForm && !examForm.reportValidity()) {
+                return;
+            }
             if (confirm("{{ _('Are you sure you want to submit your answers?') }}")) {
                 startSafeSubmission();
             }
@@ -136,6 +253,7 @@
             .then(response => {
                 if (response.ok) {
                     statusText.innerText = "{{ _('Server verified. Uploading answers...') }}";
+                    sessionStorage.removeItem('exam_draft_' + window.location.pathname);
                     document.getElementById('examForm').submit();
                 } else { throw new Error('Server not ready'); }
             })

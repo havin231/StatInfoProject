@@ -1,15 +1,17 @@
-from datetime import datetime
+from datetime import datetime, date
 from flask import Blueprint, render_template, url_for, flash, redirect, request, jsonify, session, abort
-from flask_babel import gettext as _
+from flask_babel import gettext as _, get_locale
 from flask_login import current_user, login_required
 from sqlalchemy import func, or_
 
 from app import db, bcrypt, limiter
 from app.models import (
     User, Subject, ExamResult, SiteInfo, Page, Question,
-    PageComment, AdminNotification, TeacherNotification, SubjectTeacher, calculate_age
+    PageComment, AdminNotification, TeacherNotification, SubjectTeacher,
+    Student, calculate_age
 )
-from app.forms import SetupForm, CommentForm
+from app.forms import SetupForm, CommentForm, CommentReplyForm
+from app.routes.helpers import can_edit_subject, can_student_access_subject, get_reply_display_name
 
 public = Blueprint('public', __name__)
 
@@ -107,7 +109,9 @@ def index():
             Subject.is_public == True,
             or_(
                 Subject.name.ilike(f'%{search_query}%'),
-                Subject.description.ilike(f'%{search_query}%')
+                Subject.name_kurdish.ilike(f'%{search_query}%'),
+                Subject.description.ilike(f'%{search_query}%'),
+                Subject.description_kurdish.ilike(f'%{search_query}%')
             )
         ).all()
         
@@ -115,6 +119,7 @@ def index():
             Subject.is_public == True,
             or_(
                 Page.title.ilike(f'%{search_query}%'),
+                Page.title_kurdish.ilike(f'%{search_query}%'),
                 Page.content_body.ilike(f'%{search_query}%'),
                 Page.content_body_kurdish.ilike(f'%{search_query}%')
             )
@@ -144,14 +149,16 @@ def public_stats():
 
     Calculates high-level metrics for public display using SQL aggregations.
     """
-    # 1. Subject performance aggregation
+    lang = get_locale().language
+
+    # 1. Subject performance aggregation (bilingual subject names)
     subject_scores = db.session.query(
-        Subject.name,
+        Subject,
         func.avg(ExamResult.score)
     ).join(ExamResult).group_by(Subject.id).all()
 
-    # 2. Extract labels and rounded values for Chart.js
-    chart_labels = [row[0] for row in subject_scores]
+    # 2. Extract localized labels and rounded values for Chart.js
+    chart_labels = [row[0].display_name(lang) for row in subject_scores]
     chart_values = [round(row[1], 1) for row in subject_scores]
 
     # 3. Global counters
@@ -269,7 +276,6 @@ def subject_detail(slug):
     Open to visitors and staff.
     Shows ONLY currently assigned teachers who opted to show their name.
     """
-    from app.models import SubjectTeacher
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
 
     # Visibility Check: If hidden, restrict access to staff only
@@ -278,8 +284,14 @@ def subject_detail(slug):
 
     current_assignments = SubjectTeacher.query.filter_by(subject_id=target_subject.id).all()
     visible_teachers = [a.teacher for a in current_assignments if a.show_name and a.teacher]
+    can_edit = current_user.is_authenticated and can_edit_subject(target_subject)
 
-    return render_template('subject.html', subject=target_subject, visible_teachers=visible_teachers)
+    return render_template(
+        'subject.html',
+        subject=target_subject,
+        visible_teachers=visible_teachers,
+        can_edit=can_edit
+    )
 
 
 @public.route('/subject/<slug>/page/<int:page_id>')
@@ -287,8 +299,7 @@ def view_page(slug, page_id):
     """
     LECTURE / CHAPTER CONTENT VIEW
 
-    Displays bilingual content and attached resources.
-    Discovers if targeted quiz questions exist for this lecture.
+    Displays bilingual content, attached resources, and threaded comments + teacher replies.
     """
     target_lecture = Page.query.get_or_404(page_id)
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
@@ -303,15 +314,15 @@ def view_page(slug, page_id):
         page_id=target_lecture.id
     ).first() is not None
 
+    # Fetch top-level comments (replies are eager/lazy accessed via c.replies)
     comments = PageComment.query.filter_by(
-        page_id=target_lecture.id
+        page_id=target_lecture.id,
+        parent_id=None
     ).order_by(PageComment.created_at.desc()).all()
     comment_form = CommentForm()
+    reply_form = CommentReplyForm()
 
-    can_moderate = False
-    if current_user.is_authenticated:
-        from app.routes.helpers import can_edit_subject
-        can_moderate = can_edit_subject(target_subject)
+    can_moderate = current_user.is_authenticated and can_edit_subject(target_subject)
 
     return render_template(
         'page.html',
@@ -320,7 +331,9 @@ def view_page(slug, page_id):
         has_quiz=specific_questions_exist,
         comments=comments,
         comment_form=comment_form,
-        can_moderate=can_moderate
+        reply_form=reply_form,
+        can_moderate=can_moderate,
+        get_reply_display_name=get_reply_display_name
     )
 
 
@@ -330,10 +343,9 @@ def add_page_comment(slug, page_id):
     """
     PUBLIC LECTURE COMMENT SUBMISSION
 
-    Allows any visitor to post a comment on a lecture after providing their
-    name, birth date, optional personality/about-you info, and comment text.
-    Also dispatches rich notifications to Admins and all Teachers assigned to
-    the subject.
+    Saves visitor comment (name, birth date, optional personality/about-you info, comment)
+    with is_read_by_admin=False (counted in the Admin box and shown on /admin/comments)
+    and dispatches TeacherNotification to all teachers assigned to the subject.
     """
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
     target_lecture = Page.query.get_or_404(page_id)
@@ -354,6 +366,9 @@ def add_page_comment(slug, page_id):
 
         new_comment = PageComment(
             page_id=target_lecture.id,
+            parent_id=None,
+            is_teacher_reply=False,
+            is_read_by_admin=False,
             author_name=author_name,
             author_birth_date=birth_date,
             author_age=computed_age,
@@ -361,7 +376,6 @@ def add_page_comment(slug, page_id):
             comment_text=comment_text
         )
 
-        # Build detailed notification payload (subject, lesson, commenter info, extra bio, comment)
         detail_lines = [
             f"Subject: {target_subject.name} | Lesson: {target_lecture.title}",
             f"By: {author_name} (Born: {birth_date.strftime('%Y-%m-%d')}, Age: {computed_age})"
@@ -375,21 +389,10 @@ def add_page_comment(slug, page_id):
         try:
             db.session.add(new_comment)
 
-            # 1. Notify Admins
-            db.session.add(AdminNotification(
-                notification_type='comment_added',
-                title=notif_title,
-                message=notif_body,
-                actor_type='visitor',
-                actor_name=author_name,
-                related_subject_id=target_subject.id,
-                related_page_id=target_lecture.id
-            ))
-
-            # 2. Notify all currently assigned teachers for this subject
+            # Notify all currently assigned teachers for this subject
             assignments = SubjectTeacher.query.filter_by(subject_id=target_subject.id).all()
             recipient_teacher_ids = {a.teacher_id for a in assignments}
-            if not recipient_teacher_ids and target_subject.teacher_id:
+            if target_subject.teacher_id:
                 recipient_teacher_ids.add(target_subject.teacher_id)
 
             for tid in recipient_teacher_ids:
@@ -416,19 +419,43 @@ def add_page_comment(slug, page_id):
 
 
 # ==============================================================================
-# SECTION 4: EXAM ENGINE (PUBLIC QUIZZES & EXAMS)
+# SECTION 4: EXAM ENGINE (PUBLIC & STUDENT-CODE-GATED QUIZZES/EXAMS)
 # ==============================================================================
+
+@public.route('/subject/<slug>/unlock_exam', methods=['POST'])
+@limiter.limit("20/minute")
+def unlock_exam(slug):
+    """Validate an 8+ char Student Code to unlock a hidden/restricted exam or quiz."""
+    target_subject = Subject.query.filter_by(slug=slug).first_or_404()
+    page_id = request.form.get('page_id', type=int)
+    raw_code = (request.form.get('student_code') or '').strip().upper()
+
+    dest_url = (
+        url_for('public.take_exam', slug=slug, page_id=page_id)
+        if page_id else url_for('public.take_exam', slug=slug)
+    )
+
+    if not raw_code:
+        flash(_('Please enter your Student Code.'), 'danger')
+        return redirect(dest_url)
+
+    student = Student.query.filter_by(student_code=raw_code).first()
+    if not student or not can_student_access_subject(student, target_subject):
+        flash(_('Invalid or unauthorized Student Code for this teacher/subject.'), 'danger')
+        return redirect(dest_url)
+
+    session[f'unlocked_code_{target_subject.id}'] = student.student_code
+    flash(_('Exam unlocked for %(name)s.', name=student.display_name(get_locale().language)), 'success')
+    return redirect(dest_url)
+
 
 @public.route('/subject/<slug>/exam')
 @public.route('/subject/<slug>/lecture/<int:page_id>/quiz')
 def take_exam(slug, page_id=None):
     """
-    EXAM ENGINE (DUAL MODE)
-
-    Handles:
-    A) Global Final Exams: Pulls all questions for a subject.
-    B) Lecture Quizzes: Pulls only questions tagged to a specific page_id.
+    EXAM ENGINE (DUAL MODE + BILINGUAL QUESTIONS + STUDENT-CODE GATE)
     """
+    lang = get_locale().language
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
 
     if not target_subject.is_public and not current_user.is_authenticated:
@@ -438,62 +465,146 @@ def take_exam(slug, page_id=None):
         lecture_record = Page.query.get_or_404(page_id)
         if lecture_record.subject_id != target_subject.id:
             abort(404)
+        is_restricted = bool(lecture_record.quiz_student_only)
         active_questions = Question.query.filter_by(page_id=page_id).all()
-        exam_title_text = f"Quiz: {lecture_record.title}"
+        exam_title_text = _('Quiz: %(title)s', title=lecture_record.display_title(lang))
     else:
+        is_restricted = bool(target_subject.exam_student_only)
         active_questions = Question.query.filter_by(subject_id=target_subject.id).all()
-        exam_title_text = f"{target_subject.name} Final Examination"
+        exam_title_text = _('%(name)s Final Examination', name=target_subject.display_name(lang))
+
+    unlocked_student = None
+    is_staff_viewer = current_user.is_authenticated and can_edit_subject(target_subject)
+    code = (request.args.get('code') or session.get(f'unlocked_code_{target_subject.id}') or '').strip().upper()
+    if code:
+        candidate = Student.query.filter_by(student_code=code).first()
+        if candidate and can_student_access_subject(candidate, target_subject):
+            unlocked_student = candidate
+
+    if is_restricted and not unlocked_student and not is_staff_viewer:
+        return render_template(
+            'exam_gate.html',
+            subject=target_subject,
+            page_id=page_id,
+            quiz_title=exam_title_text
+        )
 
     return render_template(
         'exam.html',
         subject=target_subject,
         questions=active_questions,
         quiz_title=exam_title_text,
-        page_id=page_id
+        page_id=page_id,
+        is_restricted=is_restricted,
+        unlocked_student=unlocked_student
     )
 
 
 @public.route('/subject/<slug>/exam/submit', methods=['POST'])
 def submit_exam(slug):
     """
-    EXAM GRADING SYSTEM
+    EXAM GRADING SYSTEM & LIVE STATS PERSISTENCE
 
-    Calculates percentage score based on submitted answers and
-    flashes the result immediately on redirect.
+    Validates student code OR guest taker info (optional name, required DOB & gender),
+    grades against the COMPLETE question pool for that exam/quiz, and saves ExamResult.
     """
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
 
     if not target_subject.is_public and not current_user.is_authenticated:
         abort(403)
 
-    # Dynamic Question Identification
-    submitted_question_ids = []
-    for key in request.form.keys():
-        if key.startswith('q_'):
-            try:
-                q_id_int = int(key.split('_')[1])
-                submitted_question_ids.append(q_id_int)
-            except (IndexError, ValueError):
-                continue
+    page_id = request.form.get('page_id', type=int)
+    retry_url = (
+        url_for('public.take_exam', slug=slug, page_id=page_id)
+        if page_id else url_for('public.take_exam', slug=slug)
+    )
 
-    validated_questions = Question.query.filter(
-        Question.id.in_(submitted_question_ids),
-        Question.subject_id == target_subject.id
-    ).all() if submitted_question_ids else []
+    if page_id:
+        lecture_record = Page.query.get_or_404(page_id)
+        if lecture_record.subject_id != target_subject.id:
+            abort(404)
+        is_restricted = bool(lecture_record.quiz_student_only)
+        expected_questions = Question.query.filter_by(page_id=page_id).all()
+    else:
+        is_restricted = bool(target_subject.exam_student_only)
+        expected_questions = Question.query.filter_by(subject_id=target_subject.id).all()
 
+    # Taker Identification: Student Code vs. Guest Info
+    taker_mode = (request.form.get('taker_mode') or 'guest').strip().lower()
+    raw_code = (request.form.get('student_code') or '').strip().upper()
+
+    student_record_id = None
+    taker_name = None
+    parsed_dob = None
+    taker_gender = None
+
+    if is_restricted or taker_mode == 'student' or raw_code:
+        student = Student.query.filter_by(student_code=raw_code).first() if raw_code else None
+        if not student:
+            flash(_('Invalid or missing Student Code.'), 'danger')
+            return redirect(retry_url)
+        if is_restricted and not can_student_access_subject(student, target_subject):
+            flash(_('This student code is not authorized for this teacher/subject exam.'), 'danger')
+            return redirect(retry_url)
+        student_record_id = student.id
+    else:
+        taker_name = (request.form.get('taker_name') or '').strip() or None
+        dob_str = (request.form.get('taker_birth_date') or '').strip()
+        taker_gender = (request.form.get('taker_gender') or '').strip().lower()
+
+        if not dob_str or taker_gender not in ('male', 'female'):
+            flash(_('Please provide your birth date and gender before submitting.'), 'danger')
+            return redirect(retry_url)
+
+        try:
+            parsed_dob = datetime.strptime(dob_str, '%Y-%m-%d').date()
+        except ValueError:
+            flash(_('Invalid birth date format.'), 'danger')
+            return redirect(retry_url)
+
+        today = date.today()
+        age_years = calculate_age(parsed_dob)
+        if parsed_dob > today or age_years < 5 or age_years > 120:
+            flash(_('Please enter a valid birth date (age must be between 5 and 120).'), 'danger')
+            return redirect(retry_url)
+
+    # Accurate grading against the COMPLETE expected question set
     correct_choices_count = 0
-    total_exam_questions = len(validated_questions)
+    total_exam_questions = len(expected_questions)
 
     if total_exam_questions > 0:
-        for question in validated_questions:
-            selection = request.form.get(f'q_{question.id}')
+        for question in expected_questions:
+            selection = (request.form.get(f'q_{question.id}') or '').strip().upper()
             if selection == question.correct_answer:
                 correct_choices_count += 1
-
         final_percentage = int((correct_choices_count / total_exam_questions) * 100)
     else:
         final_percentage = 0
 
-    flash(_('Examination Submitted. Final Grade: %(grade)s%%', grade=final_percentage), 'success')
+    try:
+        db.session.add(ExamResult(
+            score=final_percentage,
+            correct_count=correct_choices_count,
+            total_questions=total_exam_questions,
+            subject_id=target_subject.id,
+            page_id=page_id,
+            student_record_id=student_record_id,
+            taker_name=taker_name,
+            taker_birth_date=parsed_dob,
+            taker_gender=taker_gender
+        ))
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error saving exam result: %(error)s', error=str(e)), 'danger')
+        return redirect(retry_url)
+
+    flash(
+        _('Examination Submitted. Score: %(correct)s/%(total)s (%(grade)s%%)',
+          correct=correct_choices_count, total=total_exam_questions, grade=final_percentage),
+        'success'
+    )
+    if page_id:
+        return redirect(url_for('public.view_page', slug=target_subject.slug, page_id=page_id))
     return redirect(url_for('public.subject_detail', slug=target_subject.slug))
 

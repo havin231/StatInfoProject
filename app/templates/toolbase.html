@@ -130,7 +130,7 @@
                                     {{ tool.title_kurdish if get_locale().language == 'ku' and tool.title_kurdish else tool.title }}
                                 </a>
                             </h6>
-                            {% if tool.description %}
+                            {% if tool.description or tool.description_kurdish %}
                             <div class="text-muted small mt-1 text-break">{{ tool.description_kurdish if get_locale().language == 'ku' and tool.description_kurdish else tool.description }}</div>
                             {% endif %}
                             <small class="text-muted d-block mt-1 font-monospace text-break"

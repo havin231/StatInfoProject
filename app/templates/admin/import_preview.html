@@ -24,7 +24,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <!-- PASS RAW DATA AS HIDDEN JSON -->
-                <input type="hidden" name="data" value='{{ data | tojson }}'>
+                <input type="hidden" name="data" value="{{ data | tojson | forceescape }}">
                 <input type="hidden" name="import_type" value="{{ import_type }}">
                 {% if subject_id %}
                 <input type="hidden" name="subject_id" value="{{ subject_id }}">
@@ -100,17 +100,32 @@
 
                                     {% if import_type == 'question' %}
                                     <!-- Added class 'preview-text' for JS targeting -->
-                                    <td class="preview-text">{{ row.question_text | truncate(100) }}</td>
+                                    <td class="preview-text">
+                                        {{ row.question_text | truncate(100) }}
+                                        {% if row.question_text_kurdish %}
+                                        <div class="text-primary small mt-1" dir="rtl">{{ row.question_text_kurdish | truncate(100) }}</div>
+                                        {% endif %}
+                                    </td>
                                     <td class="small text-muted preview-text">
                                         A: {{ row.option_a }}<br>
                                         B: {{ row.option_b }}<br>
                                         C: {{ row.option_c }}<br>
                                         D: {{ row.option_d }}
+                                        {% if row.option_a_kurdish or row.option_b_kurdish or row.option_c_kurdish or row.option_d_kurdish %}
+                                        <div class="text-primary mt-1 pt-1 border-top" dir="rtl">
+                                            A: {{ row.option_a_kurdish }} | B: {{ row.option_b_kurdish }} | C: {{ row.option_c_kurdish }} | D: {{ row.option_d_kurdish }}
+                                        </div>
+                                        {% endif %}
                                     </td>
                                     <td class="fw-bold text-success text-center">{{ row.correct_answer }}</td>
 
                                     {% elif import_type == 'command' %}
-                                    <td class="fw-bold">{{ row.title }}</td>
+                                    <td class="fw-bold">
+                                        {{ row.title }}
+                                        {% if row.title_kurdish %}
+                                        <div class="small text-primary fw-normal" dir="rtl">{{ row.title_kurdish }}</div>
+                                        {% endif %}
+                                    </td>
                                     <td><code class="text-primary font-monospace">{{ row.command_text | truncate(80) }}</code></td>
                                     <td class="text-muted small">{{ row.description | truncate(100) }}</td>
                                     {% endif %}

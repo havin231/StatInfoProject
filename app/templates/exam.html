@@ -15,7 +15,7 @@
             </p>
         </div>
 
-        <form method="POST" action="/subject/{{ subject.slug }}/exam/submit" id="examForm">
+        <form method="POST" action="{{ submit_action if submit_action is defined else '/subject/' + subject.slug + '/exam/submit' }}" id="examForm">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
             {% if page_id %}
             <input type="hidden" name="page_id" value="{{ page_id }}" />
@@ -43,10 +43,15 @@
                         </div>
                     {% else %}
                         {% if not is_restricted %}
-                        <div class="btn-group w-100 mb-3" role="group">
+                        <div class="btn-group w-100 mb-3 flex-wrap" role="group">
                             <input type="radio" class="btn-check" name="taker_mode" id="modeGuest" value="guest" {% if not unlocked_student %}checked{% endif %} onchange="switchTakerMode('guest')">
                             <label class="btn btn-outline-primary btn-sm" for="modeGuest">
                                 <i class="fas fa-user me-1"></i>{{ _('Visitor / Guest') }}
+                            </label>
+
+                            <input type="radio" class="btn-check" name="taker_mode" id="modeGuestCode" value="guest_code" onchange="switchTakerMode('guest_code')">
+                            <label class="btn btn-outline-primary btn-sm" for="modeGuestCode">
+                                <i class="fas fa-key me-1"></i>{{ _('Guest Exam Code') }}
                             </label>
 
                             <input type="radio" class="btn-check" name="taker_mode" id="modeStudent" value="student" {% if unlocked_student %}checked{% endif %} onchange="switchTakerMode('student')">
@@ -78,6 +83,20 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="form-check mt-3">
+                                <input class="form-check-input" type="checkbox" name="generate_exam_guest_code" id="generate_exam_guest_code" value="1">
+                                <label class="form-check-label small text-muted" for="generate_exam_guest_code">
+                                    {{ _('Generate an 8-character Guest Exam Code so I can skip entering my details next time (separate from student codes)') }}
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- GUEST EXAM CODE FIELD -->
+                        <div id="guestCodeField" class="d-none">
+                            <label class="form-label small fw-bold">{{ _('Guest Exam Code') }} <span class="text-danger">*</span></label>
+                            <input type="text" name="exam_guest_code" id="exam_guest_code"
+                                   class="form-control form-control-sm font-monospace text-uppercase"
+                                   placeholder="{{ _('Enter your 8-character Guest Exam Code') }}">
                         </div>
 
                         <!-- STUDENT CODE FIELD -->
@@ -167,24 +186,32 @@
 <script>
     function switchTakerMode(mode) {
         const guestBox = document.getElementById('guestFields');
+        const guestCodeBox = document.getElementById('guestCodeField');
         const codeBox = document.getElementById('studentCodeField');
         const dobEl = document.getElementById('taker_birth_date');
         const genderEl = document.getElementById('taker_gender');
+        const guestCodeEl = document.getElementById('exam_guest_code');
         const codeEl = document.getElementById('student_code');
         if (!guestBox || !codeBox) return;
 
+        guestBox.classList.add('d-none');
+        if (guestCodeBox) guestCodeBox.classList.add('d-none');
+        codeBox.classList.add('d-none');
+        if (dobEl) dobEl.required = false;
+        if (genderEl) genderEl.required = false;
+        if (guestCodeEl) guestCodeEl.required = false;
+        if (codeEl) codeEl.required = false;
+
         if (mode === 'student') {
-            guestBox.classList.add('d-none');
             codeBox.classList.remove('d-none');
-            if (dobEl) dobEl.required = false;
-            if (genderEl) genderEl.required = false;
             if (codeEl) codeEl.required = true;
+        } else if (mode === 'guest_code' && guestCodeBox) {
+            guestCodeBox.classList.remove('d-none');
+            if (guestCodeEl) guestCodeEl.required = true;
         } else {
             guestBox.classList.remove('d-none');
-            codeBox.classList.add('d-none');
             if (dobEl) dobEl.required = true;
             if (genderEl) genderEl.required = true;
-            if (codeEl) codeEl.required = false;
         }
     }
 
@@ -197,10 +224,12 @@
                 if (!form) return;
                 const state = {};
                 form.querySelectorAll('input[type="radio"]:checked').forEach(r => { state[r.name] = r.value; });
-                ['taker_name', 'taker_birth_date', 'taker_gender', 'student_code'].forEach(id => {
+                ['taker_name', 'taker_birth_date', 'taker_gender', 'exam_guest_code', 'student_code'].forEach(id => {
                     const el = document.getElementById(id);
                     if (el && el.value) state[id] = el.value;
                 });
+                const chk = document.getElementById('generate_exam_guest_code');
+                if (chk && chk.checked) state.generate_exam_guest_code = true;
                 sessionStorage.setItem(EXAM_STATE_KEY, JSON.stringify(state));
             }
         });
@@ -213,7 +242,10 @@
                     if (r) { r.checked = true; switchTakerMode(state.taker_mode); }
                 }
                 Object.entries(state).forEach(([k, v]) => {
-                    if (k.startsWith('q_')) {
+                    if (k === 'generate_exam_guest_code') {
+                        const chk = document.getElementById('generate_exam_guest_code');
+                        if (chk) chk.checked = Boolean(v);
+                    } else if (k.startsWith('q_')) {
                         const radio = document.querySelector(`input[name="${k}"][value="${v}"]`);
                         if (radio) radio.checked = true;
                     } else if (k !== 'taker_mode') {

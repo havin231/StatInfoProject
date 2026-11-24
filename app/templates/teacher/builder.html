@@ -19,9 +19,16 @@
                         }}</span></p>
                 {% endif %}
             </div>
-            <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
-                <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Dashboard') }}
-            </a>
+            <div class="d-flex gap-2">
+                {% if subject %}
+                <a href="{{ url_for('content.builder_private_exams', subject=subject.id) }}" class="btn btn-outline-warning btn-sm fw-bold">
+                    <i class="fas fa-user-secret me-1"></i>{{ _('Hidden Exams & Links') }}
+                </a>
+                {% endif %}
+                <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left me-2"></i>{{ _('Back to Dashboard') }}
+                </a>
+            </div>
         </div>
 
         <!-- Notification Area for AJAX Messages -->
@@ -230,7 +237,6 @@
                         <thead class="bg-body-secondary sticky-top" style="z-index: 5;">
                             <tr>
                                 <th class="ps-3" style="width: 40px;">#</th>
-                                <th style="width: 50px;" class="text-center" title="{{ _('Is Kurdish? (RTL)') }}">RTL</th>
                                 <th style="min-width: 280px;">{{ _('Question (EN / KU)') }}</th>
                                 <th style="min-width: 170px;">{{ _('Assigned Lecture') }}</th>
                                 <th style="min-width: 140px;">Opt A (EN / KU)</th>
@@ -430,8 +436,8 @@
 
 <script>
     // --- 1. DATA INITIALIZATION ---
-    let questionsData = JSON.parse('{% if questions_json is defined %}{{ questions_json | tojson | safe }}{% else %}[]{% endif %}');
-    let lectureMapping = JSON.parse('{% if pages is defined %}{{ pages | tojson | safe }}{% else %}[]{% endif %}');
+    let questionsData = {% if questions_json is defined %}{{ questions_json | tojson }}{% else %}[]{% endif %};
+    let lectureMapping = {% if pages is defined %}{{ pages | tojson }}{% else %}[]{% endif %};
 
     document.addEventListener("DOMContentLoaded", function () {
         const tinyPlugins = 'advlist anchor autolink charmap code directionality emoticons fullscreen help image insertdatetime link lists media nonbreaking pagebreak preview searchreplace table visualblocks visualchars wordcount media';
@@ -592,22 +598,11 @@
                 lectureOptions += `<option value="${lec.id}" ${selected}>${escAttr(lec.title)}</option>`;
             });
 
-            const dirStyle = q.is_kurdish ? 'direction: rtl; text-align: right;' : '';
-            const checkedState = q.is_kurdish ? 'checked' : '';
-
             tr.innerHTML = `
                 <td class="ps-3 text-muted small align-middle">${index + 1}</td>
 
-                <td class="text-center align-middle">
-                    <div class="form-check form-switch d-flex justify-content-center">
-                        <input class="form-check-input" type="checkbox" role="switch"
-                               ${checkedState}
-                               onchange="updateData(${index}, 'is_kurdish', this.checked)">
-                    </div>
-                </td>
-
                 <td>
-                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.text)}" oninput="updateData(${index}, 'text', this.value)" style="${dirStyle}" placeholder="EN: Question...">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.text)}" oninput="updateData(${index}, 'text', this.value)" placeholder="EN: Question...">
                     <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.text_ku)}" oninput="updateData(${index}, 'text_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU: پرسیار (کوردی)...">
                 </td>
 
@@ -618,19 +613,19 @@
                 </td>
 
                 <td>
-                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.a)}" oninput="updateData(${index}, 'a', this.value)" style="${dirStyle}" placeholder="EN Opt A">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.a)}" oninput="updateData(${index}, 'a', this.value)" placeholder="EN Opt A">
                     <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.a_ku)}" oninput="updateData(${index}, 'a_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU A">
                 </td>
                 <td>
-                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.b)}" oninput="updateData(${index}, 'b', this.value)" style="${dirStyle}" placeholder="EN Opt B">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.b)}" oninput="updateData(${index}, 'b', this.value)" placeholder="EN Opt B">
                     <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.b_ku)}" oninput="updateData(${index}, 'b_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU B">
                 </td>
                 <td>
-                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.c)}" oninput="updateData(${index}, 'c', this.value)" style="${dirStyle}" placeholder="EN Opt C">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.c)}" oninput="updateData(${index}, 'c', this.value)" placeholder="EN Opt C">
                     <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.c_ku)}" oninput="updateData(${index}, 'c_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU C">
                 </td>
                 <td>
-                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.d)}" oninput="updateData(${index}, 'd', this.value)" style="${dirStyle}" placeholder="EN Opt D">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.d)}" oninput="updateData(${index}, 'd', this.value)" placeholder="EN Opt D">
                     <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.d_ku)}" oninput="updateData(${index}, 'd_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU D">
                 </td>
 
@@ -650,23 +645,20 @@
         });
 
         if (questionsData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" class="text-center py-5 text-muted">No questions found. Add a row manually or import from Excel.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center py-5 text-muted">No questions found. Add a row manually or import from Excel.</td></tr>';
         }
     }
 
     // --- 3. DATA PERSISTENCE HELPERS ---
     function updateData(index, field, value) {
         questionsData[index][field] = value;
-        if (field === 'is_kurdish') {
-            renderTable();
-        }
     }
 
     function addQuestion() {
         questionsData.push({
             id: null, text: '', a: '', b: '', c: '', d: '',
             text_ku: '', a_ku: '', b_ku: '', c_ku: '', d_ku: '',
-            correct: 'A', page_id: null, is_kurdish: false
+            correct: 'A', page_id: null
         });
         renderTable();
     }

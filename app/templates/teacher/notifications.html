@@ -5,19 +5,25 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
     <div>
-        <h1 class="h3 fw-bold mb-1"><i class="fas fa-bell me-2 text-primary"></i>{{ _('My Notifications') }}</h1>
+        <h1 class="h3 fw-bold mb-1">
+            <i class="fas fa-bell me-2 text-primary"></i>{{ _('My Notifications') }}
+            {% if inspected_teacher %}
+            <span class="badge bg-info-subtle text-info-emphasis fs-6 ms-2">{{ inspected_teacher.username }}</span>
+            {% endif %}
+        </h1>
         <p class="text-muted small mb-0">{{ _('Direct messages from Administrators and visitor comments on your lectures.') }}</p>
     </div>
     <div class="d-flex gap-2">
         {% if notifications %}
         <form method="POST" action="{{ url_for('teacher.mark_all_teacher_notifications_read') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if inspected_teacher %}<input type="hidden" name="teacher_id" value="{{ inspected_teacher.id }}">{% endif %}
             <button type="submit" class="btn btn-sm btn-outline-primary">
                 <i class="fas fa-check-double me-1"></i>{{ _('Mark All Read') }}
             </button>
         </form>
         {% endif %}
-        <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+        <a href="{{ url_for('teacher.view_teacher', teacher_id=inspected_teacher.id) if inspected_teacher else '/teacher/dashboard' }}" class="btn btn-outline-secondary btn-sm">
             <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Dashboard') }}
         </a>
     </div>

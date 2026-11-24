@@ -52,6 +52,7 @@
                     <option value="all" {% if exam_type == 'all' %}selected{% endif %}>{{ _('All') }}</option>
                     <option value="final" {% if exam_type == 'final' %}selected{% endif %}>{{ _('Final Exam') }}</option>
                     <option value="quiz" {% if exam_type == 'quiz' %}selected{% endif %}>{{ _('Lecture Quiz') }}</option>
+                    <option value="private" {% if exam_type == 'private' %}selected{% endif %}>{{ _('Hidden Exam') }}</option>
                 </select>
             </div>
             <div class="col-md-2">
@@ -187,11 +188,18 @@
                 <tr>
                     <td class="small text-muted">{{ r.date_submitted.strftime('%Y-%m-%d %H:%M') }}</td>
                     <td class="fw-bold">{{ r.subject.display_name(cur_lang) }}</td>
-                    <td class="small">{% if r.page %}{{ _('Quiz') }}: {{ r.page.display_title(cur_lang) }}{% else %}{{ _('Final Exam') }}{% endif %}</td>
+                    <td class="small">
+                        {% if r.private_exam %}<span class="badge bg-warning text-dark me-1">{{ _('Hidden') }}</span>{{ r.private_exam.display_title(cur_lang) }}
+                        {% elif r.page %}{{ _('Quiz') }}: {{ r.page.display_title(cur_lang) }}
+                        {% else %}{{ _('Final Exam') }}{% endif %}
+                    </td>
                     <td class="small">
                         {% if stu %}
                             <span class="badge bg-primary-subtle text-primary-emphasis border font-monospace">{{ stu.student_code }}</span>
                             <strong>{{ stu.display_name(cur_lang) }}</strong>
+                        {% elif r.exam_guest %}
+                            <span class="badge bg-info-subtle text-info-emphasis border font-monospace">{{ r.exam_guest.guest_code }}</span>
+                            {{ r.taker_name or _('Guest') }}
                         {% else %}
                             <span class="badge bg-secondary-subtle text-secondary-emphasis border">{{ _('Guest') }}</span>
                             {{ r.taker_name or _('Anonymous') }}

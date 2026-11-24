@@ -148,6 +148,14 @@ def create_app(config_class=Config):
             "ALTER TABLE page_comment ADD COLUMN author_user_id INTEGER",
             "ALTER TABLE page_comment ADD COLUMN is_teacher_reply BOOLEAN DEFAULT 0",
             "ALTER TABLE page_comment ADD COLUMN is_read_by_admin BOOLEAN DEFAULT 0",
+            "ALTER TABLE user ADD COLUMN profile_public BOOLEAN DEFAULT 1",
+            "ALTER TABLE user ADD COLUMN profile_show_name BOOLEAN DEFAULT 1",
+            "ALTER TABLE user ADD COLUMN profile_show_bio BOOLEAN DEFAULT 1",
+            "ALTER TABLE user ADD COLUMN profile_show_age BOOLEAN DEFAULT 1",
+            "ALTER TABLE user ADD COLUMN profile_show_gender BOOLEAN DEFAULT 1",
+            "ALTER TABLE page_comment ADD COLUMN comment_guest_id INTEGER",
+            "ALTER TABLE exam_result ADD COLUMN private_exam_id INTEGER",
+            "ALTER TABLE exam_result ADD COLUMN exam_guest_id INTEGER",
         ]:
             try:
                 with db.engine.connect() as conn:

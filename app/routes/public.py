@@ -8,10 +8,13 @@ from app import db, bcrypt, limiter
 from app.models import (
     User, Subject, ExamResult, SiteInfo, Page, Question,
     PageComment, AdminNotification, TeacherNotification, SubjectTeacher,
-    Student, calculate_age
+    Student, PrivateExam, CommentGuest, ExamGuest, calculate_age
 )
 from app.forms import SetupForm, CommentForm, CommentReplyForm
-from app.routes.helpers import can_edit_subject, can_student_access_subject, get_reply_display_name
+from app.routes.helpers import (
+    can_edit_subject, can_student_access_subject, get_reply_display_name,
+    get_comment_author_profile_url, generate_comment_guest_code, generate_exam_guest_code
+)
 
 public = Blueprint('public', __name__)
 
@@ -290,7 +293,31 @@ def subject_detail(slug):
         'subject.html',
         subject=target_subject,
         visible_teachers=visible_teachers,
-        can_edit=can_edit
+        can_edit=can_edit,
+        new_exam_guest_code=session.pop('new_exam_guest_code', None)
+    )
+
+
+@public.route('/teacher/<int:user_id>/profile')
+def teacher_public_profile(user_id):
+    """
+    PUBLIC TEACHER PROFILE PAGE (With Granular Teacher Privacy Controls)
+    Returns 404 to non-admin visitors if teacher disabled `profile_public`.
+    """
+    teacher = User.query.get_or_404(user_id)
+    is_privileged = current_user.is_authenticated and (current_user.is_admin or current_user.id == teacher.id)
+    if not bool(teacher.profile_public) and not is_privileged:
+        abort(404)
+
+    public_subjects = []
+    if teacher.profile_show_name:
+        assigns = SubjectTeacher.query.filter_by(teacher_id=teacher.id, show_name=True).all()
+        public_subjects = [a.subject for a in assigns if a.subject and a.subject.is_public]
+
+    return render_template(
+        'teacher_profile.html',
+        teacher=teacher,
+        public_subjects=public_subjects
     )
 
 
@@ -299,7 +326,7 @@ def view_page(slug, page_id):
     """
     LECTURE / CHAPTER CONTENT VIEW
 
-    Displays bilingual content, attached resources, and threaded comments + teacher replies.
+    Displays bilingual content, clickable teachers, attached resources, and threaded comments.
     """
     target_lecture = Page.query.get_or_404(page_id)
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
@@ -314,6 +341,9 @@ def view_page(slug, page_id):
         page_id=target_lecture.id
     ).first() is not None
 
+    current_assignments = SubjectTeacher.query.filter_by(subject_id=target_subject.id).all()
+    visible_teachers = [a.teacher for a in current_assignments if a.show_name and a.teacher]
+
     # Fetch top-level comments (replies are eager/lazy accessed via c.replies)
     comments = PageComment.query.filter_by(
         page_id=target_lecture.id,
@@ -323,17 +353,23 @@ def view_page(slug, page_id):
     reply_form = CommentReplyForm()
 
     can_moderate = current_user.is_authenticated and can_edit_subject(target_subject)
+    new_comment_guest_code = session.pop('new_comment_guest_code', None)
+    new_exam_guest_code = session.pop('new_exam_guest_code', None)
 
     return render_template(
         'page.html',
         page=target_lecture,
         subject=target_subject,
+        visible_teachers=visible_teachers,
         has_quiz=specific_questions_exist,
         comments=comments,
         comment_form=comment_form,
         reply_form=reply_form,
         can_moderate=can_moderate,
-        get_reply_display_name=get_reply_display_name
+        new_comment_guest_code=new_comment_guest_code,
+        new_exam_guest_code=new_exam_guest_code,
+        get_reply_display_name=get_reply_display_name,
+        get_comment_author_profile_url=get_comment_author_profile_url
     )
 
 
@@ -341,11 +377,11 @@ def view_page(slug, page_id):
 @limiter.limit("15/minute")
 def add_page_comment(slug, page_id):
     """
-    PUBLIC LECTURE COMMENT SUBMISSION
+    PUBLIC & STAFF LECTURE COMMENT SUBMISSION (v0.9.1)
 
-    Saves visitor comment (name, birth date, optional personality/about-you info, comment)
-    with is_read_by_admin=False (counted in the Admin box and shown on /admin/comments)
-    and dispatches TeacherNotification to all teachers assigned to the subject.
+    - Logged-in Teacher/Admin: posts directly with zero extra questions.
+    - Guest: supplies Name/Birth Date/Optional Personality (with optional 8-char code generation)
+      OR reuses a previously generated 8-char CommentGuest code.
     """
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
     target_lecture = Page.query.get_or_404(page_id)
@@ -356,85 +392,174 @@ def add_page_comment(slug, page_id):
     if target_lecture.subject_id != target_subject.id:
         abort(404)
 
-    form = CommentForm()
-    if form.validate_on_submit():
+    dest_url = url_for('public.view_page', slug=slug, page_id=page_id) + '#comments-section'
+
+    # 1. Direct staff comment (logged-in Teacher or Admin — no extra info asked)
+    if current_user.is_authenticated:
+        comment_text = (request.form.get('comment_text') or '').strip()
+        if not comment_text:
+            flash(_('Comment text cannot be empty.'), 'danger')
+            return redirect(dest_url)
+
+        staff_comment = PageComment(
+            page_id=target_lecture.id,
+            parent_id=None,
+            author_user_id=current_user.id,
+            is_teacher_reply=True,
+            is_read_by_admin=True,
+            author_name=current_user.username,
+            author_birth_date=current_user.birth_date,
+            author_age=current_user.age,
+            comment_text=comment_text
+        )
+        try:
+            db.session.add(staff_comment)
+            db.session.commit()
+            flash(_('Your comment has been posted!'), 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error posting comment: %(error)s', error=str(e)), 'danger')
+        return redirect(dest_url)
+
+    # 2. Guest Comment (Details + Optional Code OR Existing 8-char Comment Guest Code)
+    guest_mode = (request.form.get('guest_mode') or 'details').strip().lower()
+    raw_comment_code = (request.form.get('comment_guest_code') or '').strip().upper()
+
+    comment_guest_id = None
+    generated_code = None
+    author_name = None
+    birth_date = None
+    computed_age = None
+    personality_info = None
+    comment_text = None
+
+    if guest_mode == 'code' or raw_comment_code:
+        comment_text = (request.form.get('comment_text') or '').strip()
+        if not comment_text:
+            flash(_('Comment text cannot be empty.'), 'danger')
+            return redirect(dest_url)
+        cg = CommentGuest.query.filter_by(guest_code=raw_comment_code).first() if raw_comment_code else None
+        if not cg:
+            flash(_('Invalid Comment Guest Code. Please check your 8-character code.'), 'danger')
+            return redirect(dest_url)
+        comment_guest_id = cg.id
+        author_name = cg.author_name
+        birth_date = cg.author_birth_date
+        computed_age = calculate_age(birth_date)
+        personality_info = cg.personality_info
+    else:
+        form = CommentForm()
+        if not form.validate_on_submit():
+            for field_name, errors in form.errors.items():
+                for err in errors:
+                    flash(f"{err}", 'danger')
+            return redirect(dest_url)
+
         author_name = form.author_name.data.strip()
         birth_date = form.author_birth_date.data
         computed_age = calculate_age(birth_date)
         personality_info = form.personality_info.data.strip() if form.personality_info.data else None
         comment_text = form.comment_text.data.strip()
 
-        new_comment = PageComment(
-            page_id=target_lecture.id,
-            parent_id=None,
-            is_teacher_reply=False,
-            is_read_by_admin=False,
-            author_name=author_name,
-            author_birth_date=birth_date,
-            author_age=computed_age,
-            personality_info=personality_info,
-            comment_text=comment_text
-        )
+        if request.form.get('generate_comment_code') == '1':
+            new_cg = CommentGuest(
+                guest_code=generate_comment_guest_code(8),
+                author_name=author_name,
+                author_birth_date=birth_date,
+                personality_info=personality_info
+            )
+            db.session.add(new_cg)
+            db.session.flush()
+            comment_guest_id = new_cg.id
+            generated_code = new_cg.guest_code
 
-        detail_lines = [
-            f"Subject: {target_subject.name} | Lesson: {target_lecture.title}",
-            f"By: {author_name} (Born: {birth_date.strftime('%Y-%m-%d')}, Age: {computed_age})"
-        ]
-        if personality_info:
-            detail_lines.append(f"About: {personality_info}")
-        detail_lines.append(f"Comment: {comment_text}")
-        notif_title = f"{target_subject.name} — {target_lecture.title}"
-        notif_body = "\n".join(detail_lines)
+    new_comment = PageComment(
+        page_id=target_lecture.id,
+        parent_id=None,
+        comment_guest_id=comment_guest_id,
+        is_teacher_reply=False,
+        is_read_by_admin=False,
+        author_name=author_name,
+        author_birth_date=birth_date,
+        author_age=computed_age,
+        personality_info=personality_info,
+        comment_text=comment_text
+    )
 
-        try:
-            db.session.add(new_comment)
+    detail_lines = [
+        f"Subject: {target_subject.name} | Lesson: {target_lecture.title}",
+        f"By: {author_name} (Born: {birth_date.strftime('%Y-%m-%d')}, Age: {computed_age})"
+    ]
+    if personality_info:
+        detail_lines.append(f"About: {personality_info}")
+    detail_lines.append(f"Comment: {comment_text}")
+    notif_title = f"{target_subject.name} — {target_lecture.title}"
+    notif_body = "\n".join(detail_lines)
 
-            # Notify all currently assigned teachers for this subject
-            assignments = SubjectTeacher.query.filter_by(subject_id=target_subject.id).all()
-            recipient_teacher_ids = {a.teacher_id for a in assignments}
-            if target_subject.teacher_id:
-                recipient_teacher_ids.add(target_subject.teacher_id)
+    try:
+        db.session.add(new_comment)
 
-            for tid in recipient_teacher_ids:
-                db.session.add(TeacherNotification(
-                    teacher_id=tid,
-                    notification_type='comment',
-                    title=notif_title,
-                    message=notif_body,
-                    related_subject_id=target_subject.id,
-                    related_page_id=target_lecture.id
-                ))
+        assignments = SubjectTeacher.query.filter_by(subject_id=target_subject.id).all()
+        recipient_teacher_ids = {a.teacher_id for a in assignments}
+        if target_subject.teacher_id:
+            recipient_teacher_ids.add(target_subject.teacher_id)
 
-            db.session.commit()
+        for tid in recipient_teacher_ids:
+            db.session.add(TeacherNotification(
+                teacher_id=tid,
+                notification_type='comment',
+                title=notif_title,
+                message=notif_body,
+                related_subject_id=target_subject.id,
+                related_page_id=target_lecture.id
+            ))
+
+        db.session.commit()
+        if generated_code:
+            session['new_comment_guest_code'] = generated_code
+            flash(_('Your comment has been posted! Your 8-character code is: %(code)s', code=generated_code), 'success')
+        else:
             flash(_('Your comment has been posted!'), 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(_('Error posting comment: %(error)s', error=str(e)), 'danger')
-    else:
-        for field_name, errors in form.errors.items():
-            for err in errors:
-                flash(f"{err}", 'danger')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error posting comment: %(error)s', error=str(e)), 'danger')
 
-    return redirect(url_for('public.view_page', slug=slug, page_id=page_id) + '#comments-section')
+    return redirect(dest_url)
 
 
 # ==============================================================================
 # SECTION 4: EXAM ENGINE (PUBLIC & STUDENT-CODE-GATED QUIZZES/EXAMS)
 # ==============================================================================
 
-@public.route('/subject/<slug>/unlock_exam', methods=['POST'])
-@limiter.limit("20/minute")
-def unlock_exam(slug):
-    """Validate an 8+ char Student Code to unlock a hidden/restricted exam or quiz."""
-    target_subject = Subject.query.filter_by(slug=slug).first_or_404()
-    page_id = request.form.get('page_id', type=int)
+def _resolve_unlocked_student(target_subject):
+    """Return authorized Student if unlocked via query param or session for target_subject."""
+    code = (request.args.get('code') or session.get(f'unlocked_code_{target_subject.id}') or '').strip().upper()
+    if not code:
+        return None
+    candidate = Student.query.filter_by(student_code=code).first()
+    if candidate and can_student_access_subject(candidate, target_subject):
+        return candidate
+    return None
+
+
+def _grade_questions_submission(expected_questions, form_data):
+    """Grade all expected questions against submitted form selections."""
+    correct_choices_count = 0
+    total_exam_questions = len(expected_questions)
+    if total_exam_questions > 0:
+        for question in expected_questions:
+            selection = (form_data.get(f'q_{question.id}') or '').strip().upper()
+            if selection == question.correct_answer:
+                correct_choices_count += 1
+        final_percentage = int((correct_choices_count / total_exam_questions) * 100)
+    else:
+        final_percentage = 0
+    return correct_choices_count, total_exam_questions, final_percentage
+
+
+def _handle_student_unlock(target_subject, dest_url):
+    """Shared handler to validate an 8+ char Student Code and store unlock session."""
     raw_code = (request.form.get('student_code') or '').strip().upper()
-
-    dest_url = (
-        url_for('public.take_exam', slug=slug, page_id=page_id)
-        if page_id else url_for('public.take_exam', slug=slug)
-    )
-
     if not raw_code:
         flash(_('Please enter your Student Code.'), 'danger')
         return redirect(dest_url)
@@ -447,6 +572,19 @@ def unlock_exam(slug):
     session[f'unlocked_code_{target_subject.id}'] = student.student_code
     flash(_('Exam unlocked for %(name)s.', name=student.display_name(get_locale().language)), 'success')
     return redirect(dest_url)
+
+
+@public.route('/subject/<slug>/unlock_exam', methods=['POST'])
+@limiter.limit("20/minute")
+def unlock_exam(slug):
+    """Validate an 8+ char Student Code to unlock a hidden/restricted exam or quiz."""
+    target_subject = Subject.query.filter_by(slug=slug).first_or_404()
+    page_id = request.form.get('page_id', type=int)
+    dest_url = (
+        url_for('public.take_exam', slug=slug, page_id=page_id)
+        if page_id else url_for('public.take_exam', slug=slug)
+    )
+    return _handle_student_unlock(target_subject, dest_url)
 
 
 @public.route('/subject/<slug>/exam')
@@ -473,13 +611,8 @@ def take_exam(slug, page_id=None):
         active_questions = Question.query.filter_by(subject_id=target_subject.id).all()
         exam_title_text = _('%(name)s Final Examination', name=target_subject.display_name(lang))
 
-    unlocked_student = None
+    unlocked_student = _resolve_unlocked_student(target_subject)
     is_staff_viewer = current_user.is_authenticated and can_edit_subject(target_subject)
-    code = (request.args.get('code') or session.get(f'unlocked_code_{target_subject.id}') or '').strip().upper()
-    if code:
-        candidate = Student.query.filter_by(student_code=code).first()
-        if candidate and can_student_access_subject(candidate, target_subject):
-            unlocked_student = candidate
 
     if is_restricted and not unlocked_student and not is_staff_viewer:
         return render_template(
@@ -498,6 +631,93 @@ def take_exam(slug, page_id=None):
         is_restricted=is_restricted,
         unlocked_student=unlocked_student
     )
+
+
+@public.route('/exam/link/<token>')
+def take_private_exam(token):
+    """Student-Code-Gated Auto-Generated Hidden Exam / Quiz Link."""
+    lang = get_locale().language
+    pe = PrivateExam.query.filter_by(access_token=token, is_active=True).first_or_404()
+    target_subject = pe.subject
+    exam_title_text = pe.display_title(lang)
+
+    unlocked_student = _resolve_unlocked_student(target_subject)
+    is_staff_viewer = current_user.is_authenticated and can_edit_subject(target_subject)
+
+    if not unlocked_student and not is_staff_viewer:
+        return render_template(
+            'exam_gate.html',
+            subject=target_subject,
+            page_id=None,
+            quiz_title=exam_title_text,
+            unlock_action=url_for('public.unlock_private_exam', token=token)
+        )
+
+    return render_template(
+        'exam.html',
+        subject=target_subject,
+        questions=pe.assigned_questions,
+        quiz_title=exam_title_text,
+        page_id=None,
+        is_restricted=True,
+        unlocked_student=unlocked_student,
+        private_exam=pe,
+        submit_action=url_for('public.submit_private_exam', token=token)
+    )
+
+
+@public.route('/exam/link/<token>/unlock', methods=['POST'])
+@limiter.limit("20/minute")
+def unlock_private_exam(token):
+    """Validate an authorized Student Code for a PrivateExam link."""
+    pe = PrivateExam.query.filter_by(access_token=token, is_active=True).first_or_404()
+    return _handle_student_unlock(pe.subject, url_for('public.take_private_exam', token=token))
+
+
+@public.route('/exam/link/<token>/submit', methods=['POST'])
+def submit_private_exam(token):
+    """Grade & persist ExamResult for a student-code-gated PrivateExam link."""
+    pe = PrivateExam.query.filter_by(access_token=token, is_active=True).first_or_404()
+    target_subject = pe.subject
+    retry_url = url_for('public.take_private_exam', token=token)
+
+    raw_code = (request.form.get('student_code') or '').strip().upper()
+    student = Student.query.filter_by(student_code=raw_code).first() if raw_code else None
+    if not student:
+        flash(_('Invalid or missing Student Code.'), 'danger')
+        return redirect(retry_url)
+    if not can_student_access_subject(student, target_subject):
+        flash(_('This student code is not authorized for this teacher/subject exam.'), 'danger')
+        return redirect(retry_url)
+
+    correct_choices_count, total_exam_questions, final_percentage = _grade_questions_submission(
+        pe.assigned_questions, request.form
+    )
+
+    try:
+        db.session.add(ExamResult(
+            score=final_percentage,
+            correct_count=correct_choices_count,
+            total_questions=total_exam_questions,
+            subject_id=target_subject.id,
+            page_id=None,
+            private_exam_id=pe.id,
+            student_record_id=student.id
+        ))
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error saving exam result: %(error)s', error=str(e)), 'danger')
+        return redirect(retry_url)
+
+    flash(
+        _('Examination Submitted. Score: %(correct)s/%(total)s (%(grade)s%%)',
+          correct=correct_choices_count, total=total_exam_questions, grade=final_percentage),
+        'success'
+    )
+    if target_subject.is_public or (current_user.is_authenticated and can_edit_subject(target_subject)):
+        return redirect(url_for('public.subject_detail', slug=target_subject.slug))
+    return redirect(url_for('public.index'))
 
 
 @public.route('/subject/<slug>/exam/submit', methods=['POST'])
@@ -529,11 +749,15 @@ def submit_exam(slug):
         is_restricted = bool(target_subject.exam_student_only)
         expected_questions = Question.query.filter_by(subject_id=target_subject.id).all()
 
-    # Taker Identification: Student Code vs. Guest Info
+    # Taker Identification: Student Code vs. Guest Exam Code vs. Guest Details
     taker_mode = (request.form.get('taker_mode') or 'guest').strip().lower()
     raw_code = (request.form.get('student_code') or '').strip().upper()
+    raw_guest_code = (request.form.get('exam_guest_code') or '').strip().upper()
 
     student_record_id = None
+    exam_guest_id = None
+    generated_guest_code = None
+    create_exam_guest = False
     taker_name = None
     parsed_dob = None
     taker_gender = None
@@ -547,6 +771,15 @@ def submit_exam(slug):
             flash(_('This student code is not authorized for this teacher/subject exam.'), 'danger')
             return redirect(retry_url)
         student_record_id = student.id
+    elif taker_mode == 'guest_code' or raw_guest_code:
+        eg = ExamGuest.query.filter_by(guest_code=raw_guest_code).first() if raw_guest_code else None
+        if not eg:
+            flash(_('Invalid Guest Exam Code. Please check your 8-character code.'), 'danger')
+            return redirect(retry_url)
+        exam_guest_id = eg.id
+        taker_name = eg.taker_name
+        parsed_dob = eg.taker_birth_date
+        taker_gender = eg.taker_gender
     else:
         taker_name = (request.form.get('taker_name') or '').strip() or None
         dob_str = (request.form.get('taker_birth_date') or '').strip()
@@ -568,20 +801,26 @@ def submit_exam(slug):
             flash(_('Please enter a valid birth date (age must be between 5 and 120).'), 'danger')
             return redirect(retry_url)
 
-    # Accurate grading against the COMPLETE expected question set
-    correct_choices_count = 0
-    total_exam_questions = len(expected_questions)
+        create_exam_guest = (request.form.get('generate_exam_guest_code') == '1')
 
-    if total_exam_questions > 0:
-        for question in expected_questions:
-            selection = (request.form.get(f'q_{question.id}') or '').strip().upper()
-            if selection == question.correct_answer:
-                correct_choices_count += 1
-        final_percentage = int((correct_choices_count / total_exam_questions) * 100)
-    else:
-        final_percentage = 0
+    # Accurate grading against the COMPLETE expected question set
+    correct_choices_count, total_exam_questions, final_percentage = _grade_questions_submission(
+        expected_questions, request.form
+    )
 
     try:
+        if create_exam_guest:
+            new_eg = ExamGuest(
+                guest_code=generate_exam_guest_code(8),
+                taker_name=taker_name,
+                taker_birth_date=parsed_dob,
+                taker_gender=taker_gender
+            )
+            db.session.add(new_eg)
+            db.session.flush()
+            exam_guest_id = new_eg.id
+            generated_guest_code = new_eg.guest_code
+
         db.session.add(ExamResult(
             score=final_percentage,
             correct_count=correct_choices_count,
@@ -589,6 +828,7 @@ def submit_exam(slug):
             subject_id=target_subject.id,
             page_id=page_id,
             student_record_id=student_record_id,
+            exam_guest_id=exam_guest_id,
             taker_name=taker_name,
             taker_birth_date=parsed_dob,
             taker_gender=taker_gender
@@ -604,6 +844,9 @@ def submit_exam(slug):
           correct=correct_choices_count, total=total_exam_questions, grade=final_percentage),
         'success'
     )
+    if generated_guest_code:
+        session['new_exam_guest_code'] = generated_guest_code
+        flash(_('Your new 8-character Guest Exam Code is: %(code)s', code=generated_guest_code), 'info')
     if page_id:
         return redirect(url_for('public.view_page', slug=target_subject.slug, page_id=page_id))
     return redirect(url_for('public.subject_detail', slug=target_subject.slug))

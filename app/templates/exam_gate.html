@@ -13,7 +13,7 @@
                     {{ _('This exam/quiz is restricted to authorized students. Enter your unique 8-character Student Code assigned by your teacher to unlock it.') }}
                 </p>
 
-                <form method="POST" action="{{ url_for('public.unlock_exam', slug=subject.slug) }}">
+                <form method="POST" action="{{ unlock_action if unlock_action is defined else url_for('public.unlock_exam', slug=subject.slug) }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     {% if page_id %}
                     <input type="hidden" name="page_id" value="{{ page_id }}">

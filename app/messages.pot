@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-11-24 20:43+0300\n"
+"POT-Creation-Date: 2026-11-24 22:31+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,16 +21,16 @@ msgstr ""
 msgid "Birth date cannot be in the future."
 msgstr ""
 
-#: app/forms.py:18 app/routes/public.py:568
+#: app/forms.py:18 app/routes/public.py:801
 msgid "Please enter a valid birth date (age must be between 5 and 120)."
 msgstr ""
 
 #: app/forms.py:28 app/forms.py:66 app/forms.py:80
-#: app/templates/admin_dashboard.html:434
+#: app/templates/admin_dashboard.html:469
 msgid "Email"
 msgstr ""
 
-#: app/forms.py:29 app/forms.py:39 app/forms.py:67 app/forms.py:301
+#: app/forms.py:29 app/forms.py:39 app/forms.py:67 app/forms.py:308
 #: app/templates/login.html:42 app/templates/teacher_apply.html:57
 msgid "Password"
 msgstr ""
@@ -47,12 +47,12 @@ msgstr ""
 msgid "Headmaster Name"
 msgstr ""
 
-#: app/forms.py:38 app/forms.py:300 app/templates/login.html:31
+#: app/forms.py:38 app/forms.py:307 app/templates/login.html:31
 #: app/templates/teacher_apply.html:40
 msgid "Email Address"
 msgstr ""
 
-#: app/forms.py:40 app/forms.py:303 app/templates/teacher_apply.html:61
+#: app/forms.py:40 app/forms.py:310 app/templates/teacher_apply.html:61
 msgid "Confirm Password"
 msgstr ""
 
@@ -64,17 +64,19 @@ msgstr ""
 msgid "Prefer not to say / Optional"
 msgstr ""
 
-#: app/forms.py:49 app/forms.py:55 app/templates/admin/stats.html:69
-#: app/templates/admin/stats.html:227 app/templates/exam.html:76
+#: app/forms.py:49 app/forms.py:55 app/templates/admin/stats.html:70
+#: app/templates/admin/stats.html:235 app/templates/exam.html:81
+#: app/templates/teacher_profile.html:41
 msgid "Male"
 msgstr ""
 
-#: app/forms.py:50 app/forms.py:56 app/templates/admin/stats.html:70
-#: app/templates/admin/stats.html:227 app/templates/exam.html:77
+#: app/forms.py:50 app/forms.py:56 app/templates/admin/stats.html:71
+#: app/templates/admin/stats.html:235 app/templates/exam.html:82
+#: app/templates/teacher_profile.html:41
 msgid "Female"
 msgstr ""
 
-#: app/forms.py:54 app/templates/exam.html:75
+#: app/forms.py:54 app/templates/exam.html:80
 msgid "Select Gender"
 msgstr ""
 
@@ -86,24 +88,24 @@ msgstr ""
 msgid "Teacher Name (Kurdish)"
 msgstr ""
 
-#: app/forms.py:68 app/forms.py:82 app/forms.py:95
-#: app/templates/admin_dashboard.html:162
-#: app/templates/admin_dashboard.html:524
-#: app/templates/teacher/dashboard.html:75
+#: app/forms.py:68 app/forms.py:82 app/forms.py:100
+#: app/templates/admin_dashboard.html:168
+#: app/templates/admin_dashboard.html:559
+#: app/templates/teacher/dashboard.html:96
 msgid "Gender (Optional)"
 msgstr ""
 
-#: app/forms.py:69 app/forms.py:83 app/forms.py:96
-#: app/templates/admin_dashboard.html:166
-#: app/templates/admin_dashboard.html:528
-#: app/templates/teacher/dashboard.html:79
+#: app/forms.py:69 app/forms.py:83 app/forms.py:101
+#: app/templates/admin_dashboard.html:172
+#: app/templates/admin_dashboard.html:563
+#: app/templates/teacher/dashboard.html:100
 msgid "Birth Date (Optional)"
 msgstr ""
 
-#: app/forms.py:70 app/forms.py:84 app/forms.py:97 app/forms.py:308
-#: app/templates/admin_dashboard.html:170
-#: app/templates/admin_dashboard.html:532
-#: app/templates/teacher/dashboard.html:83 app/templates/teacher_apply.html:67
+#: app/forms.py:70 app/forms.py:84 app/forms.py:102 app/forms.py:315
+#: app/templates/admin_dashboard.html:176
+#: app/templates/admin_dashboard.html:567
+#: app/templates/teacher/dashboard.html:104 app/templates/teacher_apply.html:67
 msgid "Bio (Optional)"
 msgstr ""
 
@@ -123,363 +125,391 @@ msgstr ""
 msgid "Show my name on subject pages"
 msgstr ""
 
-#: app/forms.py:87
+#: app/forms.py:87 app/forms.py:103
+msgid "Make my teacher profile public"
+msgstr ""
+
+#: app/forms.py:88 app/forms.py:104
+msgid "Show my name on profile"
+msgstr ""
+
+#: app/forms.py:89 app/forms.py:105
+msgid "Show my bio on profile"
+msgstr ""
+
+#: app/forms.py:90 app/forms.py:106
+msgid "Show my age on profile"
+msgstr ""
+
+#: app/forms.py:91 app/forms.py:107
+msgid "Show my gender on profile"
+msgstr ""
+
+#: app/forms.py:92
 msgid "Update Account"
 msgstr ""
 
-#: app/forms.py:93 app/templates/admin_dashboard.html:154
-#: app/templates/teacher/dashboard.html:67
+#: app/forms.py:98 app/templates/admin_dashboard.html:160
+#: app/templates/teacher/dashboard.html:88
 msgid "Full Name"
 msgstr ""
 
-#: app/forms.py:94 app/forms.py:299 app/templates/admin_dashboard.html:158
-#: app/templates/teacher/dashboard.html:71 app/templates/teacher_apply.html:34
+#: app/forms.py:99 app/forms.py:306 app/templates/admin_dashboard.html:164
+#: app/templates/teacher/dashboard.html:92 app/templates/teacher_apply.html:34
 msgid "Full Name (Kurdish)"
 msgstr ""
 
-#: app/forms.py:98 app/templates/admin_dashboard.html:174
-#: app/templates/teacher/dashboard.html:87
+#: app/forms.py:108 app/templates/admin_dashboard.html:203
+#: app/templates/teacher/dashboard.html:134
 msgid "New Password (Optional)"
 msgstr ""
 
-#: app/forms.py:100 app/templates/admin_dashboard.html:178
-#: app/templates/teacher/dashboard.html:91
+#: app/forms.py:110 app/templates/admin_dashboard.html:207
+#: app/templates/teacher/dashboard.html:138
 msgid "Confirm New Password"
 msgstr ""
 
-#: app/forms.py:101 app/forms.py:304
+#: app/forms.py:111 app/forms.py:311
 msgid "Passwords must match."
 msgstr ""
 
-#: app/forms.py:103 app/templates/admin_dashboard.html:182
-#: app/templates/teacher/dashboard.html:96
+#: app/forms.py:113 app/templates/admin_dashboard.html:211
+#: app/templates/teacher/dashboard.html:143
 msgid "Save Profile"
 msgstr ""
 
-#: app/forms.py:109 app/templates/admin_dashboard.html:122
+#: app/forms.py:119 app/templates/admin_dashboard.html:128
 msgid "Send To"
 msgstr ""
 
-#: app/forms.py:110 app/templates/admin_dashboard.html:126
+#: app/forms.py:120 app/templates/admin_dashboard.html:132
 msgid "Message Subject"
 msgstr ""
 
-#: app/forms.py:111 app/templates/admin_dashboard.html:130
+#: app/forms.py:121 app/templates/admin_dashboard.html:136
 msgid "Message"
 msgstr ""
 
-#: app/forms.py:112 app/templates/admin_dashboard.html:135
+#: app/forms.py:122 app/templates/admin_dashboard.html:141
 msgid "Send Message"
 msgstr ""
 
-#: app/forms.py:122 app/forms.py:149
+#: app/forms.py:132 app/forms.py:159
 msgid "Page Title"
 msgstr ""
 
-#: app/forms.py:123 app/forms.py:150
+#: app/forms.py:133 app/forms.py:160
 msgid "Page Title (Kurdish)"
 msgstr ""
 
-#: app/forms.py:124
+#: app/forms.py:134
 msgid "Page Content (English)"
 msgstr ""
 
-#: app/forms.py:125
+#: app/forms.py:135
 msgid "Page Content (Kurdish)"
 msgstr ""
 
-#: app/forms.py:126
+#: app/forms.py:136
 msgid "Save Page"
 msgstr ""
 
-#: app/forms.py:136 app/templates/admin_dashboard.html:249
-#: app/templates/teacher/builder.html:268
+#: app/forms.py:146 app/templates/admin_dashboard.html:281
+#: app/templates/teacher/builder.html:274
 msgid "Subject Name"
 msgstr ""
 
-#: app/forms.py:137 app/templates/admin_dashboard.html:253
-#: app/templates/teacher/builder.html:272
+#: app/forms.py:147 app/templates/admin_dashboard.html:285
+#: app/templates/teacher/builder.html:278
 msgid "Subject Name (Kurdish)"
 msgstr ""
 
-#: app/forms.py:138
+#: app/forms.py:148
 msgid "Unique Slug (e.g. math-101)"
 msgstr ""
 
-#: app/forms.py:139 app/forms.py:269 app/templates/admin/import_preview.html:92
-#: app/templates/admin_dashboard.html:277
+#: app/forms.py:149 app/forms.py:276 app/templates/admin/import_preview.html:95
+#: app/templates/admin_dashboard.html:309
 msgid "Description"
 msgstr ""
 
-#: app/forms.py:140 app/forms.py:239 app/forms.py:270
-#: app/templates/admin_dashboard.html:282 app/templates/toolbase.html:54
+#: app/forms.py:150 app/forms.py:246 app/forms.py:277
+#: app/templates/admin_dashboard.html:314 app/templates/toolbase.html:54
 msgid "Description (Kurdish)"
 msgstr ""
 
-#: app/forms.py:141
+#: app/forms.py:151
 msgid "Assign Teacher"
 msgstr ""
 
-#: app/forms.py:142
+#: app/forms.py:152
 msgid "Create Subject"
 msgstr ""
 
-#: app/forms.py:148
+#: app/forms.py:158
 msgid "Select Subject"
 msgstr ""
 
-#: app/forms.py:151
+#: app/forms.py:161
 msgid "Content (English)"
 msgstr ""
 
-#: app/forms.py:152
+#: app/forms.py:162
 msgid "Content (Kurdish)"
 msgstr ""
 
-#: app/forms.py:153
+#: app/forms.py:163
 msgid "Publish Content"
 msgstr ""
 
-#: app/forms.py:159 app/forms.py:317 app/templates/admin/comments.html:36
-#: app/templates/admin/stats.html:175 app/templates/stats.html:72
-#: app/templates/teacher/dashboard.html:132
-#: app/templates/teacher/stats.html:132
+#: app/forms.py:169 app/forms.py:324 app/templates/admin/comments.html:36
+#: app/templates/admin/stats.html:176 app/templates/stats.html:72
+#: app/templates/teacher/dashboard.html:178
+#: app/templates/teacher/stats.html:138
 msgid "Subject"
 msgstr ""
 
-#: app/forms.py:160
+#: app/forms.py:170
 msgid "Link to Specific Lecture (Optional)"
 msgstr ""
 
-#: app/forms.py:162
+#: app/forms.py:172
 msgid "Question (English)"
 msgstr ""
 
-#: app/forms.py:163
+#: app/forms.py:173
 msgid "Option A (English)"
 msgstr ""
 
-#: app/forms.py:164
+#: app/forms.py:174
 msgid "Option B (English)"
 msgstr ""
 
-#: app/forms.py:165
+#: app/forms.py:175
 msgid "Option C (English)"
 msgstr ""
 
-#: app/forms.py:166
+#: app/forms.py:176
 msgid "Option D (English)"
 msgstr ""
 
-#: app/forms.py:168
+#: app/forms.py:178
 msgid "Question (Kurdish)"
 msgstr ""
 
-#: app/forms.py:169
+#: app/forms.py:179
 msgid "Option A (Kurdish)"
 msgstr ""
 
-#: app/forms.py:170
+#: app/forms.py:180
 msgid "Option B (Kurdish)"
 msgstr ""
 
-#: app/forms.py:171
+#: app/forms.py:181
 msgid "Option C (Kurdish)"
 msgstr ""
 
-#: app/forms.py:172
+#: app/forms.py:182
 msgid "Option D (Kurdish)"
 msgstr ""
 
-#: app/forms.py:174 app/templates/teacher/builder.html:331
+#: app/forms.py:184 app/templates/teacher/builder.html:337
 msgid "Correct Answer"
 msgstr ""
 
-#: app/forms.py:177
-msgid "Is Kurdish? (Right-to-Left)"
-msgstr ""
-
-#: app/forms.py:179
+#: app/forms.py:186
 msgid "Save Question"
 msgstr ""
 
-#: app/forms.py:199
+#: app/forms.py:206
 msgid ""
 "Please fill out at least one complete language version (English or "
 "Kurdish) including all 4 options."
 msgstr ""
 
-#: app/forms.py:212 app/templates/admin/commands.html:84
+#: app/forms.py:219 app/templates/admin/commands.html:84
 msgid "Upload File (CSV or Excel)"
 msgstr ""
 
-#: app/forms.py:214
+#: app/forms.py:221
 msgid "Tables only!"
 msgstr ""
 
-#: app/forms.py:216
+#: app/forms.py:223
 msgid "Preview Data"
 msgstr ""
 
-#: app/forms.py:222
+#: app/forms.py:229
 msgid "Resource Title (e.g. Watch Video)"
 msgstr ""
 
-#: app/forms.py:223
+#: app/forms.py:230
 msgid "Resource Title (Kurdish)"
 msgstr ""
 
-#: app/forms.py:224
+#: app/forms.py:231
 msgid "URL (Link)"
 msgstr ""
 
-#: app/forms.py:225
+#: app/forms.py:232
 msgid "Add Resource"
 msgstr ""
 
-#: app/forms.py:235
+#: app/forms.py:242
 msgid "Command Title (e.g. Reset DB)"
 msgstr ""
 
-#: app/forms.py:236
+#: app/forms.py:243
 msgid "Command Title (Kurdish)"
 msgstr ""
 
-#: app/forms.py:237
+#: app/forms.py:244
 msgid "Command Code"
 msgstr ""
 
-#: app/forms.py:238
+#: app/forms.py:245
 msgid "Description / When to use"
 msgstr ""
 
-#: app/forms.py:240
+#: app/forms.py:247
 msgid "Save Command"
 msgstr ""
 
-#: app/forms.py:247
+#: app/forms.py:254
 msgid "Select Backup File (.zip)"
 msgstr ""
 
-#: app/forms.py:249
+#: app/forms.py:256
 msgid "ZIP Archives Only!"
 msgstr ""
 
-#: app/forms.py:251
+#: app/forms.py:258
 msgid "I understand this will DELETE ALL CURRENT DATA"
 msgstr ""
 
-#: app/forms.py:252
+#: app/forms.py:259
 msgid "PERFORM FULL RESTORE"
 msgstr ""
 
-#: app/forms.py:258
+#: app/forms.py:265
 msgid "I understand this will DELETE ALL DATA permanently"
 msgstr ""
 
-#: app/forms.py:259
+#: app/forms.py:266
 msgid "WIPE EVERYTHING & START FRESH"
 msgstr ""
 
-#: app/forms.py:266 app/templates/toolbase.html:38
+#: app/forms.py:273 app/templates/toolbase.html:38
 msgid "Tool Name"
 msgstr ""
 
-#: app/forms.py:267 app/templates/toolbase.html:42
+#: app/forms.py:274 app/templates/toolbase.html:42
 msgid "Tool Name (Kurdish)"
 msgstr ""
 
-#: app/forms.py:268
+#: app/forms.py:275
 msgid "Tool URL (https://...)"
 msgstr ""
 
-#: app/forms.py:271
+#: app/forms.py:278
 msgid "Add Tool"
 msgstr ""
 
-#: app/forms.py:279 app/templates/page.html:159
+#: app/forms.py:286 app/templates/page.html:367
 msgid "Your Name"
 msgstr ""
 
-#: app/forms.py:280 app/templates/page.html:165
+#: app/forms.py:287 app/templates/page.html:373
 msgid "Your Birth Date"
 msgstr ""
 
-#: app/forms.py:281
+#: app/forms.py:288
 msgid "About You / Personality (Optional)"
 msgstr ""
 
-#: app/forms.py:282 app/templates/page.html:136
+#: app/forms.py:289 app/templates/page.html:172 app/templates/page.html:189
 msgid "Your Comment"
 msgstr ""
 
-#: app/forms.py:283 app/templates/page.html:180
+#: app/forms.py:290 app/templates/page.html:404
 msgid "Post Comment"
 msgstr ""
 
-#: app/forms.py:290
+#: app/forms.py:297
 msgid "Your Reply"
 msgstr ""
 
-#: app/forms.py:291 app/templates/admin/comments.html:148
-#: app/templates/page.html:273
+#: app/forms.py:298 app/templates/admin/comments.html:148
+#: app/templates/page.html:316
 msgid "Post Reply"
 msgstr ""
 
-#: app/forms.py:298 app/templates/teacher_apply.html:30
+#: app/forms.py:305 app/templates/teacher_apply.html:30
 msgid "Full Name (English)"
 msgstr ""
 
-#: app/forms.py:306 app/forms.py:329 app/templates/admin/stats.html:66
-#: app/templates/exam.html:73 app/templates/teacher/edit_student.html:30
+#: app/forms.py:313 app/forms.py:336 app/templates/admin/stats.html:67
+#: app/templates/exam.html:78 app/templates/teacher/edit_student.html:30
 #: app/templates/teacher/students.html:47 app/templates/teacher_apply.html:46
 msgid "Gender"
 msgstr ""
 
-#: app/forms.py:307 app/forms.py:328 app/templates/exam.html:69
+#: app/forms.py:314 app/forms.py:335 app/templates/exam.html:74
 #: app/templates/teacher/edit_student.html:26
 #: app/templates/teacher/students.html:43 app/templates/teacher_apply.html:50
 msgid "Birth Date"
 msgstr ""
 
-#: app/forms.py:309 app/templates/teacher_apply.html:72
+#: app/forms.py:316 app/templates/teacher_apply.html:72
 msgid "Why do you want to sign up as a teacher?"
 msgstr ""
 
-#: app/forms.py:310 app/templates/teacher_apply.html:78
+#: app/forms.py:317 app/templates/teacher_apply.html:78
 msgid "Submit Application"
 msgstr ""
 
-#: app/forms.py:318 app/templates/teacher/dashboard.html:136
+#: app/forms.py:325 app/templates/teacher/dashboard.html:182
 msgid "Message to Administrators"
 msgstr ""
 
-#: app/forms.py:319 app/templates/teacher/dashboard.html:141
+#: app/forms.py:326 app/templates/teacher/dashboard.html:187
 msgid "Send to Admins"
 msgstr ""
 
-#: app/forms.py:326 app/templates/teacher/edit_student.html:17
+#: app/forms.py:333 app/templates/teacher/edit_student.html:17
 #: app/templates/teacher/students.html:34
 msgid "Student Name (English)"
 msgstr ""
 
-#: app/forms.py:327 app/templates/teacher/edit_student.html:21
+#: app/forms.py:334 app/templates/teacher/edit_student.html:21
 #: app/templates/teacher/students.html:38
 msgid "Student Name (Kurdish)"
 msgstr ""
 
-#: app/forms.py:330 app/templates/teacher/edit_student.html:35
+#: app/forms.py:337 app/templates/teacher/edit_student.html:35
 #: app/templates/teacher/students.html:52
 msgid "Department (English)"
 msgstr ""
 
-#: app/forms.py:331 app/templates/teacher/edit_student.html:39
+#: app/forms.py:338 app/templates/teacher/edit_student.html:39
 #: app/templates/teacher/students.html:56
 msgid "Department (Kurdish)"
 msgstr ""
 
-#: app/forms.py:332
+#: app/forms.py:339
 msgid "Save Student"
+msgstr ""
+
+#: app/forms.py:344 app/templates/teacher/private_builder.html:46
+msgid "Hidden Exam Title (English)"
+msgstr ""
+
+#: app/forms.py:345 app/templates/teacher/private_builder.html:50
+msgid "Hidden Exam Title (Kurdish)"
+msgstr ""
+
+#: app/forms.py:346
+msgid "Create Exam & Generate Link"
 msgstr ""
 
 #: app/routes/admin.py:65
@@ -565,42 +595,42 @@ msgstr ""
 msgid "Error deleting record: %(error)s"
 msgstr ""
 
-#: app/routes/analytics.py:587
+#: app/routes/analytics.py:668
 msgid "No file provided."
 msgstr ""
 
-#: app/routes/analytics.py:597
+#: app/routes/analytics.py:678
 msgid "Invalid Backup Format. Missing core CSV files."
 msgstr ""
 
-#: app/routes/analytics.py:606
+#: app/routes/analytics.py:687
 #, python-format
 msgid "Pre-Restore Wipe Failed: %(error)s"
 msgstr ""
 
-#: app/routes/analytics.py:925
+#: app/routes/analytics.py:1077
 msgid "SYSTEM RESTORE COMPLETED. Database re-hydrated successfully."
 msgstr ""
 
-#: app/routes/analytics.py:930
+#: app/routes/analytics.py:1082
 #, python-format
 msgid "CRITICAL RESTORE FAILURE: %(error)s"
 msgstr ""
 
-#: app/routes/analytics.py:951
+#: app/routes/analytics.py:1103
 msgid "System wiped clean. Please create a new administrator account."
 msgstr ""
 
-#: app/routes/analytics.py:956
+#: app/routes/analytics.py:1108
 #, python-format
 msgid "CRITICAL WIPE FAILURE: %(error)s"
 msgstr ""
 
-#: app/routes/analytics.py:959
+#: app/routes/analytics.py:1111
 msgid "Invalid form submission."
 msgstr ""
 
-#: app/routes/analytics.py:984
+#: app/routes/analytics.py:1136
 msgid "Public Information Page Updated."
 msgstr ""
 
@@ -635,503 +665,559 @@ msgstr ""
 msgid "Error submitting application: %(error)s"
 msgstr ""
 
-#: app/routes/content.py:69
+#: app/routes/content.py:90 app/routes/content.py:1137
 #, python-format
 msgid "Import Error: Missing columns: %(fields)s"
 msgstr ""
 
-#: app/routes/content.py:104
+#: app/routes/content.py:102 app/routes/content.py:1149
 #, python-format
 msgid "Processing Error: %(error)s"
 msgstr ""
 
-#: app/routes/content.py:107
+#: app/routes/content.py:105 app/routes/content.py:1152
 msgid "Invalid request or file format."
 msgstr ""
 
-#: app/routes/content.py:181
+#: app/routes/content.py:170
 #, python-format
 msgid "Batch Processed: %(count)s questions assigned to bank."
 msgstr ""
 
-#: app/routes/content.py:201
+#: app/routes/content.py:207
+#, python-format
+msgid "Imported %(count)s hidden exam question(s)."
+msgstr ""
+
+#: app/routes/content.py:227
 #, python-format
 msgid "Batch Processed: %(count)s system commands documented."
 msgstr ""
 
-#: app/routes/content.py:206
+#: app/routes/content.py:232
 #, python-format
 msgid "Critical Commit Failure: %(error)s"
 msgstr ""
 
-#: app/routes/content.py:230 app/routes/content.py:304
+#: app/routes/content.py:256 app/routes/content.py:330
 msgid "Error: The URL Slug must be unique across all subjects."
 msgstr ""
 
-#: app/routes/content.py:273
+#: app/routes/content.py:299
 #, python-format
 msgid "Subject \"%(name)s\" created successfully."
 msgstr ""
 
-#: app/routes/content.py:276
+#: app/routes/content.py:302
 #, python-format
 msgid "Error creating subject: %(error)s"
 msgstr ""
 
-#: app/routes/content.py:332
+#: app/routes/content.py:358
 msgid "Subject information updated."
 msgstr ""
 
-#: app/routes/content.py:382
+#: app/routes/content.py:416
 #, python-format
 msgid "Subject \"%(name)s\" and all internal content has been deleted."
 msgstr ""
 
-#: app/routes/content.py:386
+#: app/routes/content.py:420
 #, python-format
 msgid "Deletion failed: %(error)s"
 msgstr ""
 
-#: app/routes/content.py:431
+#: app/routes/content.py:465
 msgid "Lecture content published."
 msgstr ""
 
-#: app/routes/content.py:469
+#: app/routes/content.py:503
 msgid "Changes saved."
 msgstr ""
 
-#: app/routes/content.py:502
+#: app/routes/content.py:536
 msgid "Lecture deleted."
 msgstr ""
 
-#: app/routes/content.py:505
+#: app/routes/content.py:539
 #, python-format
 msgid "Error deleting lecture: %(error)s"
 msgstr ""
 
-#: app/routes/content.py:528
+#: app/routes/content.py:562
 msgid "Comment deleted."
 msgstr ""
 
-#: app/routes/content.py:531
+#: app/routes/content.py:565
 #, python-format
 msgid "Error deleting comment: %(error)s"
 msgstr ""
 
-#: app/routes/content.py:568
+#: app/routes/content.py:601
 msgid "Reply posted."
 msgstr ""
 
-#: app/routes/content.py:571
+#: app/routes/content.py:604
 #, python-format
 msgid "Error posting reply: %(error)s"
 msgstr ""
 
-#: app/routes/content.py:573
+#: app/routes/content.py:606
 msgid "Reply text cannot be empty."
 msgstr ""
 
-#: app/routes/content.py:600
+#: app/routes/content.py:633
 msgid "Learning resource attached."
 msgstr ""
 
-#: app/routes/content.py:602
+#: app/routes/content.py:635
 msgid "Attachment Error: Title and Link are required."
 msgstr ""
 
-#: app/routes/content.py:619
+#: app/routes/content.py:652
 msgid "Resource removed."
 msgstr ""
 
-#: app/routes/content.py:848
+#: app/routes/content.py:868
 msgid "Question updated."
 msgstr ""
 
-#: app/routes/content.py:867
+#: app/routes/content.py:887
 msgid "Question removed from bank."
 msgstr ""
 
-#: app/routes/content.py:870
+#: app/routes/content.py:890
 #, python-format
 msgid "Error during question deletion: %(error)s"
 msgstr ""
 
-#: app/routes/helpers.py:86 app/routes/helpers.py:103
+#: app/routes/content.py:971
+#, python-format
+msgid "Hidden exam \"%(title)s\" created with a new link."
+msgstr ""
+
+#: app/routes/content.py:974
+#, python-format
+msgid "Error creating hidden exam: %(error)s"
+msgstr ""
+
+#: app/routes/content.py:994
+#, python-format
+msgid "Generated a new link for \"%(title)s\"."
+msgstr ""
+
+#: app/routes/content.py:997
+#, python-format
+msgid "Error regenerating link: %(error)s"
+msgstr ""
+
+#: app/routes/content.py:1016
+msgid "Hidden exam link deleted."
+msgstr ""
+
+#: app/routes/content.py:1019
+#, python-format
+msgid "Error deleting hidden exam: %(error)s"
+msgstr ""
+
+#: app/routes/helpers.py:132 app/routes/helpers.py:137
 msgid "From Teacher"
 msgstr ""
 
-#: app/routes/public.py:56
+#: app/routes/public.py:59
 msgid "System is already initialized. Access to setup is restricted."
 msgstr ""
 
-#: app/routes/public.py:68
+#: app/routes/public.py:71
 msgid "Error: This email is already registered in our systems."
 msgstr ""
 
-#: app/routes/public.py:85
+#: app/routes/public.py:88
 msgid "Admin Account Created! Please login to begin managing the school."
 msgstr ""
 
-#: app/routes/public.py:89
+#: app/routes/public.py:92
 #, python-format
 msgid "Critical Database Error: %(error)s"
 msgstr ""
 
-#: app/routes/public.py:206 app/templates/base.html:13
+#: app/routes/public.py:209 app/templates/base.html:13
 msgid "Welcome"
 msgstr ""
 
-#: app/routes/public.py:207 app/templates/base.html:154
-#: app/templates/exam.html:161 app/templates/page.html:298
+#: app/routes/public.py:210 app/templates/base.html:154
+#: app/templates/exam.html:180 app/templates/page.html:417
 msgid "Toggle Language"
 msgstr ""
 
-#: app/routes/public.py:208 app/templates/base.html:146
-#: app/templates/subject.html:13
+#: app/routes/public.py:211 app/templates/base.html:146
+#: app/templates/subject.html:23 app/templates/teacher_profile.html:92
 msgid "Home"
 msgstr ""
 
-#: app/routes/public.py:209 app/templates/about.html:3
+#: app/routes/public.py:212 app/templates/about.html:3
 #: app/templates/about.html:12 app/templates/base.html:133
 #: app/templates/base.html:148
 msgid "About Us"
 msgstr ""
 
-#: app/routes/public.py:235
+#: app/routes/public.py:238
 msgid "Invalid language selected."
 msgstr ""
 
-#: app/routes/public.py:261
+#: app/routes/public.py:264
 msgid "Language changed successfully."
 msgstr ""
 
-#: app/routes/public.py:409
+#: app/routes/public.py:401 app/routes/public.py:439
+msgid "Comment text cannot be empty."
+msgstr ""
+
+#: app/routes/public.py:418 app/routes/public.py:522
 msgid "Your comment has been posted!"
 msgstr ""
 
-#: app/routes/public.py:412
+#: app/routes/public.py:421 app/routes/public.py:525
 #, python-format
 msgid "Error posting comment: %(error)s"
 msgstr ""
 
-#: app/routes/public.py:439
+#: app/routes/public.py:443
+msgid "Invalid Comment Guest Code. Please check your 8-character code."
+msgstr ""
+
+#: app/routes/public.py:520
+#, python-format
+msgid "Your comment has been posted! Your 8-character code is: %(code)s"
+msgstr ""
+
+#: app/routes/public.py:564
 msgid "Please enter your Student Code."
 msgstr ""
 
-#: app/routes/public.py:444
+#: app/routes/public.py:569
 msgid "Invalid or unauthorized Student Code for this teacher/subject."
 msgstr ""
 
-#: app/routes/public.py:448
+#: app/routes/public.py:573
 #, python-format
 msgid "Exam unlocked for %(name)s."
 msgstr ""
 
-#: app/routes/public.py:470
+#: app/routes/public.py:608
 #, python-format
 msgid "Quiz: %(title)s"
 msgstr ""
 
-#: app/routes/public.py:474
+#: app/routes/public.py:612
 #, python-format
 msgid "%(name)s Final Examination"
 msgstr ""
 
-#: app/routes/public.py:544
+#: app/routes/public.py:687 app/routes/public.py:768
 msgid "Invalid or missing Student Code."
 msgstr ""
 
-#: app/routes/public.py:547
+#: app/routes/public.py:690 app/routes/public.py:771
 msgid "This student code is not authorized for this teacher/subject exam."
 msgstr ""
 
-#: app/routes/public.py:556
-msgid "Please provide your birth date and gender before submitting."
-msgstr ""
-
-#: app/routes/public.py:562
-msgid "Invalid birth date format."
-msgstr ""
-
-#: app/routes/public.py:599
+#: app/routes/public.py:710 app/routes/public.py:839
 #, python-format
 msgid "Error saving exam result: %(error)s"
 msgstr ""
 
-#: app/routes/public.py:603
+#: app/routes/public.py:714 app/routes/public.py:843
 #, python-format
 msgid "Examination Submitted. Score: %(correct)s/%(total)s (%(grade)s%%)"
 msgstr ""
 
-#: app/routes/teacher.py:66 app/routes/teacher.py:172
+#: app/routes/public.py:777
+msgid "Invalid Guest Exam Code. Please check your 8-character code."
+msgstr ""
+
+#: app/routes/public.py:789
+msgid "Please provide your birth date and gender before submitting."
+msgstr ""
+
+#: app/routes/public.py:795
+msgid "Invalid birth date format."
+msgstr ""
+
+#: app/routes/public.py:849
+#, python-format
+msgid "Your new 8-character Guest Exam Code is: %(code)s"
+msgstr ""
+
+#: app/routes/teacher.py:102 app/routes/teacher.py:199
 #: app/templates/admin/stats.html:43
 msgid "All Teachers"
 msgstr ""
 
-#: app/routes/teacher.py:130 app/routes/teacher.py:374
+#: app/routes/teacher.py:150 app/routes/teacher.py:410
 #, python-format
 msgid "Error: The name \"%(username)s\" is already taken."
 msgstr ""
 
-#: app/routes/teacher.py:144
+#: app/routes/teacher.py:171
 msgid "Your profile has been updated successfully."
 msgstr ""
 
-#: app/routes/teacher.py:147
+#: app/routes/teacher.py:174
 #, python-format
 msgid "Error updating profile: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:182
+#: app/routes/teacher.py:209
 msgid "No teachers available to message."
 msgstr ""
 
-#: app/routes/teacher.py:187 app/routes/teacher.py:628
+#: app/routes/teacher.py:214 app/routes/teacher.py:678
 msgid "Error: Selected teacher not found."
 msgstr ""
 
-#: app/routes/teacher.py:202
+#: app/routes/teacher.py:229
 #, python-format
 msgid "Announcement sent to %(count)s teacher(s)."
 msgstr ""
 
-#: app/routes/teacher.py:204
+#: app/routes/teacher.py:231
 #, python-format
 msgid "Message sent to %(username)s."
 msgstr ""
 
-#: app/routes/teacher.py:207 app/routes/teacher.py:717
+#: app/routes/teacher.py:234 app/routes/teacher.py:753
 #, python-format
 msgid "Error sending message: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:241 app/routes/teacher.py:258
+#: app/routes/teacher.py:268 app/routes/teacher.py:285
 msgid "Notification dismissed."
 msgstr ""
 
-#: app/routes/teacher.py:244 app/routes/teacher.py:261
+#: app/routes/teacher.py:271 app/routes/teacher.py:288
 #, python-format
 msgid "Error dismissing notification: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:281 app/routes/teacher.py:311
+#: app/routes/teacher.py:313 app/routes/teacher.py:347
 msgid "shown"
 msgstr ""
 
-#: app/routes/teacher.py:281 app/routes/teacher.py:311
-#: app/routes/teacher.py:338
+#: app/routes/teacher.py:313 app/routes/teacher.py:347
+#: app/routes/teacher.py:374
 msgid "hidden"
 msgstr ""
 
-#: app/routes/teacher.py:282
+#: app/routes/teacher.py:314
 #, python-format
 msgid "Your name will be %(status)s on all your subject pages."
 msgstr ""
 
-#: app/routes/teacher.py:285 app/routes/teacher.py:315
+#: app/routes/teacher.py:317 app/routes/teacher.py:351
 #, python-format
 msgid "Error updating setting: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:312
+#: app/routes/teacher.py:348
 #, python-format
 msgid "Your name is now %(status)s on \"%(subject)s\"."
 msgstr ""
 
-#: app/routes/teacher.py:338
+#: app/routes/teacher.py:374
 msgid "visible"
 msgstr ""
 
-#: app/routes/teacher.py:339
+#: app/routes/teacher.py:375
 #, python-format
 msgid "Subject \"%(name)s\" is now %(status)s on the public homepage."
 msgstr ""
 
-#: app/routes/teacher.py:342
+#: app/routes/teacher.py:378
 #, python-format
 msgid "Error updating visibility: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:368
+#: app/routes/teacher.py:404
 #, python-format
 msgid "Error: The email address \"%(email)s\" is already in use."
 msgstr ""
 
-#: app/routes/teacher.py:398
+#: app/routes/teacher.py:434
 msgid "Administrator"
 msgstr ""
 
-#: app/routes/teacher.py:398 app/templates/admin/stats.html:41
+#: app/routes/teacher.py:434 app/templates/admin/stats.html:41
 msgid "Teacher"
 msgstr ""
 
-#: app/routes/teacher.py:399
+#: app/routes/teacher.py:435
 #, python-format
 msgid "Success: %(role)s account created for %(username)s."
 msgstr ""
 
-#: app/routes/teacher.py:402
+#: app/routes/teacher.py:438
 #, python-format
 msgid "Database Error during staff creation: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:426
+#: app/routes/teacher.py:462
 msgid "Error: The new username is already taken."
 msgstr ""
 
-#: app/routes/teacher.py:431
+#: app/routes/teacher.py:467
 msgid "Error: The new email is already in use."
 msgstr ""
 
-#: app/routes/teacher.py:453
+#: app/routes/teacher.py:494
 msgid "Password has been reset."
 msgstr ""
 
-#: app/routes/teacher.py:456
+#: app/routes/teacher.py:497
 msgid "Staff profile updated."
 msgstr ""
 
-#: app/routes/teacher.py:479
+#: app/routes/teacher.py:520
 msgid "Security Violation: You cannot delete your own account."
 msgstr ""
 
-#: app/routes/teacher.py:525
+#: app/routes/teacher.py:575
 #, python-format
 msgid "Account for %(username)s and all associated course data have been purged."
 msgstr ""
 
-#: app/routes/teacher.py:529
+#: app/routes/teacher.py:579
 #, python-format
 msgid "Integrity Error during deletion: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:559
+#: app/routes/teacher.py:609
 msgid "Error: At least one teacher must be assigned to a subject."
 msgstr ""
 
-#: app/routes/teacher.py:567
+#: app/routes/teacher.py:617
 msgid "Error: No valid teachers selected."
 msgstr ""
 
-#: app/routes/teacher.py:598
+#: app/routes/teacher.py:648
 #, python-format
 msgid "Assigned teachers for \"%(subject)s\" updated successfully."
 msgstr ""
 
-#: app/routes/teacher.py:601
+#: app/routes/teacher.py:651
 #, python-format
 msgid "Error updating subject teachers: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:623
+#: app/routes/teacher.py:673
 msgid "Error: Please select a new teacher."
 msgstr ""
 
-#: app/routes/teacher.py:653
+#: app/routes/teacher.py:703
 #, python-format
 msgid "Subject \"%(subject)s\" transferred from %(old)s to %(new)s."
 msgstr ""
 
-#: app/routes/teacher.py:657
+#: app/routes/teacher.py:707
 #, python-format
 msgid "Error transferring subject: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:714
+#: app/routes/teacher.py:750
 msgid "Your message has been sent to the administrators."
 msgstr ""
 
-#: app/routes/teacher.py:744
+#: app/routes/teacher.py:797
 msgid "All notifications marked as read."
 msgstr ""
 
-#: app/routes/teacher.py:763
+#: app/routes/teacher.py:816
 msgid "Final exam is now hidden and restricted to Student Codes."
 msgstr ""
 
-#: app/routes/teacher.py:763
+#: app/routes/teacher.py:816
 msgid "Final exam is now public."
 msgstr ""
 
-#: app/routes/teacher.py:767 app/routes/teacher.py:784
+#: app/routes/teacher.py:820 app/routes/teacher.py:837
 #, python-format
 msgid "Error updating restriction: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:780
+#: app/routes/teacher.py:833
 msgid "Lecture quiz is now hidden and restricted to Student Codes."
 msgstr ""
 
-#: app/routes/teacher.py:780
+#: app/routes/teacher.py:833
 msgid "Lecture quiz is now public."
 msgstr ""
 
-#: app/routes/teacher.py:837
+#: app/routes/teacher.py:890
 #, python-format
 msgid "Student \"%(name)s\" created with code %(code)s."
 msgstr ""
 
-#: app/routes/teacher.py:841
+#: app/routes/teacher.py:894
 #, python-format
 msgid "Error creating student: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:887
+#: app/routes/teacher.py:947
 msgid "Student information updated."
 msgstr ""
 
-#: app/routes/teacher.py:891
+#: app/routes/teacher.py:951
 #, python-format
 msgid "Error updating student: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:908
+#: app/routes/teacher.py:968
 #, python-format
 msgid "New student code generated: %(code)s"
 msgstr ""
 
-#: app/routes/teacher.py:911
+#: app/routes/teacher.py:971
 #, python-format
 msgid "Error regenerating code: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:929
+#: app/routes/teacher.py:989
 msgid "Student deleted permanently."
 msgstr ""
 
-#: app/routes/teacher.py:936
+#: app/routes/teacher.py:996
 msgid "Student removed from your roster."
 msgstr ""
 
-#: app/routes/teacher.py:940
+#: app/routes/teacher.py:1000
 #, python-format
 msgid "Error deleting student: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:962
+#: app/routes/teacher.py:1022
 msgid "Please select at least one teacher."
 msgstr ""
 
-#: app/routes/teacher.py:975
+#: app/routes/teacher.py:1035
 #, python-format
 msgid "Teacher assignments updated for \"%(name)s\"."
 msgstr ""
 
-#: app/routes/teacher.py:978
+#: app/routes/teacher.py:1038
 #, python-format
 msgid "Error updating student teachers: %(error)s"
 msgstr ""
 
-#: app/routes/teacher.py:993
+#: app/routes/teacher.py:1053
 msgid "Select at least one student and a target teacher."
 msgstr ""
 
-#: app/routes/teacher.py:1008
+#: app/routes/teacher.py:1068
 #, python-format
 msgid "Shared %(count)s student(s) with %(teacher)s."
 msgstr ""
 
-#: app/routes/teacher.py:1011
+#: app/routes/teacher.py:1071
 #, python-format
 msgid "Error sharing students: %(error)s"
 msgstr ""
@@ -1194,8 +1280,8 @@ msgid "Edit This Page (Admin Only)"
 msgstr ""
 
 #: app/templates/admin_dashboard.html:17 app/templates/base.html:175
-#: app/templates/teacher/dashboard.html:18
-#: app/templates/teacher/dashboard.html:155
+#: app/templates/teacher/dashboard.html:33
+#: app/templates/teacher/dashboard.html:200
 msgid "Logout"
 msgstr ""
 
@@ -1241,258 +1327,283 @@ msgstr ""
 msgid "New Comment"
 msgstr ""
 
+#: app/templates/admin/comments.html:100
+#: app/templates/admin/notifications.html:79
 #: app/templates/admin_dashboard.html:72
-#: app/templates/teacher/dashboard.html:221
-#: app/templates/teacher/dashboard.html:254
+#: app/templates/teacher/dashboard.html:259
+#: app/templates/teacher/dashboard.html:288
+msgid "Mark as Read"
+msgstr ""
+
+#: app/templates/admin_dashboard.html:78
+#: app/templates/teacher/dashboard.html:265
+#: app/templates/teacher/dashboard.html:294
 msgid "Dismiss"
 msgstr ""
 
 #: app/templates/admin/notifications.html:68
-#: app/templates/admin_dashboard.html:79
-#: app/templates/teacher/dashboard.html:203
-#: app/templates/teacher/notifications.html:34
+#: app/templates/admin_dashboard.html:85
+#: app/templates/teacher/dashboard.html:251
+#: app/templates/teacher/notifications.html:40
 msgid "From"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:87
+#: app/templates/admin_dashboard.html:93
 msgid "Review Request"
 msgstr ""
 
 #: app/templates/admin/comments.html:93
 #: app/templates/admin/notifications.html:97
-#: app/templates/admin_dashboard.html:92 app/templates/index.html:114
-#: app/templates/teacher/dashboard.html:265
-#: app/templates/teacher/notifications.html:80
+#: app/templates/admin_dashboard.html:98 app/templates/index.html:114
+#: app/templates/teacher/dashboard.html:305
+#: app/templates/teacher/notifications.html:86
 msgid "View Lesson"
 msgstr ""
 
 #: app/templates/admin/notifications.html:108
-#: app/templates/admin_dashboard.html:100
-#: app/templates/teacher/dashboard.html:274
-#: app/templates/teacher/notifications.html:90
+#: app/templates/admin_dashboard.html:106
+#: app/templates/teacher/notifications.html:96
 msgid "No new notifications"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:107
+#: app/templates/admin_dashboard.html:113
 msgid "Open Notifications Center"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:116
+#: app/templates/admin_dashboard.html:122
 msgid "Message Teachers"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:127
+#: app/templates/admin_dashboard.html:133
 msgid "e.g., Schedule Update"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:131
+#: app/templates/admin_dashboard.html:137
 msgid "Write your message to the teacher(s)..."
 msgstr ""
 
-#: app/templates/admin_dashboard.html:147
-#: app/templates/teacher/dashboard.html:60
+#: app/templates/admin_dashboard.html:153
+#: app/templates/teacher/dashboard.html:80
 msgid "Edit My Profile"
 msgstr ""
 
 #: app/templates/admin/edit_teacher.html:47
-#: app/templates/admin_dashboard.html:171
-#: app/templates/admin_dashboard.html:533
-#: app/templates/teacher/dashboard.html:84
+#: app/templates/admin_dashboard.html:177
+#: app/templates/admin_dashboard.html:568
+#: app/templates/teacher/dashboard.html:105
 msgid "Optional short bio..."
 msgstr ""
 
-#: app/templates/admin_dashboard.html:175
-#: app/templates/teacher/dashboard.html:88
+#: app/templates/admin_dashboard.html:180
+#: app/templates/teacher/dashboard.html:110
+msgid "Public Profile Privacy"
+msgstr ""
+
+#: app/templates/admin_dashboard.html:204
+#: app/templates/teacher/dashboard.html:135
 msgid "Leave empty to keep current"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:192
+#: app/templates/admin/edit_teacher.html:114
+#: app/templates/admin_dashboard.html:213
+msgid "View Public Profile"
+msgstr ""
+
+#: app/templates/admin_dashboard.html:224
 msgid "System Management"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:196
+#: app/templates/admin_dashboard.html:228
 msgid "Detailed Statistics"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:199 app/templates/teacher/students.html:3
+#: app/templates/admin_dashboard.html:231 app/templates/teacher/students.html:3
 msgid "Manage Students"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:202
+#: app/templates/admin_dashboard.html:234
 msgid "Lecture Comments"
 msgstr ""
 
 #: app/templates/admin/teacher_requests.html:3
-#: app/templates/admin_dashboard.html:206
+#: app/templates/admin_dashboard.html:238
 msgid "Teacher Requests"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:210
+#: app/templates/admin_dashboard.html:242
 msgid "Notifications Hub"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:215
+#: app/templates/admin_dashboard.html:247
 msgid "System Commands"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:218 app/templates/toolbase.html:17
+#: app/templates/admin_dashboard.html:250 app/templates/toolbase.html:17
 msgid "Tool Base"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:221
+#: app/templates/admin_dashboard.html:253
 msgid "Edit \"About Us\""
 msgstr ""
 
-#: app/templates/admin_dashboard.html:228
+#: app/templates/admin_dashboard.html:260
 msgid "Download Full Backup (.zip)"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:235
+#: app/templates/admin_dashboard.html:267
 msgid "Restore System"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:244
+#: app/templates/admin_dashboard.html:276
 msgid "Create New Subject"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:257
+#: app/templates/admin_dashboard.html:289
 msgid "URL Slug"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:262
+#: app/templates/admin_dashboard.html:294
 msgid "Primary Teacher"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:266
+#: app/templates/admin_dashboard.html:298
 msgid "Additional Teachers (Optional)"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:287
+#: app/templates/admin_dashboard.html:319
 msgid "Initialize Subject"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:302
+#: app/templates/admin_dashboard.html:334
 msgid "Global Subject Control"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:332
-#: app/templates/teacher/dashboard.html:330
+#: app/templates/admin_dashboard.html:336
+msgid "My Teacher View"
+msgstr ""
+
+#: app/templates/admin_dashboard.html:367
+#: app/templates/teacher/dashboard.html:369
 msgid "Public"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:334 app/templates/page.html:22
-#: app/templates/teacher/dashboard.html:332
+#: app/templates/admin/stats.html:192 app/templates/admin_dashboard.html:369
+#: app/templates/page.html:42 app/templates/teacher/dashboard.html:371
+#: app/templates/teacher/dashboard.html:454
+#: app/templates/teacher/stats.html:151
 msgid "Hidden"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:340
-#: app/templates/teacher/dashboard.html:338
+#: app/templates/admin_dashboard.html:375
+#: app/templates/teacher/dashboard.html:377
 msgid "Hide"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:342
-#: app/templates/teacher/dashboard.html:340
+#: app/templates/admin_dashboard.html:377
+#: app/templates/teacher/dashboard.html:379
 msgid "Show"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:353
+#: app/templates/admin_dashboard.html:388
 msgid "Assign Teachers"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:372
+#: app/templates/admin_dashboard.html:407
 msgid "Save Teachers"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:383
+#: app/templates/admin_dashboard.html:418
 msgid "Transfer to..."
 msgstr ""
 
-#: app/templates/admin_dashboard.html:391
+#: app/templates/admin_dashboard.html:426
 msgid "Transfer this subject to another teacher?"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:399
+#: app/templates/admin_dashboard.html:434
 msgid "Open"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:402
+#: app/templates/admin_dashboard.html:437
 msgid "Edit Subject"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:403 app/templates/subject.html:95
+#: app/templates/admin_dashboard.html:438 app/templates/subject.html:103
 #: app/templates/teacher/students.html:179
 msgid "Edit"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:414
+#: app/templates/admin_dashboard.html:449
 msgid "Admin Headquarters"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:418
+#: app/templates/admin_dashboard.html:453
 msgid "Print Staff Roster"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:426
+#: app/templates/admin_dashboard.html:461
 msgid "Teaching Staff"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:433 app/templates/teacher/stats.html:98
+#: app/templates/admin_dashboard.html:468 app/templates/teacher/stats.html:104
 msgid "Name"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:435
-#: app/templates/teacher/dashboard.html:172
+#: app/templates/admin_dashboard.html:470
+#: app/templates/teacher/dashboard.html:217
 msgid "Subjects Assigned"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:438
+#: app/templates/admin_dashboard.html:473
 msgid "Manual Password"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:441
+#: app/templates/admin_dashboard.html:476
+#: app/templates/teacher/private_builder.html:66
 #: app/templates/teacher/students.html:125
 msgid "Actions"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:462
+#: app/templates/admin_dashboard.html:497
 msgid "None"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:476
+#: app/templates/admin_dashboard.html:511
 msgid "Edit Profile"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:481
+#: app/templates/admin_dashboard.html:516
 msgid "View Dashboard As..."
 msgstr ""
 
 #: app/templates/admin/notifications.html:86
 #: app/templates/admin/teacher_requests.html:78
-#: app/templates/admin_dashboard.html:486 app/templates/subject.html:97
-#: app/templates/teacher/dashboard.html:310
+#: app/templates/admin_dashboard.html:521 app/templates/subject.html:105
+#: app/templates/teacher/dashboard.html:349
+#: app/templates/teacher/private_builder.html:106
 #: app/templates/teacher/students.html:190
 msgid "Delete"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:486
+#: app/templates/admin_dashboard.html:521
 msgid "This removes all their subjects and questions!"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:487
+#: app/templates/admin_dashboard.html:522
 msgid "Delete Account"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:495
+#: app/templates/admin_dashboard.html:530
 msgid ""
 "No staff members found. Use the\n"
 "                                form below to add the first teacher."
 msgstr ""
 
-#: app/templates/admin_dashboard.html:507
+#: app/templates/admin_dashboard.html:542
 msgid "Quick Register Staff"
 msgstr ""
 
-#: app/templates/admin_dashboard.html:539
+#: app/templates/admin_dashboard.html:574
 msgid "Admin?"
 msgstr ""
 
@@ -1524,67 +1635,81 @@ msgstr ""
 msgid "Verified Student"
 msgstr ""
 
-#: app/templates/admin/stats.html:62 app/templates/exam.html:49
+#: app/templates/admin/stats.html:63 app/templates/exam.html:49
 msgid "Visitor / Guest"
 msgstr ""
 
-#: app/templates/exam.html:54
+#: app/templates/exam.html:54 app/templates/exam.html:96
+msgid "Guest Exam Code"
+msgstr ""
+
+#: app/templates/exam.html:59
 msgid "I have a Student Code"
 msgstr ""
 
-#: app/templates/exam.html:65
+#: app/templates/exam.html:70
 msgid "Name (Optional)"
 msgstr ""
 
-#: app/templates/exam.html:66 app/templates/page.html:172
+#: app/templates/exam.html:71 app/templates/page.html:380
 msgid "Optional"
 msgstr ""
 
-#: app/templates/exam.html:85 app/templates/exam_gate.html:22
+#: app/templates/exam.html:89
+msgid ""
+"Generate an 8-character Guest Exam Code so I can skip entering my details"
+" next time (separate from student codes)"
+msgstr ""
+
+#: app/templates/exam.html:99
+msgid "Enter your 8-character Guest Exam Code"
+msgstr ""
+
+#: app/templates/exam.html:104 app/templates/exam_gate.html:22
 msgid "Student Code"
 msgstr ""
 
-#: app/templates/exam.html:89
+#: app/templates/exam.html:108
 msgid "Enter your 8+ character Student Code"
 msgstr ""
 
-#: app/templates/exam.html:128
+#: app/templates/exam.html:147
 msgid "No Questions Found"
 msgstr ""
 
-#: app/templates/exam.html:129
+#: app/templates/exam.html:148
 msgid "There are no questions assigned to this exam/lecture yet."
 msgstr ""
 
-#: app/templates/exam.html:130
+#: app/templates/exam.html:149
 msgid "Go Back"
 msgstr ""
 
-#: app/templates/exam.html:137
+#: app/templates/exam.html:156
 msgid "Submit Exam"
 msgstr ""
 
-#: app/templates/exam.html:149
+#: app/templates/exam.html:168
 msgid "Submitting Exam..."
 msgstr ""
 
-#: app/templates/exam.html:150
+#: app/templates/exam.html:169
 msgid "Connecting to server..."
 msgstr ""
 
-#: app/templates/exam.html:152
+#: app/templates/exam.html:171
 msgid "DO NOT REFRESH THE PAGE"
 msgstr ""
 
-#: app/templates/exam.html:237
+#: app/templates/exam.html:269
 msgid "Are you sure you want to submit your answers?"
 msgstr ""
 
-#: app/templates/exam.html:255
+#: app/templates/exam.html:287
 msgid "Server verified. Uploading answers..."
 msgstr ""
 
-#: app/templates/exam.html:261
+#: app/templates/exam.html:293
 msgid "Waking up server (this may take 20s)..."
 msgstr ""
 
@@ -1598,11 +1723,11 @@ msgstr ""
 msgid "e.g., K7M4P9X2"
 msgstr ""
 
-#: app/templates/exam_gate.html:28 app/templates/teacher/dashboard.html:360
+#: app/templates/exam_gate.html:28 app/templates/teacher/dashboard.html:398
 msgid "Unlock Exam"
 msgstr ""
 
-#: app/templates/exam_gate.html:31 app/templates/page.html:13
+#: app/templates/exam_gate.html:31 app/templates/page.html:33
 msgid "Back to Subject"
 msgstr ""
 
@@ -1666,88 +1791,141 @@ msgstr ""
 msgid "Apply for a Teacher Account"
 msgstr ""
 
-#: app/templates/page.html:20
+#: app/templates/page.html:13
+msgid "Your 8-Character Comment Guest Code:"
+msgstr ""
+
+#: app/templates/page.html:15
+msgid "Save this code to post future comments without re-entering your details."
+msgstr ""
+
+#: app/templates/page.html:23 app/templates/subject.html:9
+msgid "Your 8-Character Guest Exam Code:"
+msgstr ""
+
+#: app/templates/page.html:25 app/templates/subject.html:11
+msgid ""
+"Save this code so you do not need to re-enter your details on future "
+"public exams/quizzes."
+msgstr ""
+
+#: app/templates/page.html:40
 msgid "Take Lecture Quiz"
 msgstr ""
 
-#: app/templates/page.html:56
+#: app/templates/page.html:61 app/templates/subject.html:35
+msgid "Taught by"
+msgstr ""
+
+#: app/templates/page.html:91
 msgid "Learning Resources"
 msgstr ""
 
-#: app/templates/page.html:89 app/templates/teacher/builder.html:396
+#: app/templates/page.html:124 app/templates/teacher/builder.html:402
 msgid "Open in New Tab"
 msgstr ""
 
-#: app/templates/page.html:120
+#: app/templates/page.html:155
 msgid "Lecture Discussion"
 msgstr ""
 
-#: app/templates/page.html:123
+#: app/templates/page.html:158
 msgid "Show / Add Comments"
 msgstr ""
 
-#: app/templates/page.html:138
-msgid "Write your question or thoughts about this lecture..."
+#: app/templates/page.html:173
+msgid "Staff Direct Post"
 msgstr ""
 
-#: app/templates/page.html:142
+#: app/templates/page.html:176
+msgid "Write your comment as a teacher (no personal details required)..."
+msgstr ""
+
+#: app/templates/page.html:180 app/templates/page.html:196
 msgid "Send Comment"
 msgstr ""
 
-#: app/templates/page.html:152
-msgid "Before Posting Your Comment"
+#: app/templates/page.html:192
+msgid "Write your question or thoughts about this lecture..."
 msgstr ""
 
-#: app/templates/page.html:161
-msgid "Enter your name"
-msgstr ""
-
-#: app/templates/page.html:171
-msgid "About You / Personality"
-msgstr ""
-
-#: app/templates/page.html:174
-msgid "Optional: share your interests, hobbies, or personality..."
-msgstr ""
-
-#: app/templates/admin/edit_about.html:61
-#: app/templates/admin/edit_teacher.html:91 app/templates/page.html:178
-#: app/templates/teacher/builder.html:300
-#: app/templates/teacher/builder.html:369
-#: app/templates/teacher/edit_student.html:43
-msgid "Cancel"
-msgstr ""
-
-#: app/templates/admin/comments.html:82 app/templates/page.html:198
+#: app/templates/admin/comments.html:82 app/templates/page.html:231
 msgid "Born"
 msgstr ""
 
-#: app/templates/admin/teacher_requests.html:33 app/templates/page.html:202
+#: app/templates/admin/teacher_requests.html:33 app/templates/page.html:235
+#: app/templates/teacher_profile.html:48
 msgid "Age"
 msgstr ""
 
-#: app/templates/page.html:213
+#: app/templates/page.html:247
 msgid "Reply"
 msgstr ""
 
-#: app/templates/admin/comments.html:105 app/templates/page.html:216
+#: app/templates/admin/comments.html:105 app/templates/page.html:252
 msgid "Delete this comment?"
 msgstr ""
 
-#: app/templates/page.html:218
+#: app/templates/page.html:254
 msgid "Delete Comment"
 msgstr ""
 
-#: app/templates/page.html:250
+#: app/templates/page.html:293
 msgid "Delete this reply?"
 msgstr ""
 
-#: app/templates/page.html:272
+#: app/templates/page.html:315
 msgid "Write a teacher reply..."
 msgstr ""
 
-#: app/templates/page.html:283
+#: app/templates/page.html:326
 msgid "No comments yet. Be the first to share your thoughts!"
+msgstr ""
+
+#: app/templates/page.html:348
+msgid "Before Posting Your Comment"
+msgstr ""
+
+#: app/templates/page.html:356
+msgid "Enter My Details"
+msgstr ""
+
+#: app/templates/page.html:360
+msgid "Use My 8-Char Code"
+msgstr ""
+
+#: app/templates/page.html:369
+msgid "Enter your name"
+msgstr ""
+
+#: app/templates/page.html:379
+msgid "About You / Personality"
+msgstr ""
+
+#: app/templates/page.html:382
+msgid "Optional: share your interests, hobbies, or personality..."
+msgstr ""
+
+#: app/templates/page.html:387
+msgid ""
+"Generate an 8-character code so I do not need to enter my details next "
+"time"
+msgstr ""
+
+#: app/templates/page.html:394
+msgid "Comment Guest Code"
+msgstr ""
+
+#: app/templates/page.html:398
+msgid "Enter your 8-character comment code"
+msgstr ""
+
+#: app/templates/admin/edit_about.html:61
+#: app/templates/admin/edit_teacher.html:121 app/templates/page.html:402
+#: app/templates/teacher/builder.html:306
+#: app/templates/teacher/builder.html:375
+#: app/templates/teacher/edit_student.html:43
+msgid "Cancel"
 msgstr ""
 
 #: app/templates/setup.html:16
@@ -1790,12 +1968,12 @@ msgstr ""
 msgid "Total Subjects"
 msgstr ""
 
-#: app/templates/admin/stats.html:97 app/templates/stats.html:43
-#: app/templates/teacher/stats.html:74
+#: app/templates/admin/stats.html:98 app/templates/stats.html:43
+#: app/templates/teacher/stats.html:80
 msgid "Subject Performance"
 msgstr ""
 
-#: app/templates/stats.html:54 app/templates/teacher/stats.html:82
+#: app/templates/stats.html:54 app/templates/teacher/stats.html:88
 msgid "Pass to Fail Ratio"
 msgstr ""
 
@@ -1803,125 +1981,128 @@ msgstr ""
 msgid "Detailed Breakdown"
 msgstr ""
 
-#: app/templates/admin/stats.html:87 app/templates/admin/stats.html:120
-#: app/templates/admin/stats.html:144 app/templates/stats.html:73
-#: app/templates/teacher/stats.html:51 app/templates/teacher/stats.html:102
+#: app/templates/admin/stats.html:88 app/templates/admin/stats.html:121
+#: app/templates/admin/stats.html:145 app/templates/admin/stats.html:230
+#: app/templates/stats.html:73 app/templates/teacher/stats.html:57
+#: app/templates/teacher/stats.html:108 app/templates/teacher/stats.html:184
 msgid "Average Score"
 msgstr ""
 
-#: app/templates/admin/stats.html:211 app/templates/stats.html:84
-#: app/templates/teacher/stats.html:162
+#: app/templates/admin/stats.html:219 app/templates/stats.html:84
+#: app/templates/teacher/stats.html:173
 msgid "No exam data available yet."
 msgstr ""
 
-#: app/templates/subject.html:25
-msgid "Taught by"
-msgstr ""
-
-#: app/templates/subject.html:47
+#: app/templates/subject.html:55
 msgid "Study Materials"
 msgstr ""
 
-#: app/templates/subject.html:65
+#: app/templates/subject.html:73
 msgid "Resource(s)"
 msgstr ""
 
-#: app/templates/subject.html:70
+#: app/templates/subject.html:78
 msgid "Quiz: Student-Only"
 msgstr ""
 
-#: app/templates/subject.html:83
+#: app/templates/subject.html:91
 msgid "Instructor Controls:"
 msgstr ""
 
-#: app/templates/subject.html:87
+#: app/templates/subject.html:95
 msgid "Toggle Hidden Student-Code-Only Quiz"
 msgstr ""
 
-#: app/templates/subject.html:89
+#: app/templates/subject.html:97
 msgid "Student-Only Quiz"
 msgstr ""
 
-#: app/templates/subject.html:89
+#: app/templates/subject.html:97
 msgid "Public Quiz"
 msgstr ""
 
-#: app/templates/subject.html:92
+#: app/templates/subject.html:100
 msgid "Direct Quiz Link"
 msgstr ""
 
-#: app/templates/subject.html:97
+#: app/templates/subject.html:105
 msgid "Delete this page?"
 msgstr ""
 
-#: app/templates/subject.html:107
+#: app/templates/subject.html:115
 msgid "No study materials available yet."
 msgstr ""
 
-#: app/templates/subject.html:120
+#: app/templates/subject.html:128
 msgid "Class Exam"
 msgstr ""
 
-#: app/templates/subject.html:124
+#: app/templates/subject.html:132
 msgid "Hidden (Student Code Required)"
 msgstr ""
 
-#: app/templates/subject.html:129
+#: app/templates/subject.html:137
 msgid ""
 "The exam is active. You will be graded immediately upon\n"
 "                    submission."
 msgstr ""
 
-#: app/templates/subject.html:133
+#: app/templates/subject.html:141
 msgid "Take Final Exam"
 msgstr ""
 
-#: app/templates/subject.html:140
+#: app/templates/subject.html:148
 msgid "Make Exam Public"
 msgstr ""
 
-#: app/templates/subject.html:140
+#: app/templates/subject.html:148
 msgid "Make Exam Student-Only (Hidden)"
 msgstr ""
 
-#: app/templates/subject.html:146
+#: app/templates/subject.html:154
 msgid "No exams available yet."
 msgstr ""
 
-#: app/templates/subject.html:147
+#: app/templates/subject.html:155
 msgid "Exam Closed"
 msgstr ""
 
-#: app/templates/subject.html:157
+#: app/templates/subject.html:165
 msgid "Question Bank"
 msgstr ""
 
-#: app/templates/subject.html:168
+#: app/templates/subject.html:176
 msgid "Lecture Specific"
 msgstr ""
 
-#: app/templates/subject.html:169
+#: app/templates/subject.html:177
 msgid "Lec"
 msgstr ""
 
-#: app/templates/subject.html:176
+#: app/templates/subject.html:184
 msgid "Delete?"
 msgstr ""
 
-#: app/templates/subject.html:181
+#: app/templates/subject.html:189
 msgid "No questions yet."
 msgstr ""
 
-#: app/templates/subject.html:186
+#: app/templates/subject.html:194
 msgid "and"
 msgstr ""
 
-#: app/templates/subject.html:186
+#: app/templates/subject.html:194
 msgid "more"
 msgstr ""
 
-#: app/templates/subject.html:193
+#: app/templates/subject.html:201
 msgid "Manage Questions (Bulk Editor)"
+msgstr ""
+
+#: app/templates/subject.html:205 app/templates/teacher/builder.html:25
+#: app/templates/teacher/dashboard.html:453
+#: app/templates/teacher/private_builder.html:3
+msgid "Hidden Exams & Links"
 msgstr ""
 
 #: app/templates/teacher_apply.html:3
@@ -1956,6 +2137,36 @@ msgstr ""
 
 #: app/templates/teacher_apply.html:81
 msgid "Back to Staff Login"
+msgstr ""
+
+#: app/templates/teacher_profile.html:3
+msgid "Instructor Profile"
+msgstr ""
+
+#: app/templates/teacher_profile.html:13
+msgid "Private Preview:"
+msgstr ""
+
+#: app/templates/teacher_profile.html:14
+msgid ""
+"This profile is currently hidden from public visitors. Only you and "
+"administrators can view it."
+msgstr ""
+
+#: app/templates/teacher_profile.html:30
+msgid "Instructor"
+msgstr ""
+
+#: app/templates/teacher_profile.html:58
+msgid "About the Instructor"
+msgstr ""
+
+#: app/templates/teacher_profile.html:67
+msgid "Subjects Taught"
+msgstr ""
+
+#: app/templates/teacher_profile.html:89
+msgid "Back"
 msgstr ""
 
 #: app/templates/toolbase.html:18
@@ -2029,9 +2240,10 @@ msgstr ""
 #: app/templates/admin/commands.html:17 app/templates/admin/comments.html:27
 #: app/templates/admin/notifications.html:22 app/templates/admin/stats.html:18
 #: app/templates/admin/teacher_requests.html:12
-#: app/templates/teacher/builder.html:23
-#: app/templates/teacher/notifications.html:21
-#: app/templates/teacher/stats.html:13 app/templates/teacher/students.html:19
+#: app/templates/teacher/builder.html:29
+#: app/templates/teacher/notifications.html:27
+#: app/templates/teacher/private_builder.html:29
+#: app/templates/teacher/stats.html:18 app/templates/teacher/students.html:19
 msgid "Back to Dashboard"
 msgstr ""
 
@@ -2062,6 +2274,7 @@ msgid "Delete this documentation?"
 msgstr ""
 
 #: app/templates/admin/commands.html:123
+#: app/templates/teacher/private_builder.html:86
 msgid "Copy"
 msgstr ""
 
@@ -2076,6 +2289,7 @@ msgid ""
 msgstr ""
 
 #: app/templates/admin/commands.html:149
+#: app/templates/teacher/private_builder.html:227
 msgid "Copied!"
 msgstr ""
 
@@ -2088,10 +2302,10 @@ msgid "All Lecture Comments"
 msgstr ""
 
 #: app/templates/admin/comments.html:12 app/templates/admin/comments.html:75
-#: app/templates/teacher/dashboard.html:206
-#: app/templates/teacher/dashboard.html:239
-#: app/templates/teacher/notifications.html:35
-#: app/templates/teacher/notifications.html:59
+#: app/templates/teacher/dashboard.html:253
+#: app/templates/teacher/dashboard.html:282
+#: app/templates/teacher/notifications.html:41
+#: app/templates/teacher/notifications.html:65
 msgid "New"
 msgstr ""
 
@@ -2102,7 +2316,7 @@ msgid ""
 msgstr ""
 
 #: app/templates/admin/comments.html:22
-#: app/templates/teacher/notifications.html:16
+#: app/templates/teacher/notifications.html:22
 msgid "Mark All Read"
 msgstr ""
 
@@ -2116,7 +2330,7 @@ msgstr ""
 
 #: app/templates/admin/comments.html:47
 #: app/templates/admin/notifications.html:37 app/templates/admin/stats.html:52
-#: app/templates/admin/stats.html:60 app/templates/admin/stats.html:68
+#: app/templates/admin/stats.html:61 app/templates/admin/stats.html:69
 msgid "All"
 msgstr ""
 
@@ -2134,13 +2348,6 @@ msgstr ""
 
 #: app/templates/admin/comments.html:56
 msgid "Filter"
-msgstr ""
-
-#: app/templates/admin/comments.html:100
-#: app/templates/admin/notifications.html:79
-#: app/templates/teacher/dashboard.html:214
-#: app/templates/teacher/dashboard.html:247
-msgid "Mark as Read"
 msgstr ""
 
 #: app/templates/admin/comments.html:147
@@ -2199,6 +2406,10 @@ msgstr ""
 msgid "Display your name publicly on subject pages visitors view."
 msgstr ""
 
+#: app/templates/admin/edit_teacher.html:90
+msgid "Public Profile Privacy Controls"
+msgstr ""
+
 #: app/templates/admin/import_preview.html:13
 msgid "Review Data Import"
 msgstr ""
@@ -2211,68 +2422,70 @@ msgstr ""
 msgid "Rows Found"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:42
-msgid ""
-"Batch\n"
-"                            Settings:"
+#: app/templates/admin/import_preview.html:41
+msgid "Batch Settings:"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:47
+#: app/templates/admin/import_preview.html:46
 msgid "Assign to Lecture:"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:49
+#: app/templates/admin/import_preview.html:48
 msgid "(None - General Subject Exam)"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:60
-msgid "Mark all as Kurdish (RTL)"
+#: app/templates/admin/import_preview.html:57
+msgid "Assign to Hidden Exam:"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:71
+#: app/templates/admin/import_preview.html:59
+msgid "(None - Assign Later)"
+msgstr ""
+
+#: app/templates/admin/import_preview.html:74
 msgid "Preview Mode Only"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:72
+#: app/templates/admin/import_preview.html:75
 msgid "This data is held in memory. It will"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:72
+#: app/templates/admin/import_preview.html:75
 msgid "not"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:72
+#: app/templates/admin/import_preview.html:75
 msgid ""
 "be\n"
 "                                saved until you click\n"
 "                                \"Confirm Import\"."
 msgstr ""
 
-#: app/templates/admin/import_preview.html:86
+#: app/templates/admin/import_preview.html:89
 msgid "Question"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:87
+#: app/templates/admin/import_preview.html:90
 msgid "Options (A / B / C / D)"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:88
+#: app/templates/admin/import_preview.html:91
 msgid "Answer"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:90
+#: app/templates/admin/import_preview.html:93
 msgid "Title"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:91
+#: app/templates/admin/import_preview.html:94
 msgid "Command"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:126
+#: app/templates/admin/import_preview.html:144
 msgid "Cancel & Discard"
 msgstr ""
 
-#: app/templates/admin/import_preview.html:129
+#: app/templates/admin/import_preview.html:147
 msgid "Confirm Import"
 msgstr ""
 
@@ -2323,7 +2536,7 @@ msgid "Questions Edited"
 msgstr ""
 
 #: app/templates/admin/notifications.html:71
-#: app/templates/teacher/dashboard.html:186
+#: app/templates/teacher/dashboard.html:230
 msgid "Unread"
 msgstr ""
 
@@ -2332,6 +2545,7 @@ msgid "Review Application"
 msgstr ""
 
 #: app/templates/admin/notifications.html:99
+#: app/templates/teacher/private_builder.html:26
 msgid "Open Subject"
 msgstr ""
 
@@ -2463,6 +2677,7 @@ msgid ""
 msgstr ""
 
 #: app/templates/admin/stats.html:15
+#: app/templates/teacher/private_builder.html:138
 msgid "Export CSV"
 msgstr ""
 
@@ -2478,8 +2693,8 @@ msgstr ""
 msgid "Exam Type"
 msgstr ""
 
-#: app/templates/admin/stats.html:53 app/templates/admin/stats.html:190
-#: app/templates/teacher/stats.html:145
+#: app/templates/admin/stats.html:53 app/templates/admin/stats.html:194
+#: app/templates/teacher/stats.html:153
 msgid "Final Exam"
 msgstr ""
 
@@ -2487,132 +2702,133 @@ msgstr ""
 msgid "Lecture Quiz"
 msgstr ""
 
-#: app/templates/admin/stats.html:58 app/templates/teacher/stats.html:134
+#: app/templates/admin/stats.html:55
+msgid "Hidden Exam"
+msgstr ""
+
+#: app/templates/admin/stats.html:59 app/templates/teacher/stats.html:140
 msgid "Participant"
 msgstr ""
 
-#: app/templates/admin/stats.html:61
+#: app/templates/admin/stats.html:62
 msgid "Registered Student"
 msgstr ""
 
-#: app/templates/admin/stats.html:74 app/templates/admin/stats.html:120
-#: app/templates/admin/stats.html:140 app/templates/admin/stats.html:178
-#: app/templates/teacher/stats.html:100 app/templates/teacher/students.html:121
+#: app/templates/admin/stats.html:75 app/templates/admin/stats.html:121
+#: app/templates/admin/stats.html:141 app/templates/admin/stats.html:179
+#: app/templates/teacher/stats.html:106 app/templates/teacher/students.html:121
 msgid "Department"
 msgstr ""
 
-#: app/templates/admin/stats.html:75
+#: app/templates/admin/stats.html:76
 msgid "Department..."
 msgstr ""
 
-#: app/templates/admin/stats.html:78
+#: app/templates/admin/stats.html:79
 msgid "Apply"
 msgstr ""
 
-#: app/templates/admin/stats.html:86 app/templates/teacher/stats.html:45
+#: app/templates/admin/stats.html:87 app/templates/teacher/stats.html:51
 msgid "Total Attempts"
 msgstr ""
 
-#: app/templates/admin/stats.html:88
+#: app/templates/admin/stats.html:89
 msgid "Passed / Failed"
 msgstr ""
 
-#: app/templates/admin/stats.html:89
+#: app/templates/admin/stats.html:90
 msgid "Male / Female"
 msgstr ""
 
-#: app/templates/admin/stats.html:90
+#: app/templates/admin/stats.html:91
 msgid "Total Students"
 msgstr ""
 
-#: app/templates/admin/stats.html:103
+#: app/templates/admin/stats.html:104
 msgid "Gender Breakdown"
 msgstr ""
 
-#: app/templates/admin/stats.html:109
+#: app/templates/admin/stats.html:110
 msgid "Age Distribution"
 msgstr ""
 
-#: app/templates/admin/stats.html:117
+#: app/templates/admin/stats.html:118
 msgid "Department Breakdown"
 msgstr ""
 
-#: app/templates/admin/stats.html:120 app/templates/admin/stats.html:143
-#: app/templates/teacher/stats.html:101
+#: app/templates/admin/stats.html:121 app/templates/admin/stats.html:144
+#: app/templates/teacher/stats.html:107
 msgid "Attempts"
 msgstr ""
 
-#: app/templates/admin/stats.html:133
+#: app/templates/admin/stats.html:134
 msgid "All Students Performance"
 msgstr ""
 
-#: app/templates/admin/stats.html:138 app/templates/teacher/stats.html:99
+#: app/templates/admin/stats.html:139 app/templates/teacher/stats.html:105
 #: app/templates/teacher/students.html:122
 msgid "Code"
 msgstr ""
 
-#: app/templates/admin/stats.html:139
+#: app/templates/admin/stats.html:140
 msgid "Name (EN / KU)"
 msgstr ""
 
-#: app/templates/admin/stats.html:141 app/templates/teacher/stats.html:135
+#: app/templates/admin/stats.html:142 app/templates/teacher/stats.html:141
 msgid "Gender / Age"
 msgstr ""
 
-#: app/templates/admin/stats.html:142
+#: app/templates/admin/stats.html:143
 msgid "Assigned Teachers"
 msgstr ""
 
-#: app/templates/admin/stats.html:160
+#: app/templates/admin/stats.html:161
 msgid "No students found."
 msgstr ""
 
-#: app/templates/admin/stats.html:169
+#: app/templates/admin/stats.html:170
 msgid "Detailed Exam & Quiz Attempt Log"
 msgstr ""
 
-#: app/templates/admin/stats.html:174 app/templates/teacher/stats.html:131
+#: app/templates/admin/stats.html:175 app/templates/teacher/stats.html:137
 msgid "Date"
 msgstr ""
 
-#: app/templates/admin/stats.html:176
+#: app/templates/admin/stats.html:177
 msgid "Exam / Quiz"
 msgstr ""
 
-#: app/templates/admin/stats.html:177
+#: app/templates/admin/stats.html:178
 msgid "Taker / Student"
 msgstr ""
 
-#: app/templates/admin/stats.html:179
+#: app/templates/admin/stats.html:180
 msgid "DOB / Age / Gender"
 msgstr ""
 
-#: app/templates/admin/stats.html:180
+#: app/templates/admin/stats.html:181
 msgid "Correct / Total"
 msgstr ""
 
-#: app/templates/admin/stats.html:181 app/templates/teacher/stats.html:136
+#: app/templates/admin/stats.html:182 app/templates/teacher/stats.html:142
 msgid "Score"
 msgstr ""
 
-#: app/templates/admin/stats.html:190 app/templates/teacher/dashboard.html:410
-#: app/templates/teacher/stats.html:145
+#: app/templates/admin/stats.html:193 app/templates/teacher/dashboard.html:448
+#: app/templates/teacher/stats.html:152
 msgid "Quiz"
 msgstr ""
 
-#: app/templates/admin/stats.html:196
+#: app/templates/admin/stats.html:202 app/templates/admin/stats.html:204
+#: app/templates/teacher/stats.html:161
 msgid "Guest"
 msgstr ""
 
-#: app/templates/admin/stats.html:197
+#: app/templates/admin/stats.html:205
 msgid "Anonymous"
 msgstr ""
 
-#: app/templates/admin/stats.html:222 app/templates/teacher/stats.html:173
-msgid "Average Score (%)"
-msgstr ""
-
-#: app/templates/admin/stats.html:234
+#: app/templates/admin/stats.html:242
 msgid "Participants"
 msgstr ""
 
@@ -2661,303 +2877,330 @@ msgid "No teacher applications found."
 msgstr ""
 
 #: app/templates/teacher/builder.html:17
+#: app/templates/teacher/private_builder.html:17
 msgid "Subject Context:"
 msgstr ""
 
-#: app/templates/teacher/builder.html:46
+#: app/templates/teacher/builder.html:53
 msgid "Validation Error:"
 msgstr ""
 
-#: app/templates/teacher/builder.html:57
+#: app/templates/teacher/builder.html:64
 msgid "Lecture Title"
 msgstr ""
 
-#: app/templates/teacher/builder.html:65
+#: app/templates/teacher/builder.html:72
 msgid "Lecture Title (Kurdish)"
 msgstr ""
 
-#: app/templates/teacher/builder.html:72
+#: app/templates/teacher/builder.html:79
 msgid ""
 "Lecture Content\n"
 "                            (English)"
 msgstr ""
 
-#: app/templates/teacher/builder.html:81
+#: app/templates/teacher/builder.html:88
 msgid ""
 "Bilingual\n"
 "                                    Support"
 msgstr ""
 
-#: app/templates/teacher/builder.html:83
+#: app/templates/teacher/builder.html:90
 msgid ""
 "Optionally add a Kurdish translation for this\n"
 "                                    lecture."
 msgstr ""
 
-#: app/templates/teacher/builder.html:88
+#: app/templates/teacher/builder.html:95
 msgid "Add / Edit Kurdish Section"
 msgstr ""
 
-#: app/templates/teacher/builder.html:98
+#: app/templates/teacher/builder.html:105
 msgid "Discard Changes"
 msgstr ""
 
-#: app/templates/teacher/builder.html:107
+#: app/templates/teacher/builder.html:114
 msgid "Resource Manager"
 msgstr ""
 
-#: app/templates/teacher/builder.html:123
+#: app/templates/teacher/builder.html:130
 msgid "Video"
 msgstr ""
 
-#: app/templates/teacher/builder.html:130
+#: app/templates/teacher/builder.html:137
 msgid "YouTube"
 msgstr ""
 
-#: app/templates/teacher/builder.html:132
+#: app/templates/teacher/builder.html:139
 msgid "Vimeo"
 msgstr ""
 
-#: app/templates/teacher/builder.html:135
+#: app/templates/teacher/builder.html:142
 msgid "Link"
 msgstr ""
 
-#: app/templates/teacher/builder.html:139
+#: app/templates/teacher/builder.html:146
 msgid "Test"
 msgstr ""
 
-#: app/templates/teacher/builder.html:146
+#: app/templates/teacher/builder.html:153
+#: app/templates/teacher/private_builder.html:93
 msgid "Preview"
 msgstr ""
 
-#: app/templates/teacher/builder.html:158
+#: app/templates/teacher/builder.html:165
 msgid "No resources attached yet. Add one below."
 msgstr ""
 
-#: app/templates/teacher/builder.html:164
+#: app/templates/teacher/builder.html:171
 msgid "Add New Link"
 msgstr ""
 
-#: app/templates/teacher/builder.html:189
+#: app/templates/teacher/builder.html:196
 msgid ""
 "To add resource links (PDFs, Videos), please Save this\n"
 "                    lecture first. You can then add them in the Edit "
 "screen."
 msgstr ""
 
-#: app/templates/teacher/builder.html:210
+#: app/templates/teacher/builder.html:217
 msgid "Detailed Question Bank"
 msgstr ""
 
-#: app/templates/teacher/builder.html:211
+#: app/templates/teacher/builder.html:218
 msgid "Manage questions, assign lectures, and set languages."
 msgstr ""
 
-#: app/templates/teacher/builder.html:218
+#: app/templates/teacher/builder.html:225
+#: app/templates/teacher/private_builder.html:141
 msgid "Import Excel"
 msgstr ""
 
-#: app/templates/teacher/builder.html:222
+#: app/templates/teacher/builder.html:229
+#: app/templates/teacher/private_builder.html:144
+#: app/templates/teacher/private_builder.html:373
 msgid "Save All Changes"
 msgstr ""
 
-#: app/templates/teacher/builder.html:233
-msgid "Is Kurdish? (RTL)"
-msgstr ""
-
-#: app/templates/teacher/builder.html:234
+#: app/templates/teacher/builder.html:240
+#: app/templates/teacher/private_builder.html:154
 msgid "Question (EN / KU)"
 msgstr ""
 
-#: app/templates/teacher/builder.html:235
-#: app/templates/teacher/builder.html:327
+#: app/templates/teacher/builder.html:241
+#: app/templates/teacher/builder.html:333
 msgid "Assigned Lecture"
 msgstr ""
 
-#: app/templates/teacher/builder.html:253
+#: app/templates/teacher/builder.html:259
+#: app/templates/teacher/private_builder.html:170
 msgid "Add New Question Row"
 msgstr ""
 
-#: app/templates/teacher/builder.html:276
+#: app/templates/teacher/builder.html:282
 msgid "URL Slug (Unique)"
 msgstr ""
 
-#: app/templates/teacher/builder.html:280
+#: app/templates/teacher/builder.html:286
 msgid "Subject Description"
 msgstr ""
 
-#: app/templates/teacher/builder.html:284
+#: app/templates/teacher/builder.html:290
 msgid "Subject Description (Kurdish)"
 msgstr ""
 
-#: app/templates/teacher/builder.html:290
+#: app/templates/teacher/builder.html:296
 msgid "Admin Control: Reassign Teacher"
 msgstr ""
 
-#: app/templates/teacher/builder.html:293
+#: app/templates/teacher/builder.html:299
 msgid ""
 "Only administrators can change the subject\n"
 "                                owner."
 msgstr ""
 
-#: app/templates/teacher/builder.html:340
+#: app/templates/teacher/builder.html:346
 msgid "English Version"
 msgstr ""
 
-#: app/templates/teacher/builder.html:355
+#: app/templates/teacher/builder.html:361
 msgid "Kurdish Version"
 msgstr ""
 
-#: app/templates/teacher/builder.html:385
-#: app/templates/teacher/builder.html:545
+#: app/templates/teacher/builder.html:391
+#: app/templates/teacher/builder.html:551
 msgid "Video Preview"
 msgstr ""
 
-#: app/templates/teacher/builder.html:394
-#: app/templates/teacher/builder.html:422
+#: app/templates/teacher/builder.html:400
+#: app/templates/teacher/builder.html:428
+#: app/templates/teacher/private_builder.html:197
 msgid "Close"
 msgstr ""
 
-#: app/templates/teacher/builder.html:409
+#: app/templates/teacher/builder.html:415
 msgid "Bulk Question Import"
 msgstr ""
 
-#: app/templates/teacher/builder.html:416
+#: app/templates/teacher/builder.html:422
+#: app/templates/teacher/private_builder.html:191
 msgid "Required Columns:"
 msgstr ""
 
-#: app/templates/teacher/builder.html:417
+#: app/templates/teacher/builder.html:423
+#: app/templates/teacher/private_builder.html:192
 msgid "Question, Opt A, Opt B, Opt C, Opt D, Answer"
 msgstr ""
 
-#: app/templates/teacher/builder.html:423
+#: app/templates/teacher/builder.html:429
+#: app/templates/teacher/private_builder.html:198
 msgid "Preview Questions"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:26
+#: app/templates/teacher/dashboard.html:12
+msgid "Admin Teacher-View Mode:"
+msgstr ""
+
+#: app/templates/teacher/dashboard.html:13
+msgid "Viewing the full teacher dashboard for"
+msgstr ""
+
+#: app/templates/teacher/dashboard.html:16
+msgid "Back to Admin HQ"
+msgstr ""
+
+#: app/templates/teacher/dashboard.html:41
 msgid "Profile Settings"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:48
+#: app/templates/teacher/dashboard.html:43
+msgid "Public Profile"
+msgstr ""
+
+#: app/templates/teacher/dashboard.html:68
 msgid "Name: Shown"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:50
+#: app/templates/teacher/dashboard.html:70
 msgid "Name: Hidden"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:53
+#: app/templates/teacher/dashboard.html:73
 msgid "Toggle whether visitors see your name on subject pages."
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:111
+#: app/templates/teacher/dashboard.html:156
 msgid "My Statistics"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:114 app/templates/teacher/stats.html:63
+#: app/templates/teacher/dashboard.html:159 app/templates/teacher/stats.html:69
 msgid "My Students"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:118
+#: app/templates/teacher/dashboard.html:163
+#: app/templates/teacher/dashboard.html:234
 msgid "All Notifications"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:126
+#: app/templates/teacher/dashboard.html:172
 msgid "Message Administration"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:133
+#: app/templates/teacher/dashboard.html:179
 msgid "e.g., Request Student Sharing"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:137
+#: app/templates/teacher/dashboard.html:183
 msgid "Write your message to the admins..."
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:171
+#: app/templates/teacher/dashboard.html:216
 msgid "My Classroom"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:181
-#: app/templates/teacher/notifications.html:3
-msgid "Notifications"
+#: app/templates/teacher/dashboard.html:225
+msgid "Unread Notifications"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:200
-#: app/templates/teacher/notifications.html:33
+#: app/templates/teacher/dashboard.html:248
+#: app/templates/teacher/notifications.html:39
 msgid "Admin Message"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:236
-#: app/templates/teacher/notifications.html:58
+#: app/templates/teacher/dashboard.html:280
+#: app/templates/teacher/notifications.html:64
 msgid "Lecture Comment"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:301
+#: app/templates/teacher/dashboard.html:314
+msgid "No unread notifications"
+msgstr ""
+
+#: app/templates/teacher/dashboard.html:340
 msgid "Settings"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:304
+#: app/templates/teacher/dashboard.html:343
 msgid "Edit Name"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:310
+#: app/templates/teacher/dashboard.html:349
 msgid "This cannot be undone."
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:311
+#: app/templates/teacher/dashboard.html:350
 msgid "Delete Subject"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:354
+#: app/templates/teacher/dashboard.html:392
 msgid "Exam: Student-Only"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:356
+#: app/templates/teacher/dashboard.html:394
 msgid "Exam: Public"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:360
+#: app/templates/teacher/dashboard.html:398
 msgid "Student-Only"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:375
+#: app/templates/teacher/dashboard.html:413
 msgid "My Name: Shown"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:377
+#: app/templates/teacher/dashboard.html:415
 msgid "My Name: Hidden"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:383
+#: app/templates/teacher/dashboard.html:421
 msgid "Hide Name"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:385
+#: app/templates/teacher/dashboard.html:423
 msgid "Show Name"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:395
+#: app/templates/teacher/dashboard.html:433
 msgid "Manage Content"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:403
+#: app/templates/teacher/dashboard.html:441
 msgid "Add Study Page"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:404
+#: app/templates/teacher/dashboard.html:442
 msgid "Page"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:409
+#: app/templates/teacher/dashboard.html:447
 msgid "Add Quiz Question"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:426
+#: app/templates/teacher/dashboard.html:470
 msgid "No Subjects Assigned"
 msgstr ""
 
-#: app/templates/teacher/dashboard.html:427
+#: app/templates/teacher/dashboard.html:471
 msgid ""
 "Please contact the Headmaster to have a subject assigned to your\n"
 "                account."
@@ -2971,67 +3214,155 @@ msgstr ""
 msgid "Edit Student Profile"
 msgstr ""
 
-#: app/templates/teacher/notifications.html:8
-msgid "My Notifications"
+#: app/templates/teacher/notifications.html:3
+msgid "Notifications"
 msgstr ""
 
 #: app/templates/teacher/notifications.html:9
+msgid "My Notifications"
+msgstr ""
+
+#: app/templates/teacher/notifications.html:14
 msgid "Direct messages from Administrators and visitor comments on your lectures."
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:14
+msgid "Hidden Exams & Question Bank Sheet"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:18
+msgid "Student-Code Only"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:23
+msgid "Public Question Bank"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:39
+msgid "Auto-Generated Hidden Exam & Quiz Links"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:47
+msgid "e.g., Group A Midterm Quiz"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:51
+msgid "نموونە: کویزی گرووپی A"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:63
+msgid "Exam Title"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:64
+msgid "Questions"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:65
+msgid "Auto-Generated Link"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:97
+msgid "Generate a fresh link? The old URL will stop working."
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:99
+msgid "Generate New Link"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:104
+msgid "Delete this hidden exam link?"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:119
+msgid ""
+"Create your first hidden exam/quiz link above, then assign questions to "
+"one or more links in the sheet below."
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:133
+msgid "Hidden Question Bank Sheet"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:134
+msgid ""
+"Add bilingual questions and assign each question to one or multiple "
+"hidden exam links."
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:155
+msgid "Assigned Exam Link(s)"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:184
+msgid "Bulk Import Hidden Questions"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:241
+msgid "Create an exam link above first"
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:295
+msgid "No hidden questions yet. Add a row or import CSV/Excel."
+msgstr ""
+
+#: app/templates/teacher/private_builder.html:361
+msgid "All hidden exam questions & links saved!"
 msgstr ""
 
 #: app/templates/teacher/stats.html:3
 msgid "Teacher Statistics"
 msgstr ""
 
-#: app/templates/teacher/stats.html:9
+#: app/templates/teacher/stats.html:10
 msgid "My Subject & Student Statistics"
 msgstr ""
 
-#: app/templates/teacher/stats.html:10
+#: app/templates/teacher/stats.html:15
 msgid "Choose which of your assigned subjects to view below."
 msgstr ""
 
-#: app/templates/teacher/stats.html:21
+#: app/templates/teacher/stats.html:27
 msgid "Select Subjects to Display"
 msgstr ""
 
-#: app/templates/teacher/stats.html:22
+#: app/templates/teacher/stats.html:28
 msgid "Show All My Subjects"
 msgstr ""
 
-#: app/templates/teacher/stats.html:32
+#: app/templates/teacher/stats.html:38
 msgid "No subjects assigned yet."
 msgstr ""
 
-#: app/templates/teacher/stats.html:36
+#: app/templates/teacher/stats.html:42
 msgid "Apply View"
 msgstr ""
 
-#: app/templates/teacher/stats.html:57 app/templates/teacher/stats.html:178
+#: app/templates/teacher/stats.html:63 app/templates/teacher/stats.html:189
 msgid "Passed"
 msgstr ""
 
-#: app/templates/teacher/stats.html:92
+#: app/templates/teacher/stats.html:98
 msgid "My Registered Students"
 msgstr ""
 
-#: app/templates/teacher/stats.html:115
+#: app/templates/teacher/stats.html:121
 msgid "No students assigned to you yet."
 msgstr ""
 
-#: app/templates/teacher/stats.html:125
+#: app/templates/teacher/stats.html:131
 msgid "Recent Exam & Quiz Attempts"
 msgstr ""
 
-#: app/templates/teacher/stats.html:133
+#: app/templates/teacher/stats.html:139
 msgid "Type"
 msgstr ""
 
-#: app/templates/teacher/stats.html:152
+#: app/templates/teacher/stats.html:163
 msgid "Anonymous Visitor"
 msgstr ""
 
-#: app/templates/teacher/stats.html:178
+#: app/templates/teacher/stats.html:189
 msgid "Failed"
 msgstr ""
 

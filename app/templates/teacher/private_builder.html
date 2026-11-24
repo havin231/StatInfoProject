@@ -1,0 +1,394 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Hidden Exams & Links') }}{% endblock %}
+
+{% block content %}
+{% set cur_lang = get_locale().language %}
+<div class="row justify-content-center">
+    <div class="col-lg-12">
+
+        <!-- HEADER -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 border-bottom pb-3 gap-2">
+            <div>
+                <h1 class="h3 mb-1">
+                    <i class="fas fa-user-secret me-2 text-warning"></i>{{ _('Hidden Exams & Question Bank Sheet') }}
+                </h1>
+                <p class="text-muted small mb-0">
+                    {{ _('Subject Context:') }} <span class="fw-bold text-highlight">{{ subject.display_name(cur_lang) }}</span>
+                    — {{ _('Student-Code Only') }}
+                </p>
+            </div>
+            <div class="d-flex gap-2 flex-wrap">
+                <a href="{{ url_for('content.builder_exam', subject=subject.id) }}" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-list me-1"></i>{{ _('Public Question Bank') }}
+                </a>
+                <a href="{{ url_for('public.subject_detail', slug=subject.slug) }}" class="btn btn-outline-info btn-sm">
+                    <i class="fas fa-folder-open me-1"></i>{{ _('Open Subject') }}
+                </a>
+                <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Dashboard') }}
+                </a>
+            </div>
+        </div>
+
+        <div id="js-alert" class="alert d-none" role="alert"></div>
+
+        <!-- CARD 1: AUTO-GENERATED HIDDEN EXAM & QUIZ LINKS -->
+        <div class="card shadow-sm border-warning mb-4 card-accent">
+            <div class="card-header bg-warning-subtle text-warning-emphasis fw-bold d-flex justify-content-between align-items-center py-3">
+                <span><i class="fas fa-link me-2"></i>{{ _('Auto-Generated Hidden Exam & Quiz Links') }}</span>
+                <span class="badge bg-warning text-dark">{{ private_exams|length }}</span>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('content.create_private_exam', subject_id=subject.id) }}" class="row g-2 align-items-end mb-4 pb-3 border-bottom">
+                    {{ exam_form.hidden_tag() }}
+                    <div class="col-md-5">
+                        <label class="form-label small fw-bold">{{ _('Hidden Exam Title (English)') }} <span class="text-danger">*</span></label>
+                        {{ exam_form.title(class="form-control form-control-sm", placeholder=_('e.g., Group A Midterm Quiz')) }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">{{ _('Hidden Exam Title (Kurdish)') }}</label>
+                        {{ exam_form.title_kurdish(class="form-control form-control-sm", dir="rtl", placeholder=_('نموونە: کویزی گرووپی A')) }}
+                    </div>
+                    <div class="col-md-3 d-grid">
+                        {{ exam_form.submit(class="btn btn-warning btn-sm fw-bold") }}
+                    </div>
+                </form>
+
+                {% if private_exams %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-body-secondary">
+                            <tr>
+                                <th>{{ _('Exam Title') }}</th>
+                                <th>{{ _('Questions') }}</th>
+                                <th>{{ _('Auto-Generated Link') }}</th>
+                                <th class="text-end">{{ _('Actions') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for ex in private_exams %}
+                            {% set ex_url = url_for('public.take_private_exam', token=ex.access_token, _external=True) %}
+                            <tr>
+                                <td>
+                                    <div class="fw-bold text-body-emphasis">{{ ex.display_title(cur_lang) }}</div>
+                                    {% if ex.title_kurdish and cur_lang != 'ku' %}
+                                    <small class="text-muted" dir="rtl">{{ ex.title_kurdish }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary-subtle text-primary-emphasis border">{{ ex.question_links|length }}</span>
+                                </td>
+                                <td style="min-width: 280px;">
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control font-monospace bg-body-tertiary" value="{{ ex_url }}" readonly id="linkInput{{ ex.id }}">
+                                        <button type="button" class="btn btn-outline-primary" onclick="copyPrivateLink('linkInput{{ ex.id }}', this)">
+                                            <i class="fas fa-copy me-1"></i>{{ _('Copy') }}
+                                        </button>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <a href="{{ url_for('public.take_private_exam', token=ex.access_token) }}" target="_blank"
+                                           class="btn btn-sm btn-outline-info" title="{{ _('Preview') }}">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </a>
+                                        <form method="POST" action="{{ url_for('content.regenerate_private_exam_link', exam_id=ex.id) }}" class="d-inline"
+                                              onsubmit="return confirm('{{ _('Generate a fresh link? The old URL will stop working.') }}');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-secondary" title="{{ _('Generate New Link') }}">
+                                                <i class="fas fa-sync-alt"></i>
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ url_for('content.delete_private_exam', exam_id=ex.id) }}" class="d-inline"
+                                              onsubmit="return confirm('{{ _('Delete this hidden exam link?') }}');">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ _('Delete') }}">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info small mb-0">
+                    <i class="fas fa-info-circle me-2"></i>{{ _('Create your first hidden exam/quiz link above, then assign questions to one or more links in the sheet below.') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- CARD 2: DEDICATED HIDDEN QUESTION BANK SPREADSHEET -->
+        <div class="card shadow-lg border-0 card-accent">
+            <div class="card-body p-4">
+                <input type="hidden" id="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" id="subject_id" value="{{ subject.id }}">
+
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+                    <div>
+                        <h5 class="fw-bold mb-0 text-muted text-uppercase">{{ _('Hidden Question Bank Sheet') }}</h5>
+                        <small class="text-muted">{{ _('Add bilingual questions and assign each question to one or multiple hidden exam links.') }}</small>
+                    </div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{{ url_for('content.export_private_questions_csv', subject_id=subject.id) }}" class="btn btn-sm btn-outline-success">
+                            <i class="fas fa-file-csv me-1"></i>{{ _('Export CSV') }}
+                        </a>
+                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importPrivateModal">
+                            <i class="fas fa-file-excel me-1"></i>{{ _('Import Excel') }}
+                        </button>
+                        <button type="button" class="btn btn-sm btn-primary px-3 shadow-sm" onclick="savePrivateChanges()" id="saveBtn">
+                            <i class="fas fa-save me-2"></i>{{ _('Save All Changes') }}
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive border rounded shadow-sm" style="max-height: 65vh; overflow-y: auto;">
+                    <table class="table table-sm table-hover align-middle mb-0">
+                        <thead class="bg-body-secondary sticky-top" style="z-index: 5;">
+                            <tr>
+                                <th class="ps-3" style="width: 40px;">#</th>
+                                <th style="min-width: 260px;">{{ _('Question (EN / KU)') }}</th>
+                                <th style="min-width: 210px;">{{ _('Assigned Exam Link(s)') }}</th>
+                                <th style="min-width: 135px;">Opt A (EN / KU)</th>
+                                <th style="min-width: 135px;">Opt B (EN / KU)</th>
+                                <th style="min-width: 135px;">Opt C (EN / KU)</th>
+                                <th style="min-width: 135px;">Opt D (EN / KU)</th>
+                                <th style="width: 70px;">Ans</th>
+                                <th style="width: 45px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="privateQuestionsBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="d-grid mt-3">
+                    <button type="button" class="btn btn-outline-secondary border-dashed py-2 fw-bold" onclick="addPrivateQuestion()">
+                        <i class="fas fa-plus me-2"></i>{{ _('Add New Question Row') }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal fade" id="importPrivateModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">{{ _('Bulk Import Hidden Questions') }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('content.import_private_questions_step1', subject_id=subject.id) }}" enctype="multipart/form-data">
+                <div class="modal-body p-4">
+                    {{ import_form.hidden_tag() }}
+                    <div class="alert alert-info small mb-4">
+                        <strong>{{ _('Required Columns:') }}</strong><br>
+                        {{ _('Question, Opt A, Opt B, Opt C, Opt D, Answer') }}
+                    </div>
+                    {{ import_form.file(class="form-control") }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ _('Close') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ _('Preview Questions') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let privateQuestions = {{ questions_json | tojson }};
+    let privateExamsMeta = {{ exams_meta | tojson }};
+
+    function escAttr(val) {
+        return String(val || '')
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    function copyPrivateLink(inputId, btn) {
+        const el = document.getElementById(inputId);
+        if (!el) return;
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(el.value);
+        } else {
+            el.select();
+            document.execCommand('copy');
+        }
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-check me-1"></i>{{ _("Copied!") }}';
+        setTimeout(() => { btn.innerHTML = orig; }, 1500);
+    }
+
+    function renderPrivateTable() {
+        const tbody = document.getElementById('privateQuestionsBody');
+        tbody.innerHTML = '';
+
+        privateQuestions.forEach((q, index) => {
+            const tr = document.createElement('tr');
+            const selectedSet = new Set((q.exam_ids || []).map(x => Number(x)));
+
+            let examsHtml = '';
+            if (privateExamsMeta.length === 0) {
+                examsHtml = '<span class="small text-muted fst-italic">{{ _("Create an exam link above first") }}</span>';
+            } else {
+                examsHtml = '<div class="d-flex flex-column gap-1" style="max-height: 110px; overflow-y: auto;">';
+                privateExamsMeta.forEach(ex => {
+                    const checked = selectedSet.has(Number(ex.id)) ? 'checked' : '';
+                    examsHtml += `
+                        <label class="form-check form-check-sm small d-flex align-items-center gap-1 mb-0">
+                            <input class="form-check-input mt-0" type="checkbox" ${checked}
+                                onchange="toggleExamLink(${index}, ${ex.id}, this.checked)">
+                            <span class="text-truncate">${escAttr(ex.title)}</span>
+                        </label>`;
+                });
+                examsHtml += '</div>';
+            }
+
+            tr.innerHTML = `
+                <td class="ps-3 text-muted small align-middle">${index + 1}</td>
+                <td>
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.text)}" oninput="updatePrivate(${index}, 'text', this.value)" placeholder="EN: Question...">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.text_ku)}" oninput="updatePrivate(${index}, 'text_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU: پرسیار (کوردی)...">
+                </td>
+                <td class="align-middle">${examsHtml}</td>
+                <td>
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.a)}" oninput="updatePrivate(${index}, 'a', this.value)" placeholder="EN Opt A">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.a_ku)}" oninput="updatePrivate(${index}, 'a_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU A">
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.b)}" oninput="updatePrivate(${index}, 'b', this.value)" placeholder="EN Opt B">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.b_ku)}" oninput="updatePrivate(${index}, 'b_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU B">
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.c)}" oninput="updatePrivate(${index}, 'c', this.value)" placeholder="EN Opt C">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.c_ku)}" oninput="updatePrivate(${index}, 'c_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU C">
+                </td>
+                <td>
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent" value="${escAttr(q.d)}" oninput="updatePrivate(${index}, 'd', this.value)" placeholder="EN Opt D">
+                    <input type="text" class="form-control form-control-sm border-0 bg-transparent text-info border-top mt-1" value="${escAttr(q.d_ku)}" oninput="updatePrivate(${index}, 'd_ku', this.value)" style="direction: rtl; text-align: right;" placeholder="KU D">
+                </td>
+                <td class="align-middle">
+                    <select class="form-select form-select-sm border-0 bg-transparent fw-bold text-success" onchange="updatePrivate(${index}, 'correct', this.value)">
+                        <option value="A" ${q.correct === 'A' ? 'selected' : ''}>A</option>
+                        <option value="B" ${q.correct === 'B' ? 'selected' : ''}>B</option>
+                        <option value="C" ${q.correct === 'C' ? 'selected' : ''}>C</option>
+                        <option value="D" ${q.correct === 'D' ? 'selected' : ''}>D</option>
+                    </select>
+                </td>
+                <td class="text-center align-middle">
+                    <button type="button" class="btn btn-link text-danger p-0" onclick="removePrivate(${index})"><i class="fas fa-times"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        if (privateQuestions.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" class="text-center py-5 text-muted">{{ _("No hidden questions yet. Add a row or import CSV/Excel.") }}</td></tr>';
+        }
+    }
+
+    function updatePrivate(index, field, value) {
+        privateQuestions[index][field] = value;
+    }
+
+    function toggleExamLink(index, examId, isChecked) {
+        const list = (privateQuestions[index].exam_ids || []).map(x => Number(x));
+        const eid = Number(examId);
+        if (isChecked) {
+            if (!list.includes(eid)) list.push(eid);
+        } else {
+            const pos = list.indexOf(eid);
+            if (pos !== -1) list.splice(pos, 1);
+        }
+        privateQuestions[index].exam_ids = list;
+    }
+
+    function addPrivateQuestion() {
+        privateQuestions.push({
+            id: null, text: '', a: '', b: '', c: '', d: '',
+            text_ku: '', a_ku: '', b_ku: '', c_ku: '', d_ku: '',
+            correct: 'A', exam_ids: []
+        });
+        renderPrivateTable();
+    }
+
+    function removePrivate(index) {
+        privateQuestions.splice(index, 1);
+        renderPrivateTable();
+    }
+
+    function savePrivateChanges() {
+        const btn = document.getElementById('saveBtn');
+        const alertBox = document.getElementById('js-alert');
+        const subjectId = document.getElementById('subject_id').value;
+        const csrfToken = document.getElementById('csrf_token').value;
+
+        alertBox.className = 'alert d-none';
+        for (let i = 0; i < privateQuestions.length; i++) {
+            const q = privateQuestions[i];
+            if (!(q.text || '').trim() && !(q.text_ku || '').trim()) {
+                alertBox.className = 'alert alert-danger';
+                alertBox.innerHTML = `<strong>Error in row ${i + 1}:</strong> Question text (English or Kurdish) cannot be empty.`;
+                alertBox.classList.remove('d-none');
+                return;
+            }
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+
+        fetch(`/teacher/api/save_private_questions/${subjectId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken
+            },
+            body: JSON.stringify(privateQuestions)
+        })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alertBox.className = 'alert alert-success';
+                    alertBox.innerHTML = '{{ _("All hidden exam questions & links saved!") }}';
+                    alertBox.classList.remove('d-none');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    throw new Error(data.message || 'Unknown error');
+                }
+            })
+            .catch(err => {
+                alertBox.className = 'alert alert-danger';
+                alertBox.innerHTML = `<strong>Failed to save:</strong> ${err.message}`;
+                alertBox.classList.remove('d-none');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save me-2"></i>{{ _("Save All Changes") }}';
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', renderPrivateTable);
+</script>
+
+<style>
+    #privateQuestionsBody input {
+        border-radius: 0;
+        padding: 0.45rem;
+    }
+    #privateQuestionsBody input:focus {
+        background-color: var(--bg-body);
+        box-shadow: none;
+        border-bottom: 2px solid var(--primary-color) !important;
+    }
+    .border-dashed {
+        border: 2px dashed var(--border-color) !important;
+    }
+</style>
+{% endblock %}

@@ -80,9 +80,39 @@
                                 {{ _('Show Name on Subject Pages') }}
                             </label>
                         </div>
-                        <div class="small text-muted mt-2">
+                        <div class="small text-muted mt-2 mb-3">
                             <i class="fas fa-eye me-1"></i>
                             {{ _('Display your name publicly on subject pages visitors view.') }}
+                        </div>
+
+                        <hr class="opacity-25">
+                        <div class="small fw-bold text-info-emphasis mb-2">
+                            <i class="fas fa-id-badge me-1"></i>{{ _('Public Profile Privacy Controls') }}
+                        </div>
+                        <div class="form-check form-switch small mb-1">
+                            {{ form.profile_public(class="form-check-input", role="switch") }}
+                            {{ form.profile_public.label(class="form-check-label fw-bold") }}
+                        </div>
+                        <div class="form-check form-switch small mb-1">
+                            {{ form.profile_show_name(class="form-check-input", role="switch") }}
+                            {{ form.profile_show_name.label(class="form-check-label") }}
+                        </div>
+                        <div class="form-check form-switch small mb-1">
+                            {{ form.profile_show_bio(class="form-check-input", role="switch") }}
+                            {{ form.profile_show_bio.label(class="form-check-label") }}
+                        </div>
+                        <div class="form-check form-switch small mb-1">
+                            {{ form.profile_show_age(class="form-check-input", role="switch") }}
+                            {{ form.profile_show_age.label(class="form-check-label") }}
+                        </div>
+                        <div class="form-check form-switch small">
+                            {{ form.profile_show_gender(class="form-check-input", role="switch") }}
+                            {{ form.profile_show_gender.label(class="form-check-label") }}
+                        </div>
+                        <div class="mt-2">
+                            <a href="{{ url_for('public.teacher_public_profile', user_id=teacher.id) }}" class="small text-decoration-none">
+                                <i class="fas fa-external-link-alt me-1"></i>{{ _('View Public Profile') }}
+                            </a>
                         </div>
                     </div>
 

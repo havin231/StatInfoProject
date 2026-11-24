@@ -523,3 +523,34 @@ Whenever a change or new feature is added, append a new version block following 
   - Updated all 258 Sorani Kurdish strings in `app/translations/ku/LC_MESSAGES/messages.po` (0 untranslated/fuzzy remaining) and compiled `messages.mo`.
   - Updated `tests/test_exam.py` and `tests/test_v080_features.py`, and added `tests/test_v090_features.py`; all 38 tests pass (100% pass rate).
   - Created local `version_0.9.0` snapshot under `~/Documents/statinfopro/`.
+
+---
+
+## Version 0.9.1
+**Date:** 2026-11-24
+**Summary:** Admin full teacher-dashboard inspector view, comment modal stacking fix, direct teacher commenting & replying without extra prompts, Question Bank `NoneType` save bug fix + manual RTL toggle removal, dedicated Hidden Exams Question Bank Sheet with multi-link assignment & auto-generated Student-Code links, clickable public Teacher Profiles with granular privacy toggles, unread-only dashboard notification boxes, optional separate 8-character guest codes for comments & public exams, and 21-CSV full backup/restore.
+
+### Changes & Improvements:
+- **Admin Full Teacher Dashboard Inspector**:
+  - Upgraded `view_teacher()` (`GET /admin/view_teacher/<id>`) via `_build_teacher_dashboard_context()` so Admins see every card, control, profile editor, unread notification inbox, student count, stats link, and subject control identically to the teacher.
+  - Added `?teacher_id=` support to `/teacher/stats`, `/staff/students`, `/teacher/notifications`, and profile/visibility routes for Admins, plus a "My Teacher View" shortcut on `admin_dashboard.html`.
+- **Lecture Comment Modal Fix & Direct Teacher Posting/Replying**:
+  - Moved `#commentDetailsModal` outside `.card` backdrop-filter stacking contexts in `app/templates/page.html` and appended it to `document.body` on `DOMContentLoaded` so inputs never appear grayed-out or blocked by the backdrop.
+  - Logged-in Teachers and Admins can now post top-level comments and replies directly without extra personal detail prompts, honoring anonymity (`From Teacher` / `لە لایەن مامۆستاوە`) and clickable public profiles.
+- **Question Bank Save Bug Fix & RTL Cleanup**:
+  - Added `_safe_optional_int()` in `app/routes/content.py` so saving newly added Question Bank rows with `page_id=None` / `""` succeeds without `int(NoneType)` errors.
+  - Removed manual `RTL` switch/column from `QuestionForm`, `builder.html`, `import_preview.html`, and CSV export; RTL now applies automatically whenever Kurdish text renders.
+- **Dedicated Hidden Exams Question Bank Sheet & Auto-Generated Multi-Links**:
+  - Added `PrivateExam`, `PrivateQuestion`, and `PrivateExamQuestion` models, `/teacher/builder/private_exams` (`teacher/private_builder.html`), multi-link question assignments (`save_private_questions_api`), CSV export/import, and Student-Code-gated `/exam/link/<token>` routes (`take_private_exam`, `unlock_private_exam`, `submit_private_exam`).
+  - Integrated Hidden Exam attempts into `/teacher/stats`, `/admin/stats` (`exam_type=private`), and `/admin/stats/export`.
+- **Public Teacher Profile Page & Granular Privacy Toggles**:
+  - Added 5 per-teacher privacy flags (`profile_public`, `profile_show_name`, `profile_show_bio`, `profile_show_age`, `profile_show_gender`), public `/teacher/<id>/profile` (`teacher_profile.html`, returning 404 to non-admins when `profile_public=False`), and clickable teacher names across `subject.html`, `page.html`, and comments/replies.
+- **Unread-Only Dashboard Notification Boxes**:
+  - Small notification boxes in `admin_dashboard.html` and `teacher/dashboard.html` now display ONLY unread notifications (`is_checked=False` / `is_read=False`), while read & unread history remains permanently on `/admin/notifications` and `/teacher/notifications` until deleted.
+- **Separate Optional 8-Character Guest Codes**:
+  - Added `CommentGuest` and `ExamGuest` models generating separate opt-in 8-character codes when visitors check the box on lecture comments or public exams/quizzes (no code created if unchecked; strictly separate from registered `Student` codes and blocked from hidden Student-Code exams).
+- **21-CSV Backup, Translations & Verification**:
+  - Expanded zero-loss Backup/Restore to 21 CSVs (`17_private_exams.csv`–`21_exam_guests.csv` + `User` privacy flags, keeping pre-v0.9.1 backwards compatibility).
+  - Updated 76 new Sorani Kurdish translations (0 remaining) and compiled `messages.mo`.
+  - Added `tests/test_v091_features.py` and updated `tests/test_v090_features.py`; all 46 tests pass (100% pass rate).
+  - Created local `version_0.9.1` snapshot under `~/Documents/statinfopro/`.

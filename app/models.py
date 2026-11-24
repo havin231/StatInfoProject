@@ -43,13 +43,22 @@ class User(db.Model, UserMixin):
     # Preferred Language for UI (e.g., 'en', 'ku')
     preferred_lang = db.Column(db.String(10), default='en')
 
-    # Profile Info (v0.8.0 / v0.9.0): Optional Gender, Birth Date & Bio
+    # Profile Info (v0.8.0 / v0.9.0 / v0.9.1): Optional Gender, Birth Date, Bio & Privacy
     gender = db.Column(db.String(20), nullable=True)
     birth_date = db.Column(db.Date, nullable=True)
     bio = db.Column(db.Text, nullable=True)
 
+    profile_public = db.Column(db.Boolean, default=True)
+    profile_show_name = db.Column(db.Boolean, default=True)
+    profile_show_bio = db.Column(db.Boolean, default=True)
+    profile_show_age = db.Column(db.Boolean, default=True)
+    profile_show_gender = db.Column(db.Boolean, default=True)
+
     # Relationship: A teacher teaches many Subjects
     subjects = db.relationship('Subject', backref='teacher', lazy=True)
+
+    def display_name(self, lang='en'):
+        return self.username_kurdish if (lang == 'ku' and self.username_kurdish) else self.username
 
     @property
     def age(self):
@@ -200,7 +209,7 @@ class Question(db.Model):
         return en_map.get(letter) or ku_map.get(letter, '')
 
     def use_rtl(self, lang='en'):
-        return (lang == 'ku' and bool(self.question_text_kurdish)) or (not self.question_text_kurdish and bool(self.is_kurdish))
+        return (lang == 'ku' and bool(self.question_text_kurdish)) or bool(self.question_text_kurdish and not self.question_text)
 
     def __repr__(self):
         return f"Question('{self.question_text[:20]}...', Correct: {self.correct_answer})"
@@ -220,7 +229,9 @@ class ExamResult(db.Model):
 
     subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False, index=True)
     page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=True)  # NULL = Final Exam, set = Lecture Quiz
+    private_exam_id = db.Column(db.Integer, db.ForeignKey('private_exam.id'), nullable=True)
     student_record_id = db.Column(db.Integer, db.ForeignKey('student_record.id'), nullable=True, index=True)
+    exam_guest_id = db.Column(db.Integer, db.ForeignKey('exam_guest.id'), nullable=True, index=True)
 
     # Guest taker info (when not using a Student Code)
     taker_name = db.Column(db.String(100), nullable=True)
@@ -229,18 +240,24 @@ class ExamResult(db.Model):
 
     # Relationships
     page = db.relationship('Page', foreign_keys=[page_id])
+    private_exam = db.relationship('PrivateExam', foreign_keys=[private_exam_id], backref='results')
     student_record = db.relationship('Student', foreign_keys=[student_record_id], backref='exam_results')
+    exam_guest = db.relationship('ExamGuest', foreign_keys=[exam_guest_id], backref='exam_results')
 
     @property
     def taker_age(self):
         if self.student_record:
             return self.student_record.age
+        if self.exam_guest:
+            return self.exam_guest.age
         return calculate_age(self.taker_birth_date)
 
     @property
     def resolved_gender(self):
         if self.student_record:
             return self.student_record.gender
+        if self.exam_guest:
+            return self.exam_guest.taker_gender
         return self.taker_gender
 
     def __repr__(self):
@@ -389,6 +406,7 @@ class PageComment(db.Model):
     page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=False, index=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('page_comment.id'), nullable=True, index=True)
     author_user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    comment_guest_id = db.Column(db.Integer, db.ForeignKey('comment_guest.id'), nullable=True)
     is_teacher_reply = db.Column(db.Boolean, default=False)
     is_read_by_admin = db.Column(db.Boolean, default=False, index=True)
 
@@ -407,6 +425,7 @@ class PageComment(db.Model):
         order_by='PageComment.created_at.asc()'
     )
     author_user = db.relationship('User', foreign_keys=[author_user_id])
+    comment_guest = db.relationship('CommentGuest', foreign_keys=[comment_guest_id], backref='comments')
 
     @property
     def display_age(self):
@@ -546,3 +565,137 @@ class StudentTeacher(db.Model):
 
     def __repr__(self):
         return f"StudentTeacher(Student: {self.student_id}, Teacher: {self.teacher_id})"
+
+
+# ==========================================
+# 17. PRIVATE / HIDDEN EXAMS & QUESTION BANK (v0.9.1)
+# ==========================================
+class PrivateExam(db.Model):
+    """
+    Auto-generated link for hidden student-only exams & quizzes.
+    Multiple PrivateQuestions can be assigned to one or more PrivateExams.
+    """
+    __tablename__ = 'private_exam'
+
+    id = db.Column(db.Integer, primary_key=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False, index=True)
+    title = db.Column(db.String(200), nullable=False)
+    title_kurdish = db.Column(db.String(200), nullable=True)
+    access_token = db.Column(db.String(32), unique=True, nullable=False, index=True)
+    is_active = db.Column(db.Boolean, default=True)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    subject = db.relationship('Subject', backref=db.backref('private_exams', lazy=True))
+    created_by = db.relationship('User', foreign_keys=[created_by_id])
+
+    def display_title(self, lang='en'):
+        return self.title_kurdish if (lang == 'ku' and self.title_kurdish) else self.title
+
+    @property
+    def assigned_questions(self):
+        return [
+            link.private_question
+            for link in sorted(self.question_links, key=lambda l: l.id)
+            if link.private_question is not None
+        ]
+
+    def __repr__(self):
+        return f"PrivateExam('{self.title}', Token: {self.access_token})"
+
+
+class PrivateQuestion(db.Model):
+    """
+    Dedicated question bank sheet for hidden/private exam links.
+    Separate from the public Question table.
+    """
+    __tablename__ = 'private_question'
+
+    id = db.Column(db.Integer, primary_key=True)
+    subject_id = db.Column(db.Integer, db.ForeignKey('subject.id'), nullable=False, index=True)
+    question_text = db.Column(db.Text, nullable=False)
+    question_text_kurdish = db.Column(db.Text, nullable=True)
+
+    option_a = db.Column(db.String(200), nullable=False)
+    option_b = db.Column(db.String(200), nullable=False)
+    option_c = db.Column(db.String(200), nullable=False)
+    option_d = db.Column(db.String(200), nullable=False)
+
+    option_a_kurdish = db.Column(db.String(200), nullable=True)
+    option_b_kurdish = db.Column(db.String(200), nullable=True)
+    option_c_kurdish = db.Column(db.String(200), nullable=True)
+    option_d_kurdish = db.Column(db.String(200), nullable=True)
+
+    correct_answer = db.Column(db.String(1), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    subject = db.relationship('Subject', backref=db.backref('private_questions', lazy=True))
+
+    def get_text(self, lang='en'):
+        return Question.get_text(self, lang)
+
+    def get_option(self, letter, lang='en'):
+        return Question.get_option(self, letter, lang)
+
+    def use_rtl(self, lang='en'):
+        return (lang == 'ku' and bool(self.question_text_kurdish)) or bool(self.question_text_kurdish and not self.question_text)
+
+    def __repr__(self):
+        return f"PrivateQuestion('{self.question_text[:20]}...', Correct: {self.correct_answer})"
+
+
+class PrivateExamQuestion(db.Model):
+    """Many-to-many link assigning PrivateQuestions to one or more PrivateExam links."""
+    __tablename__ = 'private_exam_question'
+
+    id = db.Column(db.Integer, primary_key=True)
+    private_exam_id = db.Column(db.Integer, db.ForeignKey('private_exam.id'), nullable=False, index=True)
+    private_question_id = db.Column(db.Integer, db.ForeignKey('private_question.id'), nullable=False, index=True)
+
+    private_exam = db.relationship('PrivateExam', backref=db.backref('question_links', lazy=True))
+    private_question = db.relationship('PrivateQuestion', backref=db.backref('exam_links', lazy=True))
+
+    __table_args__ = (db.UniqueConstraint('private_exam_id', 'private_question_id'),)
+
+
+# ==========================================
+# 18. GUEST COMMENT & GUEST EXAM CODE MODELS (v0.9.1)
+# ==========================================
+class CommentGuest(db.Model):
+    """
+    Separate optional 8-char identity codes for lecture comment guests so they do not
+    need to re-enter their details every time they comment.
+    """
+    __tablename__ = 'comment_guest'
+
+    id = db.Column(db.Integer, primary_key=True)
+    guest_code = db.Column(db.String(16), unique=True, nullable=False, index=True)
+    author_name = db.Column(db.String(100), nullable=False)
+    author_birth_date = db.Column(db.Date, nullable=False)
+    personality_info = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"CommentGuest('{self.author_name}', Code: {self.guest_code})"
+
+
+class ExamGuest(db.Model):
+    """
+    Separate optional 8-char identity codes for public exam/quiz guests
+    (strictly separate from registered Student codes and CommentGuest codes).
+    """
+    __tablename__ = 'exam_guest'
+
+    id = db.Column(db.Integer, primary_key=True)
+    guest_code = db.Column(db.String(16), unique=True, nullable=False, index=True)
+    taker_name = db.Column(db.String(100), nullable=True)
+    taker_birth_date = db.Column(db.Date, nullable=False)
+    taker_gender = db.Column(db.String(20), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    @property
+    def age(self):
+        return calculate_age(self.taker_birth_date)
+
+    def __repr__(self):
+        return f"ExamGuest('{self.taker_name or 'Guest'}', Code: {self.guest_code})"

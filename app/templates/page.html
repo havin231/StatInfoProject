@@ -7,6 +7,26 @@
 <div class="row justify-content-center">
     <div class="col-lg-10">
 
+        {% if new_comment_guest_code %}
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-3" role="alert">
+            <i class="fas fa-key me-2"></i>
+            <strong>{{ _('Your 8-Character Comment Guest Code:') }}</strong>
+            <span class="badge bg-dark text-warning font-monospace fs-6 mx-2">{{ new_comment_guest_code }}</span>
+            <span class="small">{{ _('Save this code to post future comments without re-entering your details.') }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endif %}
+
+        {% if new_exam_guest_code %}
+        <div class="alert alert-success alert-dismissible fade show shadow-sm mb-3" role="alert">
+            <i class="fas fa-key me-2"></i>
+            <strong>{{ _('Your 8-Character Guest Exam Code:') }}</strong>
+            <span class="badge bg-dark text-warning font-monospace fs-6 mx-2">{{ new_exam_guest_code }}</span>
+            <span class="small">{{ _('Save this code so you do not need to re-enter your details on future public exams/quizzes.') }}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endif %}
+
         <!-- TOP CONTROLS -->
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
             <a href="/subject/{{ subject.slug }}" class="btn btn-outline-secondary btn-sm">
@@ -30,10 +50,25 @@
         <div class="card shadow-lg border-0 mb-5" style="min-height: 65vh;">
             <div class="card-body p-4 p-md-5">
 
-                <!-- Page Title (Bilingual) -->
-                <h1 class="display-6 fw-bold mb-4 pb-3 border-bottom text-highlight">
-                    {{ page.display_title(cur_lang) }}
-                </h1>
+                <!-- Page Title (Bilingual) & Clickable Teachers -->
+                <div class="mb-4 pb-3 border-bottom">
+                    <h1 class="display-6 fw-bold mb-1 text-highlight">
+                        {{ page.display_title(cur_lang) }}
+                    </h1>
+                    {% if visible_teachers %}
+                    <p class="text-muted small mb-0 mt-2">
+                        <i class="fas fa-chalkboard-teacher me-1"></i>
+                        {{ _('Taught by') }}:
+                        {% for teacher in visible_teachers %}
+                        {% set t_display = teacher.display_name(cur_lang) %}
+                        {% if teacher.profile_public or (current_user.is_authenticated and current_user.is_admin) %}
+                        <a href="{{ url_for('public.teacher_public_profile', user_id=teacher.id) }}" class="fw-bold text-decoration-none">
+                            {{ t_display }}
+                        </a>{% else %}<span class="fw-bold">{{ t_display }}</span>{% endif %}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    {% endif %}
+                </div>
 
                 <!-- CONTENT BASED ON GLOBAL LOCALE -->
                 {% if cur_lang == 'ku' and page.content_body_kurdish %}
@@ -108,10 +143,10 @@
         </div>
 
         <!--
-            REDESIGNED COLLAPSIBLE LECTURE COMMENTS SECTION (v0.9.0)
-            1. User presses button to open comments.
-            2. User types comment first -> presses Send -> modal collects Name, Birth Date, optional Personality.
-            3. Teacher/Admin replies appear distinctly; anonymous teachers display "From Teacher".
+            REDESIGNED COLLAPSIBLE LECTURE COMMENTS SECTION (v0.9.1)
+            - Logged-in Teachers/Admins post & reply directly with no questions asked.
+            - Guests click Send -> #commentDetailsModal (rendered outside .card so backdrop never traps it),
+              supporting Name/DOB/Personality + optional 8-char Comment Code OR reusing an existing code.
         -->
         <div id="comments-section" class="mb-5">
             <button class="btn btn-outline-primary w-100 d-flex justify-content-between align-items-center p-3 shadow-sm fw-bold mb-3"
@@ -126,69 +161,67 @@
             <div class="collapse" id="commentsCollapse">
                 <div class="card shadow-sm border-0 card-accent">
                     <div class="card-body p-4">
-                        <!-- Step 1: Comment Textarea + Step 2: Modal for Name / DOB / Optional Personality -->
-                        <form id="commentForm" method="POST"
+                        {% if current_user.is_authenticated %}
+                        <!-- LOGGED-IN TEACHER / ADMIN DIRECT COMMENT FORM (No extra details asked) -->
+                        <form id="staffCommentForm" method="POST"
                             action="{{ url_for('public.add_page_comment', slug=subject.slug, page_id=page.id) }}"
                             class="mb-4 pb-4 border-bottom">
-                            {{ comment_form.hidden_tag() }}
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <div class="mb-3">
+                                <label class="form-label small fw-bold text-body-emphasis">
+                                    {{ _('Your Comment') }}
+                                    <span class="badge bg-success ms-1">{{ _('Staff Direct Post') }}</span>
+                                </label>
+                                <textarea name="comment_text" id="commentTextInput" class="form-control" rows="3"
+                                    placeholder="{{ _('Write your comment as a teacher (no personal details required)...') }}" required></textarea>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fas fa-paper-plane me-2"></i>{{ _('Send Comment') }}
+                                </button>
+                            </div>
+                        </form>
+                        {% else %}
+                        <!-- GUEST STEP 1: Write Comment First -> Send Opens External Modal -->
+                        <div class="mb-4 pb-4 border-bottom">
                             <div class="mb-3">
                                 <label class="form-label small fw-bold text-body-emphasis">
                                     {{ _('Your Comment') }} <span class="text-danger">*</span>
                                 </label>
-                                {{ comment_form.comment_text(id="commentTextInput", class="form-control", rows="3", placeholder=_('Write your question or thoughts about this lecture...'), required=True) }}
+                                <textarea id="commentTextInput" class="form-control" rows="3"
+                                    placeholder="{{ _('Write your question or thoughts about this lecture...') }}" required></textarea>
                             </div>
                             <div class="d-flex justify-content-end">
                                 <button type="button" class="btn btn-primary px-4" onclick="openCommentModal()">
                                     <i class="fas fa-paper-plane me-2"></i>{{ _('Send Comment') }}
                                 </button>
                             </div>
-
-                            <!-- Details Modal (Prompted on Send) -->
-                            <div class="modal fade" id="commentDetailsModal" tabindex="-1" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content border-0 shadow">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title fw-bold">
-                                                <i class="fas fa-user-circle me-2 text-primary"></i>{{ _('Before Posting Your Comment') }}
-                                            </h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold text-body-emphasis">
-                                                    {{ _('Your Name') }} <span class="text-danger">*</span>
-                                                </label>
-                                                {{ comment_form.author_name(class="form-control", placeholder=_('Enter your name'), required=True) }}
-                                            </div>
-                                            <div class="mb-3">
-                                                <label class="form-label small fw-bold text-body-emphasis">
-                                                    {{ _('Your Birth Date') }} <span class="text-danger">*</span>
-                                                </label>
-                                                {{ comment_form.author_birth_date(class="form-control", type="date", required=True) }}
-                                            </div>
-                                            <div class="mb-2">
-                                                <label class="form-label small fw-bold text-body-emphasis">
-                                                    {{ _('About You / Personality') }}
-                                                    <span class="text-muted fw-normal">({{ _('Optional') }})</span>
-                                                </label>
-                                                {{ comment_form.personality_info(class="form-control", rows="2", placeholder=_('Optional: share your interests, hobbies, or personality...')) }}
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
-                                            <button type="submit" class="btn btn-primary px-4">
-                                                <i class="fas fa-check me-2"></i>{{ _('Post Comment') }}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
+                        </div>
+                        {% endif %}
 
                         <!-- Comments & Teacher Replies List -->
                         {% if comments %}
                         <div class="d-flex flex-column gap-3">
                             {% for c in comments %}
+                            {% if c.is_teacher_reply %}
+                            {% set c_prof_url = get_comment_author_profile_url(c, subject) %}
+                            <div class="p-3 rounded border border-success border-2 bg-success-subtle">
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                    <div>
+                                        {% if c_prof_url %}
+                                        <a href="{{ c_prof_url }}" class="badge bg-success text-decoration-none me-1">
+                                            <i class="fas fa-chalkboard-teacher me-1"></i>{{ get_reply_display_name(c, subject, cur_lang) }}
+                                        </a>
+                                        {% else %}
+                                        <span class="badge bg-success me-1">
+                                            <i class="fas fa-chalkboard-teacher me-1"></i>{{ get_reply_display_name(c, subject, cur_lang) }}
+                                        </span>
+                                        {% endif %}
+                                        {% if c.created_at %}
+                                        <small class="text-muted ms-1">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        {% endif %}
+                                    </div>
+                            {% else %}
                             <div class="p-3 rounded border bg-body-tertiary">
                                 <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
                                     <div>
@@ -206,12 +239,15 @@
                                         <small class="text-muted ms-2">{{ c.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
                                         {% endif %}
                                     </div>
+                            {% endif %}
                                     <div class="d-flex align-items-center gap-1">
-                                        {% if can_moderate %}
+                                        {% if current_user.is_authenticated %}
                                         <button type="button" class="btn btn-sm btn-outline-success py-0 px-2"
                                             data-bs-toggle="collapse" data-bs-target="#replyBox{{ c.id }}">
                                             <i class="fas fa-reply me-1 small"></i>{{ _('Reply') }}
                                         </button>
+                                        {% endif %}
+                                        {% if can_moderate %}
                                         <form method="POST" action="{{ url_for('content.delete_page_comment', comment_id=c.id) }}"
                                             onsubmit="return confirm('{{ _('Delete this comment?') }}');">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
@@ -223,7 +259,7 @@
                                     </div>
                                 </div>
 
-                                {% if c.personality_info %}
+                                {% if not c.is_teacher_reply and c.personality_info %}
                                 <p class="small text-muted fst-italic mb-2">
                                     <i class="fas fa-user-circle me-1"></i>{{ c.personality_info }}
                                 </p>
@@ -231,16 +267,23 @@
 
                                 <p class="mb-0 text-body-emphasis" style="white-space: pre-wrap;">{{ c.comment_text }}</p>
 
-                                <!-- Teacher / Admin Replies (Visually Distinct + Respects Teacher Anonymity) -->
+                                <!-- Teacher / Admin Replies (Visually Distinct + Respects Anonymity + Clickable Profile) -->
                                 {% if c.replies %}
                                 <div class="mt-3 ps-3 border-start border-3 border-success d-flex flex-column gap-2">
                                     {% for reply in c.replies %}
+                                    {% set r_prof_url = get_comment_author_profile_url(reply, subject) %}
                                     <div class="p-2 rounded bg-success-subtle border border-success-subtle">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <div>
+                                                {% if r_prof_url %}
+                                                <a href="{{ r_prof_url }}" class="badge bg-success text-decoration-none me-1">
+                                                    <i class="fas fa-chalkboard-teacher me-1"></i>{{ get_reply_display_name(reply, subject, cur_lang) }}
+                                                </a>
+                                                {% else %}
                                                 <span class="badge bg-success me-1">
                                                     <i class="fas fa-chalkboard-teacher me-1"></i>{{ get_reply_display_name(reply, subject, cur_lang) }}
                                                 </span>
+                                                {% endif %}
                                                 {% if reply.created_at %}
                                                 <small class="text-muted">{{ reply.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
                                                 {% endif %}
@@ -261,8 +304,8 @@
                                 </div>
                                 {% endif %}
 
-                                <!-- Inline Staff Reply Box -->
-                                {% if can_moderate %}
+                                <!-- Inline Staff Reply Box (Any Logged-in Teacher or Admin, no extra questions) -->
+                                {% if current_user.is_authenticated %}
                                 <div class="collapse mt-3" id="replyBox{{ c.id }}">
                                     <form method="POST"
                                         action="{{ url_for('content.reply_page_comment', slug=subject.slug, page_id=page.id, comment_id=c.id) }}"
@@ -291,6 +334,82 @@
     </div>
 </div>
 
+<!-- GUEST COMMENT METADATA MODAL (Rendered OUTSIDE .card and moved to document.body to avoid backdrop stacking trap) -->
+{% if not current_user.is_authenticated %}
+<div class="modal fade" id="commentDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <form id="commentForm" method="POST"
+                action="{{ url_for('public.add_page_comment', slug=subject.slug, page_id=page.id) }}">
+                {{ comment_form.hidden_tag() }}
+                <input type="hidden" name="comment_text" id="modalCommentText">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">
+                        <i class="fas fa-user-circle me-2 text-primary"></i>{{ _('Before Posting Your Comment') }}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-group w-100 mb-3" role="group">
+                        <input type="radio" class="btn-check" name="guest_mode" id="cgModeDetails" value="details" checked onchange="switchCommentGuestMode('details')">
+                        <label class="btn btn-outline-primary btn-sm" for="cgModeDetails">
+                            <i class="fas fa-user me-1"></i>{{ _('Enter My Details') }}
+                        </label>
+                        <input type="radio" class="btn-check" name="guest_mode" id="cgModeCode" value="code" onchange="switchCommentGuestMode('code')">
+                        <label class="btn btn-outline-primary btn-sm" for="cgModeCode">
+                            <i class="fas fa-key me-1"></i>{{ _('Use My 8-Char Code') }}
+                        </label>
+                    </div>
+
+                    <div id="commentGuestDetailsBox">
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-body-emphasis">
+                                {{ _('Your Name') }} <span class="text-danger">*</span>
+                            </label>
+                            {{ comment_form.author_name(id="cgAuthorName", class="form-control", placeholder=_('Enter your name'), required=True) }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-body-emphasis">
+                                {{ _('Your Birth Date') }} <span class="text-danger">*</span>
+                            </label>
+                            {{ comment_form.author_birth_date(id="cgAuthorDob", class="form-control", type="date", required=True) }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold text-body-emphasis">
+                                {{ _('About You / Personality') }}
+                                <span class="text-muted fw-normal">({{ _('Optional') }})</span>
+                            </label>
+                            {{ comment_form.personality_info(id="cgPersonality", class="form-control", rows="2", placeholder=_('Optional: share your interests, hobbies, or personality...')) }}
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="generate_comment_code" id="generateCommentCode" value="1">
+                            <label class="form-check-label small text-muted" for="generateCommentCode">
+                                {{ _('Generate an 8-character code so I do not need to enter my details next time') }}
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="commentGuestCodeBox" class="d-none">
+                        <label class="form-label small fw-bold text-body-emphasis">
+                            {{ _('Comment Guest Code') }} <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" name="comment_guest_code" id="cgCodeInput"
+                            class="form-control font-monospace text-uppercase"
+                            placeholder="{{ _('Enter your 8-character comment code') }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ _('Cancel') }}</button>
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="fas fa-check me-2"></i>{{ _('Post Comment') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- FLOATING LANGUAGE TOGGLE (Preserves vertical scroll position via base.html) -->
 <a id="floatingLangToggle"
     href="{{ url_for('public.set_lang', lang='en' if cur_lang == 'ku' else 'ku') }}"
@@ -308,11 +427,44 @@
             if (textEl) textEl.reportValidity();
             return;
         }
-        const modal = new bootstrap.Modal(document.getElementById('commentDetailsModal'));
+        const hiddenText = document.getElementById('modalCommentText');
+        if (hiddenText) hiddenText.value = textEl.value;
+        const modalEl = document.getElementById('commentDetailsModal');
+        if (!modalEl) return;
+        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
         modal.show();
     }
 
+    function switchCommentGuestMode(mode) {
+        const detailsBox = document.getElementById('commentGuestDetailsBox');
+        const codeBox = document.getElementById('commentGuestCodeBox');
+        const nameEl = document.getElementById('cgAuthorName');
+        const dobEl = document.getElementById('cgAuthorDob');
+        const codeEl = document.getElementById('cgCodeInput');
+        if (!detailsBox || !codeBox) return;
+
+        if (mode === 'code') {
+            detailsBox.classList.add('d-none');
+            codeBox.classList.remove('d-none');
+            if (nameEl) nameEl.required = false;
+            if (dobEl) dobEl.required = false;
+            if (codeEl) codeEl.required = true;
+        } else {
+            detailsBox.classList.remove('d-none');
+            codeBox.classList.add('d-none');
+            if (nameEl) nameEl.required = true;
+            if (dobEl) dobEl.required = true;
+            if (codeEl) codeEl.required = false;
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
+        // Move modal to document.body so parent card backdrop-filter never blurs or traps it
+        const modalEl = document.getElementById('commentDetailsModal');
+        if (modalEl && modalEl.parentElement !== document.body) {
+            document.body.appendChild(modalEl);
+        }
+
         if (window.location.hash === '#comments-section') {
             const el = document.getElementById('commentsCollapse');
             if (el) {

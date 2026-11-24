@@ -9,12 +9,62 @@ import io
 from app import db
 from app.models import (
     User, Subject, Page, Question, Resource, ExamResult,
-    SystemCommand, SubjectTeacher, AdminNotification, PageComment, TeacherNotification
+    SystemCommand, SubjectTeacher, AdminNotification, PageComment, TeacherNotification,
+    PrivateExam, PrivateQuestion, PrivateExamQuestion
 )
-from app.forms import SubjectForm, PageForm, QuestionForm, BulkImportForm, ResourceForm
-from app.routes.helpers import can_edit_subject
+from app.forms import (
+    SubjectForm, PageForm, QuestionForm, BulkImportForm, ResourceForm, PrivateExamCreateForm
+)
+from app.routes.helpers import can_edit_subject, generate_private_exam_token
 
 content = Blueprint('content', __name__)
+
+
+def _safe_optional_int(val):
+    """Safely convert optional ID values from JSON/forms; treats None/empty/0 as None."""
+    if val in (None, '', 'None', 'null', 0, '0'):
+        return None
+    return int(val)
+
+
+def _parse_bilingual_question_upload(uploaded_file):
+    """Parse an uploaded CSV or Excel sheet of bilingual questions into preview dicts."""
+    file_extension = uploaded_file.filename.lower()
+    if file_extension.endswith('.csv'):
+        data_frame = pd.read_csv(uploaded_file)
+    else:
+        data_frame = pd.read_excel(uploaded_file)
+
+    data_frame.columns = [col.lower().strip() for col in data_frame.columns]
+    if 'answer' not in data_frame.columns and 'ans' in data_frame.columns:
+        data_frame['answer'] = data_frame['ans']
+
+    required_fields = ['question', 'opt a', 'opt b', 'opt c', 'opt d', 'answer']
+    missing_fields = [f for f in required_fields if f not in data_frame.columns]
+    if missing_fields:
+        return None, missing_fields
+
+    def clean_cell(val):
+        return '' if pd.isna(val) else str(val).strip()
+
+    preview_rows = []
+    for _, row in data_frame.iterrows():
+        raw_ans = clean_cell(row['answer']).upper()
+        ans_char = raw_ans[0] if raw_ans and raw_ans[0] in ('A', 'B', 'C', 'D') else 'A'
+        preview_rows.append({
+            'question_text': clean_cell(row['question']),
+            'option_a': clean_cell(row['opt a']),
+            'option_b': clean_cell(row['opt b']),
+            'option_c': clean_cell(row['opt c']),
+            'option_d': clean_cell(row['opt d']),
+            'question_text_kurdish': clean_cell(row.get('question_ku', '')) if 'question_ku' in data_frame.columns else '',
+            'option_a_kurdish': clean_cell(row.get('opt a_ku', '')) if 'opt a_ku' in data_frame.columns else '',
+            'option_b_kurdish': clean_cell(row.get('opt b_ku', '')) if 'opt b_ku' in data_frame.columns else '',
+            'option_c_kurdish': clean_cell(row.get('opt c_ku', '')) if 'opt c_ku' in data_frame.columns else '',
+            'option_d_kurdish': clean_cell(row.get('opt d_ku', '')) if 'opt d_ku' in data_frame.columns else '',
+            'correct_answer': ans_char
+        })
+    return preview_rows, None
 
 # ==============================================================================
 # SECTION 8: BULK IMPORT ENGINE (WITH LANGUAGE & LECTURE LOGIC)
@@ -25,81 +75,29 @@ content = Blueprint('content', __name__)
 def import_questions_step1(subject_id):
     """
     BULK QUESTION IMPORT (STEP 1: PARSING)
-
-    Logic:
-    - Parses the question table.
-    - Fetches current Subject Lectures to populate the Batch Settings dropdown.
     """
-    # 1. Permission and Context check (v0.5.0 - Multi-Teacher Support)
     target_subject = Subject.query.get_or_404(subject_id)
     if not can_edit_subject(target_subject):
         abort(403)
 
     form = BulkImportForm()
+    available_lectures = [{'id': p.id, 'title': p.title} for p in target_subject.pages]
 
-    # 2. Fetch all lectures associated with this subject for the preview dropdown
-    available_lectures = []
-    for p in target_subject.pages:
-        available_lectures.append({
-            'id': p.id,
-            'title': p.title
-        })
-
-    # 3. Handle File
     if form.validate_on_submit():
-        uploaded_file = form.file.data
-        file_extension = uploaded_file.filename.lower()
-
         try:
-            if file_extension.endswith('.csv'):
-                data_frame = pd.read_csv(uploaded_file)
-            else:
-                data_frame = pd.read_excel(uploaded_file)
-
-            data_frame.columns = [col.lower().strip() for col in data_frame.columns]
-
-            # Define required structure (accept both 'answer' and 'ans' headers)
-            if 'answer' not in data_frame.columns and 'ans' in data_frame.columns:
-                data_frame['answer'] = data_frame['ans']
-
-            required_fields = ['question', 'opt a', 'opt b', 'opt c', 'opt d', 'answer']
-            missing_fields = [f for f in required_fields if f not in data_frame.columns]
-
+            question_preview_data, missing_fields = _parse_bilingual_question_upload(form.file.data)
             if missing_fields:
                 flash(_('Import Error: Missing columns: %(fields)s', fields=", ".join(missing_fields)), 'danger')
                 return redirect(url_for('content.builder_exam', subject=target_subject.id))
-
-            def clean_cell(val):
-                return '' if pd.isna(val) else str(val).strip()
-
-            # Prepare Preview
-            question_preview_data = []
-            for _, row in data_frame.iterrows():
-                raw_ans = clean_cell(row['answer']).upper()
-                ans_char = raw_ans[0] if raw_ans and raw_ans[0] in ('A', 'B', 'C', 'D') else 'A'
-                question_preview_data.append({
-                    'question_text': clean_cell(row['question']),
-                    'option_a': clean_cell(row['opt a']),
-                    'option_b': clean_cell(row['opt b']),
-                    'option_c': clean_cell(row['opt c']),
-                    'option_d': clean_cell(row['opt d']),
-                    'question_text_kurdish': clean_cell(row.get('question_ku', '')) if 'question_ku' in data_frame.columns else '',
-                    'option_a_kurdish': clean_cell(row.get('opt a_ku', '')) if 'opt a_ku' in data_frame.columns else '',
-                    'option_b_kurdish': clean_cell(row.get('opt b_ku', '')) if 'opt b_ku' in data_frame.columns else '',
-                    'option_c_kurdish': clean_cell(row.get('opt c_ku', '')) if 'opt c_ku' in data_frame.columns else '',
-                    'option_d_kurdish': clean_cell(row.get('opt d_ku', '')) if 'opt d_ku' in data_frame.columns else '',
-                    'correct_answer': ans_char
-                })
 
             return render_template(
                 'admin/import_preview.html',
                 data=question_preview_data,
                 import_type='question',
                 subject_id=target_subject.id,
-                lectures=available_lectures, # Passes the dropdown list
+                lectures=available_lectures,
                 title=f"Verify Questions for {target_subject.name}"
             )
-
         except Exception as file_err:
             flash(_('Processing Error: %(error)s', error=str(file_err)), 'danger')
             return redirect(url_for('content.builder_exam', subject=target_subject.id))
@@ -134,16 +132,7 @@ def process_import_confirmation():
                 abort(403)
 
             # --- EXTRACT BATCH SETTINGS FROM FORM ---
-            # Lecture ID
-            global_pid = request.form.get('bulk_lecture_id')
-            if global_pid == "" or global_pid == "None":
-                global_pid = None
-            else:
-                global_pid = int(global_pid)
-
-            # Language Toggle (Task Requirement)
-            bulk_lang_val = request.form.get('bulk_language')
-            mark_kurdish = (bulk_lang_val == 'on')
+            global_pid = _safe_optional_int(request.form.get('bulk_lecture_id'))
 
             q_save_count = 0
             for q_row in parsed_data:
@@ -160,8 +149,8 @@ def process_import_confirmation():
                     option_d_kurdish=q_row.get('option_d_kurdish') or None,
                     correct_answer=q_row['correct_answer'],
                     subject_id=subject_record.id,
-                    page_id=global_pid,     # Linked to specific lecture
-                    is_kurdish=mark_kurdish # Applied globally per your request
+                    page_id=global_pid,
+                    is_kurdish=False
                 ))
                 q_save_count += 1
 
@@ -180,6 +169,43 @@ def process_import_confirmation():
             db.session.commit()
             flash(_('Batch Processed: %(count)s questions assigned to bank.', count=q_save_count), 'success')
             return redirect(url_for('content.builder_exam', subject=subject_record.id))
+
+        elif import_category == 'private_question':
+            subj_id_str = request.form.get('subject_id')
+            subject_record = Subject.query.get_or_404(int(subj_id_str))
+            if not can_edit_subject(subject_record):
+                abort(403)
+
+            target_pe_id = _safe_optional_int(request.form.get('bulk_private_exam_id'))
+            valid_pe = None
+            if target_pe_id:
+                valid_pe = PrivateExam.query.filter_by(id=target_pe_id, subject_id=subject_record.id).first()
+
+            pq_count = 0
+            for q_row in parsed_data:
+                pq = PrivateQuestion(
+                    subject_id=subject_record.id,
+                    question_text=q_row.get('question_text', ''),
+                    option_a=q_row.get('option_a', ''),
+                    option_b=q_row.get('option_b', ''),
+                    option_c=q_row.get('option_c', ''),
+                    option_d=q_row.get('option_d', ''),
+                    question_text_kurdish=q_row.get('question_text_kurdish') or None,
+                    option_a_kurdish=q_row.get('option_a_kurdish') or None,
+                    option_b_kurdish=q_row.get('option_b_kurdish') or None,
+                    option_c_kurdish=q_row.get('option_c_kurdish') or None,
+                    option_d_kurdish=q_row.get('option_d_kurdish') or None,
+                    correct_answer=q_row['correct_answer']
+                )
+                db.session.add(pq)
+                if valid_pe:
+                    db.session.flush()
+                    db.session.add(PrivateExamQuestion(private_exam_id=valid_pe.id, private_question_id=pq.id))
+                pq_count += 1
+
+            db.session.commit()
+            flash(_('Imported %(count)s hidden exam question(s).', count=pq_count), 'success')
+            return redirect(url_for('content.builder_private_exams', subject=subject_record.id))
 
         # 4. Handle System Command Commit
         elif import_category == 'command':
@@ -362,8 +388,16 @@ def delete_subject(subject_id):
         # B. Clear exam results
         ExamResult.query.filter_by(subject_id=subj_record.id).delete()
 
-        # C. Clear Question bank (before Pages because Question.page_id references Page.id)
+        # C. Clear public and private question banks & private exam links
         Question.query.filter_by(subject_id=subj_record.id).delete()
+        pe_ids = [pe.id for pe in PrivateExam.query.filter_by(subject_id=subj_record.id).all()]
+        pq_ids = [pq.id for pq in PrivateQuestion.query.filter_by(subject_id=subj_record.id).all()]
+        if pe_ids:
+            PrivateExamQuestion.query.filter(PrivateExamQuestion.private_exam_id.in_(pe_ids)).delete(synchronize_session=False)
+        if pq_ids:
+            PrivateExamQuestion.query.filter(PrivateExamQuestion.private_question_id.in_(pq_ids)).delete(synchronize_session=False)
+        PrivateQuestion.query.filter_by(subject_id=subj_record.id).delete()
+        PrivateExam.query.filter_by(subject_id=subj_record.id).delete()
 
         # D. Clear Resources, Comments (replies first), and Lectures
         pages_list = Page.query.filter_by(subject_id=subj_record.id).all()
@@ -539,7 +573,7 @@ def delete_page_comment(comment_id):
 @content.route('/subject/<slug>/page/<int:page_id>/comment/<int:comment_id>/reply', methods=['POST'])
 @login_required
 def reply_page_comment(slug, page_id, comment_id):
-    """Allows teachers (assigned to subject) or admins to reply to a visitor's comment."""
+    """Allows any logged-in teacher or admin to reply directly to a comment without extra questions."""
     from app.forms import CommentReplyForm
     target_subject = Subject.query.filter_by(slug=slug).first_or_404()
     target_page = Page.query.get_or_404(page_id)
@@ -547,9 +581,6 @@ def reply_page_comment(slug, page_id, comment_id):
 
     if target_page.subject_id != target_subject.id or parent_comment.page_id != target_page.id:
         abort(404)
-
-    if not can_edit_subject(target_subject):
-        abort(403)
 
     form = CommentReplyForm()
     if form.validate_on_submit():
@@ -560,6 +591,8 @@ def reply_page_comment(slug, page_id, comment_id):
             is_teacher_reply=True,
             is_read_by_admin=True,
             author_name=current_user.username,
+            author_birth_date=current_user.birth_date,
+            author_age=current_user.age,
             comment_text=form.comment_text.data.strip()
         )
         try:
@@ -659,8 +692,7 @@ def builder_exam():
             'c_ku': question.option_c_kurdish or '',
             'd_ku': question.option_d_kurdish or '',
             'correct': question.correct_answer,
-            'page_id': question.page_id,
-            'is_kurdish': question.is_kurdish
+            'page_id': question.page_id
         })
 
     return render_template(
@@ -674,10 +706,34 @@ def builder_exam():
     )
 
 
+def _export_bilingual_questions_csv(rows, filename):
+    """Shared UTF-8-SIG + QUOTE_ALL exporter for public and private question banks."""
+    string_io_obj = io.StringIO()
+    string_io_obj.write('\ufeff')
+    csv_writer_obj = csv.writer(string_io_obj, quoting=csv.QUOTE_ALL)
+    csv_writer_obj.writerow([
+        'Question', 'Opt A', 'Opt B', 'Opt C', 'Opt D',
+        'Question_KU', 'Opt A_KU', 'Opt B_KU', 'Opt C_KU', 'Opt D_KU',
+        'Answer'
+    ])
+    for q in rows:
+        csv_writer_obj.writerow([
+            q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
+            q.question_text_kurdish or '', q.option_a_kurdish or '',
+            q.option_b_kurdish or '', q.option_c_kurdish or '', q.option_d_kurdish or '',
+            q.correct_answer
+        ])
+    return Response(
+        string_io_obj.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename={filename}"}
+    )
+
+
 @content.route('/teacher/api/save_questions/<int:subject_id>', methods=['POST'])
 @login_required
 def save_questions_api(subject_id):
-    """The AJAX backend that saves the Bulk Editor grid data (supports dual EN & KU faces)."""
+    """The AJAX backend that saves the Bulk Editor grid data (dual EN & KU faces)."""
     target_subject = Subject.query.get_or_404(subject_id)
     if not can_edit_subject(target_subject):
         return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
@@ -687,64 +743,56 @@ def save_questions_api(subject_id):
         return jsonify({'status': 'error', 'message': 'Payload Empty'}), 400
 
     try:
-        # Determine which IDs were sent
-        sent_ids = [q['id'] for q in incoming_json_data if q.get('id')]
+        sent_ids = [_safe_optional_int(q.get('id')) for q in incoming_json_data if _safe_optional_int(q.get('id'))]
 
-        # 1. Clean up deleted questions (unlink AdminNotification FK first)
         current_db_questions = Question.query.filter_by(subject_id=target_subject.id).all()
         for q_db in current_db_questions:
             if q_db.id not in sent_ids:
                 AdminNotification.query.filter_by(related_question_id=q_db.id).update({'related_question_id': None})
                 db.session.delete(q_db)
 
-        # 2. Process UPSERT (Update or Insert)
         for data_row in incoming_json_data:
             text_content = (data_row.get('text') or '').strip()
             text_ku = (data_row.get('text_ku') or '').strip()
             if not text_content and not text_ku:
                 continue
 
-            # Handle Foreign Key for Lecture
-            pid_val = data_row.get('page_id')
-            if pid_val == "" or pid_val == "None" or pid_val == 0:
-                pid_val = None
-            else:
-                pid_val = int(pid_val)
+            pid_val = _safe_optional_int(data_row.get('page_id'))
+            ans_val = (data_row.get('correct') or 'A').strip().upper()[:1] or 'A'
+            q_id = _safe_optional_int(data_row.get('id'))
 
-            kurdish_flag = bool(data_row.get('is_kurdish', False))
-
-            if data_row.get('id'):
-                target_q = Question.query.get(data_row['id'])
+            if q_id:
+                target_q = Question.query.get(q_id)
                 if target_q and target_q.subject_id == target_subject.id:
                     target_q.question_text = text_content
-                    target_q.option_a = data_row.get('a', '')
-                    target_q.option_b = data_row.get('b', '')
-                    target_q.option_c = data_row.get('c', '')
-                    target_q.option_d = data_row.get('d', '')
+                    target_q.option_a = data_row.get('a') or ''
+                    target_q.option_b = data_row.get('b') or ''
+                    target_q.option_c = data_row.get('c') or ''
+                    target_q.option_d = data_row.get('d') or ''
                     target_q.question_text_kurdish = text_ku or None
                     target_q.option_a_kurdish = (data_row.get('a_ku') or '').strip() or None
                     target_q.option_b_kurdish = (data_row.get('b_ku') or '').strip() or None
                     target_q.option_c_kurdish = (data_row.get('c_ku') or '').strip() or None
                     target_q.option_d_kurdish = (data_row.get('d_ku') or '').strip() or None
-                    target_q.correct_answer = data_row.get('correct', 'A')
+                    target_q.correct_answer = ans_val
                     target_q.page_id = pid_val
-                    target_q.is_kurdish = kurdish_flag
+                    target_q.is_kurdish = False
             else:
                 db.session.add(Question(
                     question_text=text_content,
-                    option_a=data_row.get('a', ''),
-                    option_b=data_row.get('b', ''),
-                    option_c=data_row.get('c', ''),
-                    option_d=data_row.get('d', ''),
+                    option_a=data_row.get('a') or '',
+                    option_b=data_row.get('b') or '',
+                    option_c=data_row.get('c') or '',
+                    option_d=data_row.get('d') or '',
                     question_text_kurdish=text_ku or None,
                     option_a_kurdish=(data_row.get('a_ku') or '').strip() or None,
                     option_b_kurdish=(data_row.get('b_ku') or '').strip() or None,
                     option_c_kurdish=(data_row.get('c_ku') or '').strip() or None,
                     option_d_kurdish=(data_row.get('d_ku') or '').strip() or None,
-                    correct_answer=data_row.get('correct', 'A'),
+                    correct_answer=ans_val,
                     subject_id=target_subject.id,
                     page_id=pid_val,
-                    is_kurdish=kurdish_flag
+                    is_kurdish=False
                 ))
 
         if not current_user.is_admin:
@@ -769,33 +817,11 @@ def save_questions_api(subject_id):
 @content.route('/teacher/export/questions/<int:subject_id>', methods=['GET'])
 @login_required
 def export_questions_csv(subject_id):
-    """Exports bilingual Question Bank for a subject. Uses strict quoting and BOM."""
+    """Exports bilingual Question Bank for a subject."""
     target_subject = Subject.query.get_or_404(subject_id)
     if not can_edit_subject(target_subject):
         abort(403)
-
-    string_io_obj = io.StringIO()
-    string_io_obj.write('\ufeff') # BOM for Excel UTF-8
-    csv_writer_obj = csv.writer(string_io_obj, quoting=csv.QUOTE_ALL)
-
-    csv_writer_obj.writerow([
-        'Question', 'Opt A', 'Opt B', 'Opt C', 'Opt D',
-        'Question_KU', 'Opt A_KU', 'Opt B_KU', 'Opt C_KU', 'Opt D_KU',
-        'Answer', 'Kurdish'
-    ])
-    for q in target_subject.questions:
-        csv_writer_obj.writerow([
-            q.question_text, q.option_a, q.option_b, q.option_c, q.option_d,
-            q.question_text_kurdish or '', q.option_a_kurdish or '',
-            q.option_b_kurdish or '', q.option_c_kurdish or '', q.option_d_kurdish or '',
-            q.correct_answer, "True" if q.is_kurdish else "False"
-        ])
-
-    return Response(
-        string_io_obj.getvalue(),
-        mimetype="text/csv",
-        headers={"Content-Disposition": f"attachment;filename={target_subject.slug}_questions.csv"}
-    )
+    return _export_bilingual_questions_csv(target_subject.questions, f"{target_subject.slug}_questions.csv")
 
 
 @content.route('/teacher/edit/question/<int:question_id>', methods=['GET', 'POST'])
@@ -808,8 +834,6 @@ def edit_question(question_id):
 
     form = QuestionForm(obj=target_q)
     form.subject_id.choices = [(target_q.subject.id, target_q.subject.name)]
-
-    # Get available lectures for dropdown
     form.page_id.choices = [(0, "(None - General Exam)")] + [(p.id, p.title) for p in target_q.subject.pages]
 
     if form.validate_on_submit():
@@ -824,12 +848,8 @@ def edit_question(question_id):
         target_q.option_c_kurdish = (form.option_c_kurdish.data or '').strip() or None
         target_q.option_d_kurdish = (form.option_d_kurdish.data or '').strip() or None
         target_q.correct_answer = form.correct_answer.data
-        target_q.is_kurdish = form.is_kurdish.data
-
-        if form.page_id.data == 0:
-            target_q.page_id = None
-        else:
-            target_q.page_id = form.page_id.data
+        target_q.is_kurdish = False
+        target_q.page_id = None if form.page_id.data == 0 else form.page_id.data
 
         if not current_user.is_admin:
             db.session.add(AdminNotification(
@@ -870,3 +890,264 @@ def delete_question(question_id):
         flash(_('Error during question deletion: %(error)s', error=str(e)), 'danger')
 
     return redirect(url_for('public.subject_detail', slug=subject_slug_ref))
+
+
+# ==============================================================================
+# SECTION 11: HIDDEN EXAMS QUESTION BANK SHEET & AUTO-GENERATED LINKS (v0.9.1)
+# ==============================================================================
+
+@content.route('/teacher/builder/private_exams', methods=['GET'])
+@login_required
+def builder_private_exams():
+    """Dedicated Hidden Quiz & Exam Question Bank Sheet + Auto-Generated Exam Links."""
+    sid_param = request.args.get('subject', type=int)
+    if not sid_param:
+        abort(404)
+    target_subject = Subject.query.get_or_404(sid_param)
+    if not can_edit_subject(target_subject):
+        abort(403)
+
+    private_exams = PrivateExam.query.filter_by(
+        subject_id=target_subject.id
+    ).order_by(PrivateExam.created_at.desc()).all()
+
+    exams_meta = [{'id': pe.id, 'title': pe.title, 'title_kurdish': pe.title_kurdish or ''} for pe in private_exams]
+
+    all_pqs = PrivateQuestion.query.filter_by(
+        subject_id=target_subject.id
+    ).order_by(PrivateQuestion.id.asc()).all()
+
+    pqs_json = []
+    for pq in all_pqs:
+        pqs_json.append({
+            'id': pq.id,
+            'text': pq.question_text,
+            'a': pq.option_a,
+            'b': pq.option_b,
+            'c': pq.option_c,
+            'd': pq.option_d,
+            'text_ku': pq.question_text_kurdish or '',
+            'a_ku': pq.option_a_kurdish or '',
+            'b_ku': pq.option_b_kurdish or '',
+            'c_ku': pq.option_c_kurdish or '',
+            'd_ku': pq.option_d_kurdish or '',
+            'correct': pq.correct_answer,
+            'exam_ids': [link.private_exam_id for link in pq.exam_links]
+        })
+
+    return render_template(
+        'teacher/private_builder.html',
+        subject=target_subject,
+        private_exams=private_exams,
+        exams_meta=exams_meta,
+        questions_json=pqs_json,
+        exam_form=PrivateExamCreateForm(),
+        import_form=BulkImportForm()
+    )
+
+
+@content.route('/teacher/private_exam/<int:subject_id>/create', methods=['POST'])
+@login_required
+def create_private_exam(subject_id):
+    """Create a new hidden exam link with an auto-generated access token."""
+    target_subject = Subject.query.get_or_404(subject_id)
+    if not can_edit_subject(target_subject):
+        abort(403)
+
+    form = PrivateExamCreateForm()
+    if form.validate_on_submit():
+        token = generate_private_exam_token(16)
+        new_pe = PrivateExam(
+            subject_id=target_subject.id,
+            title=form.title.data.strip(),
+            title_kurdish=form.title_kurdish.data.strip() if form.title_kurdish.data else None,
+            access_token=token,
+            is_active=True,
+            created_by_id=current_user.id
+        )
+        try:
+            db.session.add(new_pe)
+            db.session.commit()
+            flash(_('Hidden exam "%(title)s" created with a new link.', title=new_pe.title), 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(_('Error creating hidden exam: %(error)s', error=str(e)), 'danger')
+    else:
+        for errs in form.errors.values():
+            for err in errs:
+                flash(str(err), 'danger')
+
+    return redirect(url_for('content.builder_private_exams', subject=target_subject.id))
+
+
+@content.route('/teacher/private_exam/<int:exam_id>/regenerate_link', methods=['POST'])
+@login_required
+def regenerate_private_exam_link(exam_id):
+    """Regenerates the unique URL token for a PrivateExam."""
+    pe = PrivateExam.query.get_or_404(exam_id)
+    if not can_edit_subject(pe.subject):
+        abort(403)
+
+    pe.access_token = generate_private_exam_token(16)
+    try:
+        db.session.commit()
+        flash(_('Generated a new link for "%(title)s".', title=pe.title), 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error regenerating link: %(error)s', error=str(e)), 'danger')
+
+    return redirect(url_for('content.builder_private_exams', subject=pe.subject_id))
+
+
+@content.route('/teacher/private_exam/<int:exam_id>/delete', methods=['POST'])
+@login_required
+def delete_private_exam(exam_id):
+    """Delete a hidden exam link (preserving existing exam result statistics)."""
+    pe = PrivateExam.query.get_or_404(exam_id)
+    if not can_edit_subject(pe.subject):
+        abort(403)
+
+    subj_id = pe.subject_id
+    try:
+        ExamResult.query.filter_by(private_exam_id=pe.id).update({'private_exam_id': None})
+        PrivateExamQuestion.query.filter_by(private_exam_id=pe.id).delete()
+        db.session.delete(pe)
+        db.session.commit()
+        flash(_('Hidden exam link deleted.'), 'info')
+    except Exception as e:
+        db.session.rollback()
+        flash(_('Error deleting hidden exam: %(error)s', error=str(e)), 'danger')
+
+    return redirect(url_for('content.builder_private_exams', subject=subj_id))
+
+
+@content.route('/teacher/api/save_private_questions/<int:subject_id>', methods=['POST'])
+@login_required
+def save_private_questions_api(subject_id):
+    """AJAX backend saving the Hidden Exam Question Bank Sheet & multi-link assignments."""
+    target_subject = Subject.query.get_or_404(subject_id)
+    if not can_edit_subject(target_subject):
+        return jsonify({'status': 'error', 'message': 'Unauthorized'}), 403
+
+    incoming_rows = request.get_json()
+    if incoming_rows is None:
+        return jsonify({'status': 'error', 'message': 'Payload Empty'}), 400
+
+    valid_exam_ids = {pe.id for pe in PrivateExam.query.filter_by(subject_id=target_subject.id).all()}
+
+    try:
+        sent_ids = [_safe_optional_int(r.get('id')) for r in incoming_rows if _safe_optional_int(r.get('id'))]
+        existing_pqs = PrivateQuestion.query.filter_by(subject_id=target_subject.id).all()
+        for pq_db in existing_pqs:
+            if pq_db.id not in sent_ids:
+                PrivateExamQuestion.query.filter_by(private_question_id=pq_db.id).delete()
+                db.session.delete(pq_db)
+
+        for row in incoming_rows:
+            text_en = (row.get('text') or '').strip()
+            text_ku = (row.get('text_ku') or '').strip()
+            if not text_en and not text_ku:
+                continue
+
+            ans_val = (row.get('correct') or 'A').strip().upper()[:1] or 'A'
+            pq_id = _safe_optional_int(row.get('id'))
+
+            raw_eids = row.get('exam_ids') or []
+            target_eids = set()
+            for raw_eid in raw_eids:
+                parsed_eid = _safe_optional_int(raw_eid)
+                if parsed_eid and parsed_eid in valid_exam_ids:
+                    target_eids.add(parsed_eid)
+
+            if pq_id:
+                target_pq = PrivateQuestion.query.get(pq_id)
+                if not target_pq or target_pq.subject_id != target_subject.id:
+                    continue
+                target_pq.question_text = text_en
+                target_pq.option_a = row.get('a') or ''
+                target_pq.option_b = row.get('b') or ''
+                target_pq.option_c = row.get('c') or ''
+                target_pq.option_d = row.get('d') or ''
+                target_pq.question_text_kurdish = text_ku or None
+                target_pq.option_a_kurdish = (row.get('a_ku') or '').strip() or None
+                target_pq.option_b_kurdish = (row.get('b_ku') or '').strip() or None
+                target_pq.option_c_kurdish = (row.get('c_ku') or '').strip() or None
+                target_pq.option_d_kurdish = (row.get('d_ku') or '').strip() or None
+                target_pq.correct_answer = ans_val
+            else:
+                target_pq = PrivateQuestion(
+                    subject_id=target_subject.id,
+                    question_text=text_en,
+                    option_a=row.get('a') or '',
+                    option_b=row.get('b') or '',
+                    option_c=row.get('c') or '',
+                    option_d=row.get('d') or '',
+                    question_text_kurdish=text_ku or None,
+                    option_a_kurdish=(row.get('a_ku') or '').strip() or None,
+                    option_b_kurdish=(row.get('b_ku') or '').strip() or None,
+                    option_c_kurdish=(row.get('c_ku') or '').strip() or None,
+                    option_d_kurdish=(row.get('d_ku') or '').strip() or None,
+                    correct_answer=ans_val
+                )
+                db.session.add(target_pq)
+                db.session.flush()
+
+            existing_links = PrivateExamQuestion.query.filter_by(private_question_id=target_pq.id).all()
+            existing_eids = {lk.private_exam_id for lk in existing_links}
+            for lk in existing_links:
+                if lk.private_exam_id not in target_eids:
+                    db.session.delete(lk)
+            for eid in target_eids:
+                if eid not in existing_eids:
+                    db.session.add(PrivateExamQuestion(private_exam_id=eid, private_question_id=target_pq.id))
+
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    except Exception as err:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(err)}), 500
+
+
+@content.route('/teacher/export/private_questions/<int:subject_id>', methods=['GET'])
+@login_required
+def export_private_questions_csv(subject_id):
+    """Exports the Hidden Exam Question Bank for a subject."""
+    target_subject = Subject.query.get_or_404(subject_id)
+    if not can_edit_subject(target_subject):
+        abort(403)
+    pqs = PrivateQuestion.query.filter_by(subject_id=target_subject.id).order_by(PrivateQuestion.id.asc()).all()
+    return _export_bilingual_questions_csv(pqs, f"{target_subject.slug}_hidden_questions.csv")
+
+
+@content.route('/teacher/import/private_questions/<int:subject_id>', methods=['POST'])
+@login_required
+def import_private_questions_step1(subject_id):
+    """Bulk import parser for the Hidden Exam Question Bank."""
+    target_subject = Subject.query.get_or_404(subject_id)
+    if not can_edit_subject(target_subject):
+        abort(403)
+
+    form = BulkImportForm()
+    private_exams = PrivateExam.query.filter_by(subject_id=target_subject.id).order_by(PrivateExam.created_at.desc()).all()
+
+    if form.validate_on_submit():
+        try:
+            preview_data, missing_fields = _parse_bilingual_question_upload(form.file.data)
+            if missing_fields:
+                flash(_('Import Error: Missing columns: %(fields)s', fields=", ".join(missing_fields)), 'danger')
+                return redirect(url_for('content.builder_private_exams', subject=target_subject.id))
+
+            return render_template(
+                'admin/import_preview.html',
+                data=preview_data,
+                import_type='private_question',
+                subject_id=target_subject.id,
+                private_exams=private_exams,
+                title=f"Verify Hidden Questions for {target_subject.name}"
+            )
+        except Exception as file_err:
+            flash(_('Processing Error: %(error)s', error=str(file_err)), 'danger')
+            return redirect(url_for('content.builder_private_exams', subject=target_subject.id))
+
+    flash(_('Invalid request or file format.'), 'danger')
+    return redirect(url_for('content.builder_private_exams', subject=target_subject.id))

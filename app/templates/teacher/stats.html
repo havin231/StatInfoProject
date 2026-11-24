@@ -6,20 +6,26 @@
 {% set cur_lang = get_locale().language %}
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
     <div>
-        <h1 class="h3 fw-bold mb-1"><i class="fas fa-chart-line me-2 text-primary"></i>{{ _('My Subject & Student Statistics') }}</h1>
+        <h1 class="h3 fw-bold mb-1">
+            <i class="fas fa-chart-line me-2 text-primary"></i>{{ _('My Subject & Student Statistics') }}
+            {% if inspected_teacher %}
+            <span class="badge bg-info-subtle text-info-emphasis fs-6 ms-2">{{ inspected_teacher.username }}</span>
+            {% endif %}
+        </h1>
         <p class="text-muted small mb-0">{{ _('Choose which of your assigned subjects to view below.') }}</p>
     </div>
-    <a href="/teacher/dashboard" class="btn btn-outline-secondary btn-sm">
+    <a href="{{ url_for('teacher.view_teacher', teacher_id=inspected_teacher.id) if inspected_teacher else '/teacher/dashboard' }}" class="btn btn-outline-secondary btn-sm">
         <i class="fas fa-arrow-left me-1"></i>{{ _('Back to Dashboard') }}
     </a>
 </div>
 
 <!-- SUBJECT VIEW ORGANIZER BAR (Teacher's own view only) -->
 <form method="GET" action="{{ url_for('analytics.teacher_stats') }}" class="card shadow-sm mb-4 card-accent">
+    {% if inspected_teacher %}<input type="hidden" name="teacher_id" value="{{ inspected_teacher.id }}">{% endif %}
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
             <span class="small fw-bold text-uppercase text-muted"><i class="fas fa-filter me-1"></i>{{ _('Select Subjects to Display') }}</span>
-            <a href="{{ url_for('analytics.teacher_stats') }}" class="small text-decoration-none">{{ _('Show All My Subjects') }}</a>
+            <a href="{{ url_for('analytics.teacher_stats', teacher_id=inspected_teacher.id if inspected_teacher else None) }}" class="small text-decoration-none">{{ _('Show All My Subjects') }}</a>
         </div>
         <div class="d-flex flex-wrap gap-3 mb-3">
             {% for sub in all_subjects %}
@@ -142,12 +148,17 @@
                     <td class="small text-muted">{{ r.date_submitted.strftime('%Y-%m-%d %H:%M') }}</td>
                     <td class="fw-bold">{{ r.subject.display_name(cur_lang) }}</td>
                     <td class="small">
-                        {% if r.page %}{{ _('Quiz') }}: {{ r.page.display_title(cur_lang) }}{% else %}{{ _('Final Exam') }}{% endif %}
+                        {% if r.private_exam %}<span class="badge bg-warning text-dark me-1">{{ _('Hidden') }}</span>{{ r.private_exam.display_title(cur_lang) }}
+                        {% elif r.page %}{{ _('Quiz') }}: {{ r.page.display_title(cur_lang) }}
+                        {% else %}{{ _('Final Exam') }}{% endif %}
                     </td>
                     <td class="small">
                         {% if r.student_record %}
                             <span class="badge bg-primary-subtle text-primary-emphasis border font-monospace me-1">{{ r.student_record.student_code }}</span>
                             {{ r.student_record.display_name(cur_lang) }}
+                        {% elif r.exam_guest %}
+                            <span class="badge bg-secondary-subtle text-secondary-emphasis border font-monospace me-1">{{ r.exam_guest.guest_code }}</span>
+                            {{ r.taker_name or _('Guest') }}
                         {% else %}
                             {{ r.taker_name or _('Anonymous Visitor') }}
                         {% endif %}

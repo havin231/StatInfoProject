@@ -10,11 +10,29 @@
 
 ## 1. PROJECT IDENTITY & CONTEXT
 - **System Name:** StatInfoProject (StatInfoPRO)
-- **Current Version:** 0.9.0 (2026-11-24)
+- **Current Version:** 0.9.1 (2026-11-24)
 - **Deployment:** PythonAnywhere (Linux/Bash/MySQL).
 - **Primary Language:** Python 3.10 / Flask 3.0.0.
 - **Frontend:** HTML5, Bootstrap 5.3, Jinja2, Custom CSS Variables.
 - **Context:** A bilingual (English/Kurdish) Learning Management System for the University of Sulaimani.
+
+## RECENT CHANGES (v0.9.1)
+- **Admin Full Teacher Dashboard Inspector & Unread-Only Notification Boxes**:
+  - Updated `view_teacher()` (`GET /admin/view_teacher/<id>`) via `_build_teacher_dashboard_context()` so Admins see the complete teacher dashboard (profile, unread inbox, students count, stats/students/notifications links, and subject toggles) and added `?teacher_id=` support for Admin views.
+  - Small notification boxes in `admin_dashboard.html` and `teacher/dashboard.html` now show ONLY unread notifications (`is_checked=False` / `is_read=False`), while full read & unread history persists permanently on `/admin/notifications` and `/teacher/notifications`.
+- **Comment Modal Fix, Direct Teacher Comments & Optional Comment Guest Codes**:
+  - Moved `#commentDetailsModal` in `page.html` outside `.card` backdrop-filter containers and appended it to `document.body` on `DOMContentLoaded` to eliminate modal backdrop stacking/grayed-out lockup.
+  - Logged-in Teachers and Admins can post top-level comments and replies directly with no extra questions, honoring anonymity (`From Teacher` / `لە لایەن مامۆستاوە`).
+  - Added optional 8-character `CommentGuest` code creation and reuse (`generate_comment_code='1'`, `guest_mode='code'`).
+- **Question Bank Save Fix, RTL Removal & Dedicated Hidden Exams Bank**:
+  - Fixed `NoneType` `int()` crash in `save_questions_api()` via `_safe_optional_int()` when adding new questions with `page_id=None`.
+  - Removed manual `RTL` toggle/column from `QuestionForm`, `builder.html`, `import_preview.html`, and CSV exports (RTL auto-detects from Kurdish text).
+  - Added `PrivateExam`, `PrivateQuestion`, and `PrivateExamQuestion` with `/teacher/builder/private_exams` (`teacher/private_builder.html`), multi-link assignments, and Student-Code-gated `/exam/link/<token>` routes.
+- **Public Teacher Profiles & Optional Exam Guest Codes**:
+  - Added 5 privacy flags on `User` (`profile_public`, `profile_show_name`, `profile_show_bio`, `profile_show_age`, `profile_show_gender`), `/teacher/<id>/profile` (`teacher_profile.html`, 404 when `profile_public=False`), and clickable teacher names on subjects/lessons/comments.
+  - Added `ExamGuest` model & opt-in 8-character guest exam codes for public exams/quizzes (strictly separate from `Student` codes and blocked from hidden Student-Code exams).
+- **21-CSV Full Backup, Kurdish Translations & Testing**:
+  - Upgraded `export_full_backup()` and `restore_system()` to 21 CSVs (`17_private_exams.csv`–`21_exam_guests.csv`), updated 76 new Kurdish strings (0 remaining), compiled `messages.mo`, and added `tests/test_v091_features.py` (46/46 tests pass).
 
 ## RECENT CHANGES (v0.9.0)
 - **Logical Audit Fixes & Dual-Language Exam Engine**:
@@ -210,6 +228,7 @@ StatInfoProject_PlayGround (Project Root)
         ├── stats.html        # Public Analytics
         ├── subject.html      # Subject Overview & Syllabus
         ├── teacher_apply.html # Public Teacher Signup Request Form
+        ├── teacher_profile.html # Public Teacher Profile (Respecting Privacy Switches)
         ├── toolbase.html     # Bilingual External Tools Directory
         ├── admin/
         │   ├── commands.html         # System Documentation Hub
@@ -218,14 +237,15 @@ StatInfoProject_PlayGround (Project Root)
         │   ├── edit_teacher.html     # Edit Staff Account
         │   ├── import_preview.html   # Batch Import Confirmation UI
         │   ├── notifications.html    # Permanent Admin Notifications Hub
-        │   ├── restore_center.html   # 16-CSV Backup/Restore & Wipe Center
+        │   ├── restore_center.html   # 21-CSV Backup/Restore & Wipe Center
         │   ├── stats.html            # Detailed Admin Statistics & CSV Export
         │   └── teacher_requests.html # Teacher Signup Request Approval Queue
         └── teacher/
             ├── builder.html          # Lecture Editor & Bilingual Question Bank Spreadsheet
-            ├── dashboard.html        # Teacher Workspace & Profile Hub
+            ├── dashboard.html        # Teacher Workspace & Profile Hub (Also Admin Inspector View)
             ├── edit_student.html     # Edit Code-Based Student Record
             ├── notifications.html    # Teacher Notifications Hub
+            ├── private_builder.html  # Hidden Exam Bank Sheet & Auto-Generated Multi-Links
             ├── stats.html            # Teacher-Scoped Statistics Hub
             └── students.html         # Code-Based Student Roster & Admin Sharing
 3. DATABASE SCHEMA (STRICT RULES)
@@ -233,21 +253,26 @@ StatInfoProject_PlayGround (Project Root)
 Database Engine: MySQL (Production) / SQLite (Dev).
 Constraint: InnoDB Engine (Enforces Foreign Keys).
 
-Models & Fields (16 SQLAlchemy Models)
+Models & Fields (21 SQLAlchemy Models)
 
-- User: id, username (String 100), username_kurdish (String 100, nullable), email, password_hash, gender (String 20, nullable), is_admin (Bool), show_name_on_subject (Bool, default=False), preferred_lang (String, default='en'), birth_date (Date, nullable), bio (Text, nullable).
+- User: id, username (String 100), username_kurdish (String 100, nullable), email, password_hash, gender (String 20, nullable), is_admin (Bool), show_name_on_subject (Bool, default=False), preferred_lang (String, default='en'), birth_date (Date, nullable), bio (Text, nullable), profile_public (Bool, default=True), profile_show_name (Bool, default=True), profile_show_bio (Bool, default=True), profile_show_age (Bool, default=True), profile_show_gender (Bool, default=True).
 - TeacherRequest (`teacher_request`): id, name_en, name_ku, email, password_hash, gender, birth_date, bio (nullable), reason, status ('pending' | 'approved' | 'rejected'), reviewed_by_id (FK user.id), reviewed_at, admin_note, created_at.
 - Subject: id, name, name_kurdish (VARCHAR 100, nullable), slug, description, description_kurdish (TEXT, nullable), teacher_id (FK user.id), is_public (Bool, default=True), exam_student_only (Bool, default=False).
 - SubjectTeacher: id, subject_id (FK subject.id), teacher_id (FK user.id), is_primary (Bool), show_name (Bool, default=True), added_at. Unique (subject_id, teacher_id).
 - Page (Lecture): id, title (VARCHAR 200), title_kurdish (VARCHAR 200, nullable), content_body (HTML), content_body_kurdish (HTML), subject_id (FK subject.id), quiz_student_only (Bool, default=False). Relationship: resources (Cascade Delete), questions (Backref), comments (Order by created_at).
 - Resource: id, title, title_kurdish (VARCHAR 100, nullable), link, page_id (FK page.id).
-- Question: id, question_text, option_a..option_d, question_text_kurdish (nullable), option_a_kurdish..option_d_kurdish (nullable), correct_answer, subject_id (FK subject.id), page_id (Nullable FK page.id), is_kurdish (Bool legacy RTL fallback).
+- Question: id, question_text, option_a..option_d, question_text_kurdish (nullable), option_a_kurdish..option_d_kurdish (nullable), correct_answer, subject_id (FK subject.id), page_id (Nullable FK page.id), is_kurdish (Bool legacy).
+- PrivateExam (`private_exam`): id, subject_id (FK subject.id), title, title_kurdish, access_token (String 32, unique), is_active (Bool), created_by_id (FK user.id), created_at.
+- PrivateQuestion (`private_question`): id, subject_id (FK subject.id), question_text, question_text_kurdish, option_a..d, option_a_kurdish..d_kurdish, correct_answer, created_at.
+- PrivateExamQuestion (`private_exam_question`): id, private_exam_id (FK private_exam.id), private_question_id (FK private_question.id). Unique (private_exam_id, private_question_id).
 - Student (`student_record`): id, name_en, name_ku, birth_date (Date), gender, department_en, department_ku, student_code (String 16, unique, >= 8 chars, no password/login), created_by_id (FK user.id), created_at.
 - StudentTeacher (`student_teacher`): id, student_id (FK student_record.id), teacher_id (FK user.id), assigned_at. Unique (student_id, teacher_id).
-- ExamResult: id, score (0-100), correct_count (nullable), total_questions (nullable), date_submitted, subject_id (FK subject.id), page_id (Nullable FK page.id), student_record_id (Nullable FK student_record.id), taker_name (nullable), taker_birth_date (nullable), taker_gender (nullable).
-- PageComment (`page_comment`): id, page_id (FK page.id), parent_id (Self-FK page_comment.id, nullable), author_user_id (FK user.id, nullable), is_teacher_reply (Bool), is_read_by_admin (Bool), author_name, author_birth_date (Date), author_age (Integer, nullable legacy), personality_info (TEXT, nullable), comment_text (TEXT), created_at.
-- AdminNotification: id, notification_type ('question_added' | 'question_edited' | 'page_added' | 'page_edited' | 'teacher_message' | 'teacher_request' | 'comment_added'), title, message, actor_type, actor_id, actor_name, related_subject_id, related_page_id, related_question_id, is_checked, checked_at, delete_scheduled_at, is_deleted, created_at (persistent until Admin explicitly deletes).
-- TeacherNotification: id, teacher_id (FK user.id), sender_id (FK user.id, nullable), notification_type ('comment' | 'admin_message'), title, message, related_subject_id, related_page_id, is_read, created_at.
+- CommentGuest (`comment_guest`): id, guest_code (String 16, unique), author_name, author_birth_date (Date), personality_info, created_at.
+- ExamGuest (`exam_guest`): id, guest_code (String 16, unique), taker_name, taker_birth_date (Date), taker_gender, created_at.
+- ExamResult: id, score (0-100), correct_count (nullable), total_questions (nullable), date_submitted, subject_id (FK subject.id), page_id (Nullable FK page.id), private_exam_id (Nullable FK private_exam.id), student_record_id (Nullable FK student_record.id), exam_guest_id (Nullable FK exam_guest.id), taker_name (nullable), taker_birth_date (nullable), taker_gender (nullable).
+- PageComment (`page_comment`): id, page_id (FK page.id), parent_id (Self-FK page_comment.id, nullable), author_user_id (FK user.id, nullable), comment_guest_id (FK comment_guest.id, nullable), is_teacher_reply (Bool), is_read_by_admin (Bool), author_name, author_birth_date (Date), author_age (Integer, nullable legacy), personality_info (TEXT, nullable), comment_text (TEXT), created_at.
+- AdminNotification: id, notification_type ('question_added' | 'question_edited' | 'page_added' | 'page_edited' | 'teacher_message' | 'teacher_request' | 'comment_added'), title, message, actor_type, actor_id, actor_name, related_subject_id, related_page_id, related_question_id, is_checked, checked_at, delete_scheduled_at, is_deleted, created_at (small box displays unread only; `/admin/notifications` persists until deleted).
+- TeacherNotification: id, teacher_id (FK user.id), sender_id (FK user.id, nullable), notification_type ('comment' | 'admin_message'), title, message, related_subject_id, related_page_id, is_read, created_at (small box displays unread only; `/teacher/notifications` persists until deleted).
 - SiteInfo: id, key, title, title_kurdish (VARCHAR 200, nullable), content, content_kurdish (HTML, nullable), last_updated.
 - SystemCommand: id, title, title_kurdish (VARCHAR 100, nullable), command_text, description, description_kurdish (TEXT, nullable). Bulk Import Supported via `/admin/system/commands/import`.
 - Tool: id, title, title_kurdish (VARCHAR 100, nullable), link, description, description_kurdish (TEXT, nullable), created_at.
@@ -308,17 +333,17 @@ If page_id is None: Query Question.query.filter_by(subject_id=subject.id). (Fina
 
 If page_id is None: Query Question.query.filter_by(subject_id=subject.id). (Final Exam).
 
-F. Full System Restore Strategy (Zero-Loss 16-CSV Backup)
+F. Full System Restore Strategy (Zero-Loss 21-CSV Backup)
 
 Routes: `/admin/export/full_backup` (ZIP download) & `/admin/system/restore` (UI: `restore_center.html`).
 
 Logic:
 1. Wipe: `_wipe_all_non_user_tables()` deletes rows in strict InnoDB bottom-up FK order, then `1_users.csv` upserts/syncs users safely.
 2. Rehydrate: Streams UTF-8-SIG CSVs from the backup ZIP, normalizing line endings cleanly (`\r\n`/`\r` -> `\n` without touching `rn` substrings).
-3. Strict Dependency Order (16 CSVs):
-   `1_users.csv` -> `14_teacher_requests.csv` -> `2_subjects.csv` -> `3_subject_teachers.csv` -> `4_pages.csv` -> `5_resources.csv` -> `6_questions.csv` -> `7_students.csv` -> `8_student_teachers.csv` -> `9_exam_results.csv` -> `10_page_comments.csv` (parents before replies) -> `11_site_info.csv` -> `12_commands.csv` -> `13_tools.csv` -> `15_admin_notifications.csv` -> `16_teacher_notifications.csv`.
+3. Strict Dependency Order (21 CSVs):
+   `1_users.csv` -> `14_teacher_requests.csv` -> `2_subjects.csv` -> `3_subject_teachers.csv` -> `8_students.csv` -> `13_student_teachers.csv` -> `4_pages.csv` -> `5_resources.csv` -> `6_questions.csv` -> `17_private_exams.csv` -> `18_private_questions.csv` -> `19_private_exam_questions.csv` -> `20_comment_guests.csv` -> `21_exam_guests.csv` -> `7_results.csv` -> `12_comments.csv` (parents before replies) -> `9_commands.csv` -> `10_siteinfo.csv` -> `11_tools.csv` -> `15_admin_notifications.csv` -> `16_teacher_notifications.csv`.
 
-Backup Compatibility: Backwards compatible with v0.6–v0.8 backup ZIPs while preserving 100% of v0.9.0 fields and foreign keys.
+Backup Compatibility: Backwards compatible with v0.6–v0.9.0 backup ZIPs while preserving 100% of v0.9.1 fields and foreign keys.
 
 G. The Translation Toggle Fix (v2.x)
 

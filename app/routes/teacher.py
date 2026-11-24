@@ -7,7 +7,8 @@ from app import db, bcrypt
 from app.models import (
     User, Subject, Page, Question, Resource, ExamResult,
     SubjectTeacher, AdminNotification, PageComment, TeacherNotification,
-    Student, StudentTeacher, TeacherRequest
+    Student, StudentTeacher, TeacherRequest,
+    PrivateExam, PrivateQuestion, PrivateExamQuestion
 )
 from app.forms import (
     SubjectForm, TeacherSignupForm, TeacherEditForm,
@@ -17,6 +18,39 @@ from app.forms import (
 from app.routes.helpers import can_edit_subject, generate_student_code
 
 teacher = Blueprint('teacher', __name__)
+
+
+def _build_teacher_dashboard_context(target_user, view_as_admin=False):
+    """Build identical Teacher Dashboard context for both the teacher and Admin inspector."""
+    assignments = SubjectTeacher.query.filter_by(teacher_id=target_user.id).all()
+    assigned_subjects = [a.subject for a in assignments if a.subject]
+    assignment_map = {a.subject_id: a for a in assignments}
+
+    # Dashboard small notification box shows ONLY unread notifications
+    teacher_notifications = TeacherNotification.query.filter_by(
+        teacher_id=target_user.id,
+        is_read=False
+    ).order_by(
+        TeacherNotification.created_at.desc()
+    ).all()
+    total_notifications_count = TeacherNotification.query.filter_by(teacher_id=target_user.id).count()
+
+    profile_form = TeacherProfileForm(obj=target_user)
+    admin_msg_form = TeacherToAdminMessageForm()
+    my_students_count = StudentTeacher.query.filter_by(teacher_id=target_user.id).count()
+
+    return dict(
+        subjects=assigned_subjects,
+        assignment_map=assignment_map,
+        teacher_notifications=teacher_notifications,
+        total_notifications_count=total_notifications_count,
+        profile_form=profile_form,
+        admin_msg_form=admin_msg_form,
+        my_students_count=my_students_count,
+        inspected_teacher=target_user,
+        teacher_name=target_user.username,
+        view_as_admin=view_as_admin
+    )
 
 # ==============================================================================
 # SECTION 5: STAFF DASHBOARD & TEACHER ADMINISTRATION
@@ -29,16 +63,18 @@ def teacher_dashboard():
     CENTRAL STAFF CONTROL PANEL
 
     Logic:
-    - Admin Mode: Pulls all data for global management (Teachers + Subjects).
-    - Teacher Mode: Pulls data restricted to the current user's ownership.
+    - Admin Mode: Pulls unread notifications for the sidebar box + all subjects & staff.
+    - Teacher Mode: Uses _build_teacher_dashboard_context (only unread in small box).
     """
     # 1. Administrator Context
     if current_user.is_admin:
-        # Admin notifications persist permanently until Admin deletes them
-        notifications = AdminNotification.query.order_by(
-            AdminNotification.is_checked.asc(),
+        # Admin sidebar box displays ONLY unread (is_checked=False) notifications
+        notifications = AdminNotification.query.filter_by(
+            is_checked=False
+        ).order_by(
             AdminNotification.created_at.desc()
         ).all()
+        total_notifications_count = AdminNotification.query.count()
         unread_comments_count = PageComment.query.filter_by(
             is_read_by_admin=False,
             is_teacher_reply=False
@@ -78,66 +114,57 @@ def teacher_dashboard():
             admin_message_form=admin_message_form,
             profile_form=profile_form,
             notifications=notifications,
+            total_notifications_count=total_notifications_count,
             unread_comments_count=unread_comments_count,
             pending_requests_count=pending_requests_count
         )
 
-    # 2. Standard Teacher Context (v0.5.0 - Multi-Teacher Support)
-    else:
-        assignments = SubjectTeacher.query.filter_by(teacher_id=current_user.id).all()
-        assigned_subjects = [a.subject for a in assignments if a.subject]
-        assignment_map = {a.subject_id: a for a in assignments}
-
-        teacher_notifications = TeacherNotification.query.filter_by(
-            teacher_id=current_user.id
-        ).order_by(
-            TeacherNotification.is_read.asc(),
-            TeacherNotification.created_at.desc()
-        ).all()
-
-        profile_form = TeacherProfileForm(obj=current_user)
-        admin_msg_form = TeacherToAdminMessageForm()
-        my_students_count = StudentTeacher.query.filter_by(teacher_id=current_user.id).count()
-
-        return render_template(
-            'teacher/dashboard.html',
-            subjects=assigned_subjects,
-            assignment_map=assignment_map,
-            teacher_notifications=teacher_notifications,
-            profile_form=profile_form,
-            admin_msg_form=admin_msg_form,
-            my_students_count=my_students_count
-        )
+    # 2. Standard Teacher Context
+    ctx = _build_teacher_dashboard_context(current_user, view_as_admin=False)
+    return render_template('teacher/dashboard.html', **ctx)
 
 
 @teacher.route('/teacher/profile/update', methods=['POST'])
 @login_required
 def update_own_profile():
     """
-    SELF-SERVICE PROFILE UPDATE (TEACHERS & ADMINS)
-
-    Allows any logged-in staff member to update their own name, Kurdish name,
-    birth date, bio (optional), and optionally change their password.
+    SELF-SERVICE PROFILE & PRIVACY UPDATE (TEACHERS & ADMINS)
     """
     form = TeacherProfileForm()
+    target_uid = request.form.get('target_user_id', type=int)
+    if target_uid and target_uid != current_user.id:
+        if not current_user.is_admin:
+            abort(403)
+        target_user = User.query.get_or_404(target_uid)
+        redirect_url = url_for('teacher.view_teacher', teacher_id=target_user.id)
+    else:
+        target_user = current_user
+        redirect_url = url_for('teacher.teacher_dashboard')
 
     if form.validate_on_submit():
         new_username = form.username.data.strip()
 
         # Check username uniqueness if modified
-        if new_username != current_user.username:
+        if new_username != target_user.username:
             if User.query.filter_by(username=new_username).first():
                 flash(_('Error: The name "%(username)s" is already taken.', username=new_username), 'danger')
-                return redirect(url_for('teacher.teacher_dashboard'))
+                return redirect(redirect_url)
 
-        current_user.username = new_username
-        current_user.username_kurdish = form.username_kurdish.data.strip() if form.username_kurdish.data else None
-        current_user.gender = form.gender.data or None
-        current_user.birth_date = form.birth_date.data
-        current_user.bio = form.bio.data.strip() if form.bio.data else None
+        target_user.username = new_username
+        target_user.username_kurdish = form.username_kurdish.data.strip() if form.username_kurdish.data else None
+        target_user.gender = form.gender.data or None
+        target_user.birth_date = form.birth_date.data
+        target_user.bio = form.bio.data.strip() if form.bio.data else None
+
+        # Profile Privacy Flags
+        target_user.profile_public = bool(form.profile_public.data)
+        target_user.profile_show_name = bool(form.profile_show_name.data)
+        target_user.profile_show_bio = bool(form.profile_show_bio.data)
+        target_user.profile_show_age = bool(form.profile_show_age.data)
+        target_user.profile_show_gender = bool(form.profile_show_gender.data)
 
         if form.new_password.data:
-            current_user.password_hash = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+            target_user.password_hash = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
 
         try:
             db.session.commit()
@@ -150,7 +177,7 @@ def update_own_profile():
             for err in field_errors:
                 flash(str(err), 'danger')
 
-    return redirect(url_for('teacher.teacher_dashboard'))
+    return redirect(redirect_url)
 
 
 @teacher.route('/admin/message_teacher', methods=['POST'])
@@ -216,16 +243,16 @@ def send_teacher_message():
 @teacher.route('/teacher/notification/<int:notif_id>/read', methods=['POST'])
 @login_required
 def mark_teacher_notification_read(notif_id):
-    """Marks a teacher notification as read."""
+    """Marks a teacher notification as read (vanishes from dashboard box; kept in full history)."""
     notif = TeacherNotification.query.get_or_404(notif_id)
-    if notif.teacher_id != current_user.id:
+    if notif.teacher_id != current_user.id and not current_user.is_admin:
         abort(403)
     try:
         notif.is_read = True
         db.session.commit()
     except Exception:
         db.session.rollback()
-    return redirect(url_for('teacher.teacher_dashboard'))
+    return redirect(request.referrer or url_for('teacher.teacher_dashboard'))
 
 
 @teacher.route('/teacher/notification/<int:notif_id>/delete', methods=['POST'])
@@ -233,7 +260,7 @@ def mark_teacher_notification_read(notif_id):
 def delete_teacher_notification(notif_id):
     """Deletes a teacher notification from their inbox."""
     notif = TeacherNotification.query.get_or_404(notif_id)
-    if notif.teacher_id != current_user.id:
+    if notif.teacher_id != current_user.id and not current_user.is_admin:
         abort(403)
     try:
         db.session.delete(notif)
@@ -242,7 +269,7 @@ def delete_teacher_notification(notif_id):
     except Exception as e:
         db.session.rollback()
         flash(_('Error dismissing notification: %(error)s', error=str(e)), 'danger')
-    return redirect(url_for('teacher.teacher_dashboard'))
+    return redirect(request.referrer or url_for('teacher.teacher_dashboard'))
 
 
 @teacher.route('/admin/notification/<int:notif_id>/delete', methods=['POST'])
@@ -259,7 +286,7 @@ def delete_admin_notification(notif_id):
     except Exception as e:
         db.session.rollback()
         flash(_('Error dismissing notification: %(error)s', error=str(e)), 'danger')
-    return redirect(url_for('teacher.teacher_dashboard'))
+    return redirect(request.referrer or url_for('teacher.teacher_dashboard'))
 
 
 @teacher.route('/teacher/toggle_name_visibility', methods=['POST'])
@@ -267,24 +294,29 @@ def delete_admin_notification(notif_id):
 def toggle_name_visibility():
     """
     TEACHER NAME VISIBILITY TOGGLE (GLOBAL)
-
-    Allows teachers to toggle whether their name appears publicly
-    across all their assigned subject pages.
     """
-    current_user.show_name_on_subject = not current_user.show_name_on_subject
+    target_uid = request.form.get('target_user_id', type=int)
+    if target_uid and target_uid != current_user.id:
+        if not current_user.is_admin:
+            abort(403)
+        target_user = User.query.get_or_404(target_uid)
+    else:
+        target_user = current_user
+
+    target_user.show_name_on_subject = not target_user.show_name_on_subject
 
     try:
-        SubjectTeacher.query.filter_by(teacher_id=current_user.id).update(
-            {'show_name': current_user.show_name_on_subject}
+        SubjectTeacher.query.filter_by(teacher_id=target_user.id).update(
+            {'show_name': target_user.show_name_on_subject}
         )
         db.session.commit()
-        status = _('shown') if current_user.show_name_on_subject else _('hidden')
+        status = _('shown') if target_user.show_name_on_subject else _('hidden')
         flash(_('Your name will be %(status)s on all your subject pages.', status=status), 'success')
     except Exception as e:
         db.session.rollback()
         flash(_('Error updating setting: %(error)s', error=str(e)), 'danger')
 
-    return redirect(url_for('teacher.teacher_dashboard'))
+    return redirect(request.referrer or url_for('teacher.teacher_dashboard'))
 
 
 @teacher.route('/subject/<int:subject_id>/toggle_my_name', methods=['POST'])
@@ -292,13 +324,17 @@ def toggle_name_visibility():
 def toggle_subject_name_visibility(subject_id):
     """
     PER-SUBJECT INDIVIDUAL TEACHER NAME VISIBILITY TOGGLE
-
-    Allows each teacher assigned to a subject to independently show or hide
-    their own name on that specific subject's public page.
     """
+    target_uid = request.form.get('teacher_id', type=int)
+    if target_uid and target_uid != current_user.id:
+        if not current_user.is_admin:
+            abort(403)
+    else:
+        target_uid = current_user.id
+
     assignment = SubjectTeacher.query.filter_by(
         subject_id=subject_id,
-        teacher_id=current_user.id
+        teacher_id=target_uid
     ).first()
 
     if not assignment:
@@ -439,6 +475,11 @@ def edit_teacher(teacher_id):
         target_staff.birth_date = form.birth_date.data
         target_staff.bio = form.bio.data.strip() if form.bio.data else None
         target_staff.show_name_on_subject = form.show_name_on_subject.data
+        target_staff.profile_public = bool(form.profile_public.data)
+        target_staff.profile_show_name = bool(form.profile_show_name.data)
+        target_staff.profile_show_bio = bool(form.profile_show_bio.data)
+        target_staff.profile_show_age = bool(form.profile_show_age.data)
+        target_staff.profile_show_gender = bool(form.profile_show_gender.data)
 
         # Security Logic: Prevent Admins from accidentally downgrading themselves
         if target_staff.id == current_user.id:
@@ -467,7 +508,7 @@ def delete_teacher(teacher_id):
 
     MySQL Constraint Logic:
     We cannot delete a teacher if they own subjects that have exams with answers.
-    We delete in this order: Answers -> Results -> Questions -> Pages -> Subjects -> User.
+    We delete in this order: Notifications -> Results -> Questions -> Pages -> Subjects -> User.
     """
     if not current_user.is_admin:
         abort(403)
@@ -480,13 +521,14 @@ def delete_teacher(teacher_id):
         return redirect(url_for('teacher.teacher_dashboard'))
 
     try:
-        # 2. Clean up notifications, student ownership/sharing, review links, and comment authorship
+        # 2. Clean up notifications, student ownership/sharing, review links, private exam creators, and comment authorship
         TeacherNotification.query.filter(
             (TeacherNotification.teacher_id == target_staff.id) |
             (TeacherNotification.sender_id == target_staff.id)
         ).delete(synchronize_session=False)
         StudentTeacher.query.filter_by(teacher_id=target_staff.id).delete()
         Student.query.filter_by(created_by_id=target_staff.id).update({'created_by_id': None})
+        PrivateExam.query.filter_by(created_by_id=target_staff.id).update({'created_by_id': None})
         TeacherRequest.query.filter_by(reviewed_by_id=target_staff.id).update({'reviewed_by_id': None})
         PageComment.query.filter_by(author_user_id=target_staff.id).update({'author_user_id': None})
         SubjectTeacher.query.filter_by(teacher_id=target_staff.id).delete()
@@ -502,8 +544,16 @@ def delete_teacher(teacher_id):
             # B. Clean up Exam Results
             ExamResult.query.filter_by(subject_id=subj.id).delete()
 
-            # C. Clean up Questions (before Pages due to page_id FK)
+            # C. Clean up Public & Private Questions (before Pages due to page_id FK)
             Question.query.filter_by(subject_id=subj.id).delete()
+            pe_ids = [pe.id for pe in PrivateExam.query.filter_by(subject_id=subj.id).all()]
+            pq_ids = [pq.id for pq in PrivateQuestion.query.filter_by(subject_id=subj.id).all()]
+            if pe_ids:
+                PrivateExamQuestion.query.filter(PrivateExamQuestion.private_exam_id.in_(pe_ids)).delete(synchronize_session=False)
+            if pq_ids:
+                PrivateExamQuestion.query.filter(PrivateExamQuestion.private_question_id.in_(pq_ids)).delete(synchronize_session=False)
+            PrivateQuestion.query.filter_by(subject_id=subj.id).delete()
+            PrivateExam.query.filter_by(subject_id=subj.id).delete()
 
             # D. Clean up Comments (replies first), Resources & Pages
             pages_found = Page.query.filter_by(subject_id=subj.id).all()
@@ -663,31 +713,17 @@ def transfer_subject(subject_id):
 @login_required
 def view_teacher(teacher_id):
     """
-    SIMULATED TEACHER VIEW
+    FULL ADMIN INSPECTOR VIEW OF A TEACHER'S DASHBOARD
 
-    Allows an Administrator to enter a 'Read-Only' view of a specific teacher's
-    classroom to verify content or check results.
+    Renders the exact same dashboard context seen by `teacher_record` so
+    Admins can inspect everything (notifications, profile, stats, students, subjects).
     """
     if not current_user.is_admin:
         abort(403)
 
     teacher_record = User.query.get_or_404(teacher_id)
-    assignments = SubjectTeacher.query.filter_by(teacher_id=teacher_record.id).all()
-    teacher_subjects = [a.subject for a in assignments if a.subject]
-    assignment_map = {a.subject_id: a for a in assignments}
-
-    # Aggregated stats for the view
-    subject_ids = [s.id for s in teacher_subjects]
-    results_count = ExamResult.query.filter(ExamResult.subject_id.in_(subject_ids)).count() if subject_ids else 0
-
-    return render_template(
-        'teacher/dashboard.html',
-        subjects=teacher_subjects,
-        assignment_map=assignment_map,
-        total_results=results_count,
-        view_as_admin=True,
-        teacher_name=teacher_record.username
-    )
+    ctx = _build_teacher_dashboard_context(teacher_record, view_as_admin=True)
+    return render_template('teacher/dashboard.html', **ctx)
 
 
 # ==============================================================================
@@ -725,21 +761,38 @@ def send_admin_message():
 @teacher.route('/teacher/notifications')
 @login_required
 def teacher_notifications_page():
-    """Dedicated full-page notifications view for the logged-in teacher."""
+    """Dedicated full-page notifications view (all read & unread until deleted)."""
+    req_tid = request.args.get('teacher_id', type=int)
+    if req_tid and current_user.is_admin:
+        target_teacher = User.query.get_or_404(req_tid)
+    else:
+        target_teacher = current_user
+
     notifs = TeacherNotification.query.filter_by(
-        teacher_id=current_user.id
+        teacher_id=target_teacher.id
     ).order_by(
         TeacherNotification.is_read.asc(),
         TeacherNotification.created_at.desc()
     ).all()
-    return render_template('teacher/notifications.html', notifications=notifs)
+    return render_template(
+        'teacher/notifications.html',
+        notifications=notifs,
+        inspected_teacher=target_teacher if target_teacher.id != current_user.id else None
+    )
 
 
 @teacher.route('/teacher/notifications/mark_all_read', methods=['POST'])
 @login_required
 def mark_all_teacher_notifications_read():
+    target_uid = request.form.get('teacher_id', type=int)
+    if target_uid and target_uid != current_user.id:
+        if not current_user.is_admin:
+            abort(403)
+    else:
+        target_uid = current_user.id
+
     try:
-        TeacherNotification.query.filter_by(teacher_id=current_user.id, is_read=False).update({'is_read': True})
+        TeacherNotification.query.filter_by(teacher_id=target_uid, is_read=False).update({'is_read': True})
         db.session.commit()
         flash(_('All notifications marked as read.'), 'success')
     except Exception:
@@ -841,8 +894,14 @@ def manage_students():
             flash(_('Error creating student: %(error)s', error=str(e)), 'danger')
 
     q_str = (request.args.get('q') or '').strip()
+    filter_tid = request.args.get('teacher_id', type=int)
+    inspected_teacher = None
     if current_user.is_admin:
-        query = Student.query
+        if filter_tid:
+            inspected_teacher = User.query.get_or_404(filter_tid)
+            query = Student.query.join(StudentTeacher).filter(StudentTeacher.teacher_id == inspected_teacher.id)
+        else:
+            query = Student.query
     else:
         query = Student.query.join(StudentTeacher).filter(StudentTeacher.teacher_id == current_user.id)
 
@@ -861,7 +920,8 @@ def manage_students():
         form=form,
         students=students_list,
         all_teachers=all_teachers,
-        search_query=q_str
+        search_query=q_str,
+        inspected_teacher=inspected_teacher
     )
 
 

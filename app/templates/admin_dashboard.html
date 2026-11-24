@@ -67,6 +67,12 @@
                             </span>
                             <div class="d-flex align-items-center gap-1">
                                 <small class="text-muted" style="font-size: 0.7rem;">{{ notif.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                <form method="POST" action="{{ url_for('admin.check_admin_notification', notif_id=notif.id) }}" class="d-inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-link btn-sm p-0 text-success" title="{{ _('Mark as Read') }}">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
                                 <form method="POST" action="{{ url_for('teacher.delete_admin_notification', notif_id=notif.id) }}" class="d-inline">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="btn btn-link btn-sm p-0 text-muted" title="{{ _('Dismiss') }}">
@@ -170,6 +176,29 @@
                             <label class="form-label small fw-bold">{{ _('Bio (Optional)') }}</label>
                             {{ profile_form.bio(class="form-control form-control-sm", rows="2", placeholder=_('Optional short bio...')) }}
                         </div>
+                        <div class="p-2 mb-2 rounded border bg-body-tertiary">
+                            <div class="small fw-bold text-primary mb-1"><i class="fas fa-user-shield me-1"></i>{{ _('Public Profile Privacy') }}</div>
+                            <div class="form-check form-switch small mb-1">
+                                {{ profile_form.profile_public(class="form-check-input", role="switch") }}
+                                {{ profile_form.profile_public.label(class="form-check-label fw-bold") }}
+                            </div>
+                            <div class="form-check form-switch small mb-1">
+                                {{ profile_form.profile_show_name(class="form-check-input", role="switch") }}
+                                {{ profile_form.profile_show_name.label(class="form-check-label") }}
+                            </div>
+                            <div class="form-check form-switch small mb-1">
+                                {{ profile_form.profile_show_bio(class="form-check-input", role="switch") }}
+                                {{ profile_form.profile_show_bio.label(class="form-check-label") }}
+                            </div>
+                            <div class="form-check form-switch small mb-1">
+                                {{ profile_form.profile_show_age(class="form-check-input", role="switch") }}
+                                {{ profile_form.profile_show_age.label(class="form-check-label") }}
+                            </div>
+                            <div class="form-check form-switch small">
+                                {{ profile_form.profile_show_gender(class="form-check-input", role="switch") }}
+                                {{ profile_form.profile_show_gender.label(class="form-check-label") }}
+                            </div>
+                        </div>
                         <div class="mb-2">
                             <label class="form-label small fw-bold">{{ _('New Password (Optional)') }}</label>
                             {{ profile_form.new_password(class="form-control form-control-sm", placeholder=_('Leave empty to keep current')) }}
@@ -178,8 +207,11 @@
                             <label class="form-label small fw-bold">{{ _('Confirm New Password') }}</label>
                             {{ profile_form.confirm_password(class="form-control form-control-sm") }}
                         </div>
-                        <div class="d-grid">
+                        <div class="d-grid gap-1">
                             <button type="submit" class="btn btn-primary btn-sm">{{ _('Save Profile') }}</button>
+                            <a href="{{ url_for('public.teacher_public_profile', user_id=current_user.id) }}" class="btn btn-link btn-sm text-decoration-none">
+                                <i class="fas fa-id-card me-1"></i>{{ _('View Public Profile') }}
+                            </a>
                         </div>
                     </form>
                 </div>
@@ -208,7 +240,7 @@
                 </a>
                 <a href="{{ url_for('admin.admin_notifications_page') }}" class="btn btn-outline-secondary btn-sm d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-bell me-2"></i>{{ _('Notifications Hub') }}</span>
-                    {% if notifications %}<span class="badge bg-secondary">{{ notifications|length }}</span>{% endif %}
+                    {% if total_notifications_count %}<span class="badge bg-secondary">{{ total_notifications_count }}</span>{% endif %}
                 </a>
                 <hr class="text-muted opacity-25 my-1">
                 <a href="/admin/system/commands" class="btn btn-outline-body btn-sm">
@@ -298,8 +330,11 @@
     <div class="col-lg-9">
 
         <!-- GLOBAL SUBJECT MANAGEMENT -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
             <h1 class="h3 mb-0">{{ _('Global Subject Control') }}</h1>
+            <a href="{{ url_for('teacher.view_teacher', teacher_id=current_user.id) }}" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-chalkboard me-1"></i>{{ _('My Teacher View') }}
+            </a>
         </div>
 
         <div class="row g-4 mb-5">

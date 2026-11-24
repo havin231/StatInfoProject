@@ -84,6 +84,11 @@ class TeacherEditForm(FlaskForm):
     bio = TextAreaField(_l('Bio (Optional)'), validators=[Optional(), Length(max=500)])
     is_admin = BooleanField(_l('Grant Admin Access'))
     show_name_on_subject = BooleanField(_l('Show my name on subject pages'))
+    profile_public = BooleanField(_l('Make my teacher profile public'), default=True)
+    profile_show_name = BooleanField(_l('Show my name on profile'), default=True)
+    profile_show_bio = BooleanField(_l('Show my bio on profile'), default=True)
+    profile_show_age = BooleanField(_l('Show my age on profile'), default=True)
+    profile_show_gender = BooleanField(_l('Show my gender on profile'), default=True)
     submit = SubmitField(_l('Update Account'))
 
 class TeacherProfileForm(FlaskForm):
@@ -95,6 +100,11 @@ class TeacherProfileForm(FlaskForm):
     gender = SelectField(_l('Gender (Optional)'), choices=GENDER_CHOICES_OPTIONAL, validators=[Optional()])
     birth_date = DateField(_l('Birth Date (Optional)'), format='%Y-%m-%d', validators=[Optional(), validate_birth_date])
     bio = TextAreaField(_l('Bio (Optional)'), validators=[Optional(), Length(max=500)])
+    profile_public = BooleanField(_l('Make my teacher profile public'), default=True)
+    profile_show_name = BooleanField(_l('Show my name on profile'), default=True)
+    profile_show_bio = BooleanField(_l('Show my bio on profile'), default=True)
+    profile_show_age = BooleanField(_l('Show my age on profile'), default=True)
+    profile_show_gender = BooleanField(_l('Show my gender on profile'), default=True)
     new_password = PasswordField(_l('New Password (Optional)'), validators=[Optional(), Length(min=6)])
     confirm_password = PasswordField(
         _l('Confirm New Password'),
@@ -172,9 +182,6 @@ class QuestionForm(FlaskForm):
     option_d_kurdish = StringField(_l('Option D (Kurdish)'), validators=[Optional()])
 
     correct_answer = SelectField(_l('Correct Answer'), choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')], validators=[DataRequired()])
-
-    # Legacy RTL flag for single-language fallback
-    is_kurdish = BooleanField(_l('Is Kurdish? (Right-to-Left)'))
 
     submit = SubmitField(_l('Save Question'))
 
@@ -330,3 +337,10 @@ class StudentManageForm(FlaskForm):
     department_en = StringField(_l('Department (English)'), validators=[DataRequired(), Length(min=1, max=100)])
     department_ku = StringField(_l('Department (Kurdish)'), validators=[DataRequired(), Length(min=1, max=100)])
     submit = SubmitField(_l('Save Student'))
+
+
+class PrivateExamCreateForm(FlaskForm):
+    """Form to create a new auto-generated Hidden Exam / Quiz link."""
+    title = StringField(_l('Hidden Exam Title (English)'), validators=[DataRequired(), Length(min=1, max=200)])
+    title_kurdish = StringField(_l('Hidden Exam Title (Kurdish)'), validators=[Optional(), Length(max=200)])
+    submit = SubmitField(_l('Create Exam & Generate Link'))

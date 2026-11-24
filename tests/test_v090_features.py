@@ -517,7 +517,9 @@ def test_full_system_backup_wipe_and_restore_zero_loss(client, db, admin_user, t
         assert '14_teacher_requests.csv' in names
         assert '15_admin_notifications.csv' in names
         assert '16_teacher_notifications.csv' in names
-        assert len(names) == 16
+        assert '17_private_exams.csv' in names
+        assert '21_exam_guests.csv' in names
+        assert len(names) == 21
 
     # 2. Wipe clean & re-initialize temp admin to reach restore endpoint
     wipe_resp = client.post('/admin/system/wipe_clean', data={'confirm_wipe': 'y'}, follow_redirects=True)

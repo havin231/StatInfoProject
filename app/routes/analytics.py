@@ -12,7 +12,8 @@ from app.models import (
     User, Subject, Page, Question, ExamResult,
     SiteInfo, Resource, SystemCommand, Tool,
     SubjectTeacher, AdminNotification, PageComment, TeacherNotification,
-    Student, StudentTeacher, TeacherRequest
+    Student, StudentTeacher, TeacherRequest,
+    PrivateExam, PrivateQuestion, PrivateExamQuestion, CommentGuest, ExamGuest
 )
 from app.forms import InfoPageForm, RestoreBackupForm, WipeCleanForm
 
@@ -137,10 +138,16 @@ def teacher_analytics():
 def teacher_stats():
     """
     TEACHER-SCOPED STATISTICS PAGE (View-Only Subject Picker)
-    Shows only the logged-in teacher's assigned subjects and their linked students.
+    Shows the teacher's assigned subjects and linked students (Admins can pass ?teacher_id=).
     """
     lang = get_locale().language
-    assignments = SubjectTeacher.query.filter_by(teacher_id=current_user.id).all()
+    req_tid = request.args.get('teacher_id', type=int)
+    if req_tid and current_user.is_admin:
+        target_teacher = User.query.get_or_404(req_tid)
+    else:
+        target_teacher = current_user
+
+    assignments = SubjectTeacher.query.filter_by(teacher_id=target_teacher.id).all()
     teacher_subjects = [a.subject for a in assignments if a.subject]
     allowed_ids = [s.id for s in teacher_subjects]
 
@@ -156,7 +163,7 @@ def teacher_stats():
         results = []
 
     my_students = Student.query.join(StudentTeacher).filter(
-        StudentTeacher.teacher_id == current_user.id
+        StudentTeacher.teacher_id == target_teacher.id
     ).order_by(Student.name_en.asc()).all()
 
     payload = _compute_stats_payload(results, active_subjects, lang)
@@ -168,6 +175,7 @@ def teacher_stats():
         selected_ids=active_ids,
         results=results,
         student_rows=student_rows,
+        inspected_teacher=target_teacher if target_teacher.id != current_user.id else None,
         **payload
     )
 
@@ -200,9 +208,11 @@ def _filtered_admin_results_and_context():
         query = query.filter(db.literal(False))
 
     if exam_type == 'final':
-        query = query.filter(ExamResult.page_id.is_(None))
+        query = query.filter(ExamResult.page_id.is_(None), ExamResult.private_exam_id.is_(None))
     elif exam_type == 'quiz':
         query = query.filter(ExamResult.page_id.isnot(None))
+    elif exam_type == 'private':
+        query = query.filter(ExamResult.private_exam_id.isnot(None))
 
     if taker_type == 'student':
         query = query.filter(ExamResult.student_record_id.isnot(None))
@@ -291,14 +301,21 @@ def export_admin_stats():
     ])
     for r in ctx['results']:
         stu = r.student_record
+        eg = r.exam_guest
+        if r.private_exam:
+            ex_label = f"Hidden: {r.private_exam.title}"
+        elif r.page_id:
+            ex_label = 'Lecture Quiz'
+        else:
+            ex_label = 'Final Exam'
         w.writerow([
             r.id,
             r.date_submitted.strftime('%Y-%m-%d %H:%M:%S'),
             r.subject.name if r.subject else '',
-            'Lecture Quiz' if r.page_id else 'Final Exam',
-            r.page.title if r.page else '',
-            'Student' if stu else 'Guest',
-            stu.student_code if stu else '',
+            ex_label,
+            r.page.title if r.page else (r.private_exam.title if r.private_exam else ''),
+            'Student' if stu else ('Guest Code' if eg else 'Guest'),
+            stu.student_code if stu else (eg.guest_code if eg else ''),
             stu.name_en if stu else (r.taker_name or 'Anonymous'),
             stu.name_ku if stu else '',
             stu.department_en if stu else '',
@@ -319,14 +336,14 @@ def export_admin_stats():
 
 
 # ==============================================================================
-# ZERO-LOSS FULL SYSTEM BACKUP & RESTORE (ALL 14 TABLES / 16 CSV FILES)
+# ZERO-LOSS FULL SYSTEM BACKUP & RESTORE (ALL 19 DOMAIN TABLES / 21 CSV FILES)
 # ==============================================================================
 
 @analytics.route('/admin/export/full_backup')
 @login_required
 def export_full_backup():
     """
-    GENERATES COMPLETE ZERO-LOSS ZIP SYSTEM BACKUP.
+    GENERATES COMPLETE ZERO-LOSS ZIP SYSTEM BACKUP (21 CSVs).
     Exports every single table and every single column so nothing is lost on restore.
     """
     if not current_user.is_admin:
@@ -344,14 +361,18 @@ def export_full_backup():
         master_zip.writestr(filename, s_obj.getvalue())
 
     with zipfile.ZipFile(binary_stream, 'w', zipfile.ZIP_DEFLATED) as master_zip:
-        # 1. Users
+        # 1. Users (includes v0.9.1 public profile privacy flags)
         write_csv(
             '1_users.csv',
             ['ID', 'Name', 'Name_KU', 'Email', 'Password_Hash', 'Gender', 'Birth_Date', 'Bio',
-             'Is_Admin', 'Show_Name_On_Subject', 'Preferred_Lang'],
+             'Is_Admin', 'Show_Name_On_Subject', 'Preferred_Lang',
+             'Profile_Public', 'Profile_Show_Name', 'Profile_Show_Bio',
+             'Profile_Show_Age', 'Profile_Show_Gender'],
             [[u.id, u.username, u.username_kurdish or '', u.email, u.password_hash,
               u.gender or '', u.birth_date.isoformat() if u.birth_date else '',
-              u.bio or '', u.is_admin, u.show_name_on_subject, u.preferred_lang or 'en']
+              u.bio or '', u.is_admin, u.show_name_on_subject, u.preferred_lang or 'en',
+              bool(u.profile_public), bool(u.profile_show_name), bool(u.profile_show_bio),
+              bool(u.profile_show_age), bool(u.profile_show_gender)]
              for u in User.query.order_by(User.id.asc()).all()]
         )
 
@@ -410,11 +431,14 @@ def export_full_backup():
         # 7. ExamResults
         write_csv(
             '7_results.csv',
-            ['ID', 'Subject_ID', 'Page_ID', 'Student_Record_ID', 'Score',
-             'Correct_Count', 'Total_Questions', 'Taker_Name', 'Taker_Birth_Date',
-             'Taker_Gender', 'Date_Submitted'],
+            ['ID', 'Subject_ID', 'Page_ID', 'Private_Exam_ID', 'Student_Record_ID',
+             'Exam_Guest_ID', 'Score', 'Correct_Count', 'Total_Questions',
+             'Taker_Name', 'Taker_Birth_Date', 'Taker_Gender', 'Date_Submitted'],
             [[r.id, r.subject_id, r.page_id if r.page_id else '',
-              r.student_record_id if r.student_record_id else '', r.score,
+              r.private_exam_id if r.private_exam_id else '',
+              r.student_record_id if r.student_record_id else '',
+              r.exam_guest_id if r.exam_guest_id else '',
+              r.score,
               r.correct_count if r.correct_count is not None else '',
               r.total_questions if r.total_questions is not None else '',
               r.taker_name or '',
@@ -468,11 +492,12 @@ def export_full_backup():
         replies = PageComment.query.filter(PageComment.parent_id.isnot(None)).order_by(PageComment.id.asc()).all()
         write_csv(
             '12_comments.csv',
-            ['ID', 'Page_ID', 'Parent_ID', 'Author_User_ID', 'Is_Teacher_Reply',
-             'Is_Read_By_Admin', 'Author_Name', 'Author_Birth_Date', 'Author_Age',
-             'Personality_Info', 'Comment_Text', 'Created_At'],
+            ['ID', 'Page_ID', 'Parent_ID', 'Author_User_ID', 'Comment_Guest_ID',
+             'Is_Teacher_Reply', 'Is_Read_By_Admin', 'Author_Name',
+             'Author_Birth_Date', 'Author_Age', 'Personality_Info', 'Comment_Text', 'Created_At'],
             [[c.id, c.page_id, c.parent_id if c.parent_id else '',
               c.author_user_id if c.author_user_id else '',
+              c.comment_guest_id if c.comment_guest_id else '',
               bool(c.is_teacher_reply), bool(c.is_read_by_admin),
               c.author_name,
               c.author_birth_date.isoformat() if c.author_birth_date else '',
@@ -537,6 +562,57 @@ def export_full_backup():
              for tn in TeacherNotification.query.order_by(TeacherNotification.id.asc()).all()]
         )
 
+        # 17. PrivateExam
+        write_csv(
+            '17_private_exams.csv',
+            ['ID', 'Subject_ID', 'Title', 'Title_KU', 'Access_Token', 'Is_Active', 'Created_By_ID', 'Created_At'],
+            [[pe.id, pe.subject_id, pe.title, pe.title_kurdish or '', pe.access_token,
+              bool(pe.is_active), pe.created_by_id if pe.created_by_id else '',
+              pe.created_at.isoformat(sep=' ') if pe.created_at else '']
+             for pe in PrivateExam.query.order_by(PrivateExam.id.asc()).all()]
+        )
+
+        # 18. PrivateQuestion
+        write_csv(
+            '18_private_questions.csv',
+            ['ID', 'Subject_ID', 'Question_Text', 'Question_Text_KU',
+             'Option_A', 'Option_B', 'Option_C', 'Option_D',
+             'Option_A_KU', 'Option_B_KU', 'Option_C_KU', 'Option_D_KU',
+             'Correct', 'Created_At'],
+            [[pq.id, pq.subject_id, pq.question_text, pq.question_text_kurdish or '',
+              pq.option_a, pq.option_b, pq.option_c, pq.option_d,
+              pq.option_a_kurdish or '', pq.option_b_kurdish or '',
+              pq.option_c_kurdish or '', pq.option_d_kurdish or '',
+              pq.correct_answer, pq.created_at.isoformat(sep=' ') if pq.created_at else '']
+             for pq in PrivateQuestion.query.order_by(PrivateQuestion.id.asc()).all()]
+        )
+
+        # 19. PrivateExamQuestion
+        write_csv(
+            '19_private_exam_questions.csv',
+            ['ID', 'Private_Exam_ID', 'Private_Question_ID'],
+            [[peq.id, peq.private_exam_id, peq.private_question_id]
+             for peq in PrivateExamQuestion.query.order_by(PrivateExamQuestion.id.asc()).all()]
+        )
+
+        # 20. CommentGuest
+        write_csv(
+            '20_comment_guests.csv',
+            ['ID', 'Guest_Code', 'Author_Name', 'Author_Birth_Date', 'Personality_Info', 'Created_At'],
+            [[cg.id, cg.guest_code, cg.author_name, cg.author_birth_date.isoformat(),
+              cg.personality_info or '', cg.created_at.isoformat(sep=' ') if cg.created_at else '']
+             for cg in CommentGuest.query.order_by(CommentGuest.id.asc()).all()]
+        )
+
+        # 21. ExamGuest
+        write_csv(
+            '21_exam_guests.csv',
+            ['ID', 'Guest_Code', 'Taker_Name', 'Taker_Birth_Date', 'Taker_Gender', 'Created_At'],
+            [[eg.id, eg.guest_code, eg.taker_name or '', eg.taker_birth_date.isoformat(),
+              eg.taker_gender, eg.created_at.isoformat(sep=' ') if eg.created_at else '']
+             for eg in ExamGuest.query.order_by(ExamGuest.id.asc()).all()]
+        )
+
     binary_stream.seek(0)
     current_time_str = datetime.now().strftime("%Y_%m_%d_%H%M")
     backup_file_name = f"StatInfo_FULL_BACKUP_{current_time_str}.zip"
@@ -554,7 +630,12 @@ def _wipe_all_non_user_tables():
     db.session.query(AdminNotification).delete()
     PageComment.query.filter(PageComment.parent_id.isnot(None)).delete(synchronize_session=False)
     db.session.query(PageComment).delete()
+    db.session.query(CommentGuest).delete()
     db.session.query(ExamResult).delete()
+    db.session.query(ExamGuest).delete()
+    db.session.query(PrivateExamQuestion).delete()
+    db.session.query(PrivateQuestion).delete()
+    db.session.query(PrivateExam).delete()
     db.session.query(Question).delete()
     db.session.query(Resource).delete()
     db.session.query(Page).delete()
@@ -637,6 +718,11 @@ def restore_system():
                     target.is_admin = (row.get('Is_Admin') == 'True')
                     target.show_name_on_subject = (row.get('Show_Name_On_Subject') == 'True')
                     target.preferred_lang = row.get('Preferred_Lang') or 'en'
+                    target.profile_public = (row.get('Profile_Public', 'True') == 'True')
+                    target.profile_show_name = (row.get('Profile_Show_Name', 'True') == 'True')
+                    target.profile_show_bio = (row.get('Profile_Show_Bio', 'True') == 'True')
+                    target.profile_show_age = (row.get('Profile_Show_Age', 'True') == 'True')
+                    target.profile_show_gender = (row.get('Profile_Show_Gender', 'True') == 'True')
                     if not existing:
                         db.session.add(target)
                 db.session.commit()
@@ -787,6 +873,68 @@ def restore_system():
                     db.session.add_all(batch)
                     db.session.commit()
 
+                # I2. PrivateExams, PrivateQuestions, PrivateExamQuestions, CommentGuests & ExamGuests
+                for row in stream_csv('17_private_exams.csv'):
+                    db.session.add(PrivateExam(
+                        id=int(row['ID']),
+                        subject_id=int(row['Subject_ID']),
+                        title=row['Title'],
+                        title_kurdish=row.get('Title_KU') or None,
+                        access_token=row['Access_Token'],
+                        is_active=(row.get('Is_Active', 'True') == 'True'),
+                        created_by_id=int(row['Created_By_ID']) if row.get('Created_By_ID') else None,
+                        created_at=_parse_dt(row.get('Created_At', ''), default_now=True)
+                    ))
+                db.session.commit()
+
+                for row in stream_csv('18_private_questions.csv'):
+                    db.session.add(PrivateQuestion(
+                        id=int(row['ID']),
+                        subject_id=int(row['Subject_ID']),
+                        question_text=clean_newlines(row['Question_Text']),
+                        question_text_kurdish=clean_newlines(row.get('Question_Text_KU', '')) or None,
+                        option_a=clean_newlines(row['Option_A']),
+                        option_b=clean_newlines(row['Option_B']),
+                        option_c=clean_newlines(row['Option_C']),
+                        option_d=clean_newlines(row['Option_D']),
+                        option_a_kurdish=clean_newlines(row.get('Option_A_KU', '')) or None,
+                        option_b_kurdish=clean_newlines(row.get('Option_B_KU', '')) or None,
+                        option_c_kurdish=clean_newlines(row.get('Option_C_KU', '')) or None,
+                        option_d_kurdish=clean_newlines(row.get('Option_D_KU', '')) or None,
+                        correct_answer=row['Correct'],
+                        created_at=_parse_dt(row.get('Created_At', ''), default_now=True)
+                    ))
+                db.session.commit()
+
+                for row in stream_csv('19_private_exam_questions.csv'):
+                    db.session.add(PrivateExamQuestion(
+                        id=int(row['ID']),
+                        private_exam_id=int(row['Private_Exam_ID']),
+                        private_question_id=int(row['Private_Question_ID'])
+                    ))
+                db.session.commit()
+
+                for row in stream_csv('20_comment_guests.csv'):
+                    db.session.add(CommentGuest(
+                        id=int(row['ID']),
+                        guest_code=row['Guest_Code'],
+                        author_name=row['Author_Name'],
+                        author_birth_date=_parse_date(row['Author_Birth_Date']),
+                        personality_info=row.get('Personality_Info') or None,
+                        created_at=_parse_dt(row.get('Created_At', ''), default_now=True)
+                    ))
+
+                for row in stream_csv('21_exam_guests.csv'):
+                    db.session.add(ExamGuest(
+                        id=int(row['ID']),
+                        guest_code=row['Guest_Code'],
+                        taker_name=row.get('Taker_Name') or None,
+                        taker_birth_date=_parse_date(row['Taker_Birth_Date']),
+                        taker_gender=row['Taker_Gender'],
+                        created_at=_parse_dt(row.get('Created_At', ''), default_now=True)
+                    ))
+                db.session.commit()
+
                 # J. ExamResults
                 batch = []
                 for row in stream_csv('7_results.csv'):
@@ -794,7 +942,9 @@ def restore_system():
                         id=int(row['ID']),
                         subject_id=int(row['Subject_ID']),
                         page_id=int(row['Page_ID']) if row.get('Page_ID') else None,
+                        private_exam_id=int(row['Private_Exam_ID']) if row.get('Private_Exam_ID') else None,
                         student_record_id=int(row['Student_Record_ID']) if row.get('Student_Record_ID') else None,
+                        exam_guest_id=int(row['Exam_Guest_ID']) if row.get('Exam_Guest_ID') else None,
                         score=int(row['Score']),
                         correct_count=int(row['Correct_Count']) if row.get('Correct_Count') else None,
                         total_questions=int(row['Total_Questions']) if row.get('Total_Questions') else None,
@@ -822,6 +972,7 @@ def restore_system():
                         page_id=int(row['Page_ID']),
                         parent_id=None,
                         author_user_id=int(row['Author_User_ID']) if row.get('Author_User_ID') else None,
+                        comment_guest_id=int(row['Comment_Guest_ID']) if row.get('Comment_Guest_ID') else None,
                         is_teacher_reply=(row.get('Is_Teacher_Reply') == 'True'),
                         is_read_by_admin=(row.get('Is_Read_By_Admin') == 'True'),
                         author_name=row['Author_Name'],
@@ -839,6 +990,7 @@ def restore_system():
                         page_id=int(row['Page_ID']),
                         parent_id=int(row['Parent_ID']),
                         author_user_id=int(row['Author_User_ID']) if row.get('Author_User_ID') else None,
+                        comment_guest_id=int(row['Comment_Guest_ID']) if row.get('Comment_Guest_ID') else None,
                         is_teacher_reply=(row.get('Is_Teacher_Reply') == 'True'),
                         is_read_by_admin=(row.get('Is_Read_By_Admin') == 'True'),
                         author_name=row['Author_Name'],

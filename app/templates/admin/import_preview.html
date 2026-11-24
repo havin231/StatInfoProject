@@ -33,17 +33,16 @@
                 <div class="card-body p-0">
 
                     <!--
-                        BATCH SETTINGS TOOLBAR (Only for Questions)
-                        Allows global assignment of Lecture and Language.
+                        BATCH SETTINGS TOOLBAR (For Public Questions & Private Exam Questions)
                     -->
-                    {% if import_type == 'question' %}
+                    {% if import_type in ['question', 'private_question'] %}
                     <div class="bg-body-tertiary p-3 border-bottom d-flex flex-wrap gap-3 align-items-center">
                         <div class="fw-bold text-muted text-uppercase small"><i class="fas fa-sliders-h me-2"></i>{{
-                            _('Batch
-                            Settings:') }}</div>
+                            _('Batch Settings:') }}</div>
 
-                        <!-- 1. Bulk Lecture Assignment -->
-                        <div class="input-group input-group-sm" style="max-width: 300px;">
+                        {% if import_type == 'question' %}
+                        <!-- Bulk Lecture Assignment -->
+                        <div class="input-group input-group-sm" style="max-width: 320px;">
                             <span class="input-group-text bg-transparent">{{ _('Assign to Lecture:') }}</span>
                             <select name="bulk_lecture_id" class="form-select">
                                 <option value="">{{ _('(None - General Subject Exam)') }}</option>
@@ -52,14 +51,18 @@
                                 {% endfor %}
                             </select>
                         </div>
-
-                        <!-- 2. Language/RTL Toggle -->
-                        <div class="form-check form-switch ms-auto">
-                            <input class="form-check-input" type="checkbox" role="switch" id="bulkLanguage"
-                                name="bulk_language">
-                            <label class="form-check-label fw-bold" for="bulkLanguage">{{ _('Mark all as Kurdish (RTL)')
-                                }}</label>
+                        {% elif import_type == 'private_question' and private_exams %}
+                        <!-- Bulk Hidden Exam Link Assignment -->
+                        <div class="input-group input-group-sm" style="max-width: 340px;">
+                            <span class="input-group-text bg-transparent">{{ _('Assign to Hidden Exam:') }}</span>
+                            <select name="bulk_private_exam_id" class="form-select">
+                                <option value="">{{ _('(None - Assign Later)') }}</option>
+                                {% for pe in private_exams %}
+                                <option value="{{ pe.id }}">{{ pe.title }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
+                        {% endif %}
                     </div>
                     {% endif %}
 
@@ -82,7 +85,7 @@
                             <thead class="bg-body-secondary sticky-top" style="z-index: 5;">
                                 <tr>
                                     <th class="ps-4">#</th>
-                                    {% if import_type == 'question' %}
+                                    {% if import_type in ['question', 'private_question'] %}
                                     <th style="width: 40%;">{{ _('Question') }}</th>
                                     <th>{{ _('Options (A / B / C / D)') }}</th>
                                     <th>{{ _('Answer') }}</th>
@@ -98,7 +101,7 @@
                                 <tr>
                                     <td class="ps-4 text-muted">{{ loop.index }}</td>
 
-                                    {% if import_type == 'question' %}
+                                    {% if import_type in ['question', 'private_question'] %}
                                     <!-- Added class 'preview-text' for JS targeting -->
                                     <td class="preview-text">
                                         {{ row.question_text | truncate(100) }}
@@ -149,32 +152,4 @@
 
     </div>
 </div>
-
-<!-- JAVASCRIPT FOR RTL PREVIEW -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const toggle = document.getElementById('bulkLanguage');
-        const textElements = document.querySelectorAll('.preview-text');
-
-        if (toggle) {
-            toggle.addEventListener('change', function () {
-                if (this.checked) {
-                    // Switch to Kurdish Mode (RTL)
-                    textElements.forEach(el => {
-                        el.style.direction = 'rtl';
-                        el.style.textAlign = 'right';
-                        el.classList.add('font-kurdish'); // Optional if you have specific fonts
-                    });
-                } else {
-                    // Switch back to English Mode (LTR)
-                    textElements.forEach(el => {
-                        el.style.direction = 'ltr';
-                        el.style.textAlign = 'left';
-                        el.classList.remove('font-kurdish');
-                    });
-                }
-            });
-        }
-    });
-</script>
 {% endblock %}
